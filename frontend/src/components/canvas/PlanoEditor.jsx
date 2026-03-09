@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { fabric } from 'fabric';
-import { Camera, Wifi, TreePine, Save, X, RotateCcw, Trash2 } from 'lucide-react';
+import { Camera, Wifi, TreePine, Save, X, RotateCcw, Trash2, CheckCircle } from 'lucide-react';
 
 const ICON_TYPES = [
   { id: 'camara', label: 'Camera', icon: Camera, color: '#FF6B6B' },
@@ -17,6 +17,14 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
   const [comentarios, setComentarios] = useState(plano?.comentarios || '');
   const [nombrePlano, setNombrePlano] = useState(plano?.nombre || `Plano ${idxPlano + 1}`);
   const [guardando, setGuardando] = useState(false);
+  const [savedToast, setSavedToast] = useState(false);
+
+  // Auto-dismiss the save toast after 3 seconds
+  useEffect(() => {
+    if (!savedToast) return;
+    const t = setTimeout(() => setSavedToast(false), 3000);
+    return () => clearTimeout(t);
+  }, [savedToast]);
 
   // Función para recrear marcadores PNG desde el array guardado
   const recrearMarcadores = (canvas, marcadoresData) => {
@@ -205,6 +213,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
       console.log('🔄 Calling onSave | hasDrawing:', !!dataDibujo, '| markers:', marcadores.length);
       await onSave(idxPlano, planoGuardar);
       console.log('✅ Save completed');
+      setSavedToast(true);
     } catch (error) {
       console.error('❌ Error saving:', error);
       alert(`❌ Error saving: ${error.message}`);
@@ -331,6 +340,13 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 z-[9999] flex items-center justify-center p-4">
+      {/* Save toast */}
+      {savedToast && (
+        <div className="fixed top-6 right-6 z-[10000] flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-xl shadow-xl animate-fade-in">
+          <CheckCircle size={20} />
+          <span className="font-semibold text-sm">Floor plan saved successfully!</span>
+        </div>
+      )}
       <div className="bg-white rounded-lg w-full h-full max-w-6xl flex flex-col">
         {/* Header */}
         <div className="bg-gray-900 text-white p-4 flex justify-between items-center">

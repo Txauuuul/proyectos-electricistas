@@ -86,6 +86,11 @@ export default function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
             />
+            {!isLogin && (
+              <p className="text-xs text-gray-400 mt-1">
+                Min. 8 characters · 1 uppercase letter · 1 number
+              </p>
+            )}
           </div>
 
           <button

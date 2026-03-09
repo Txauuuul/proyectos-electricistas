@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Plus, Eye, Search, FileText, Send, CheckCircle, DollarSign, Flag, RefreshCw,
+  Plus, Eye, Search, FileText, Send, CheckCircle, DollarSign, Flag, RefreshCw, Download, TrendingUp,
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -30,6 +30,27 @@ export default function Dashboard() {
   }, [token, navigate]);
 
   const esAdmin = usuario?.rol === 'administrador';
+
+  // ─── CSV export (admin only) ───────────────────────────────
+  const handleExportCSV = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/export/csv`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `projects-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Error exporting CSV: ' + err.message);
+    }
+  };
 
   const getStatusInfo = (estado) => {
     const map = {
@@ -220,6 +241,28 @@ export default function Dashboard() {
               value={`€${proyectos.filter(p => p.estado === 'paid').reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0).toFixed(0)}`}
               color="text-green-700"
             />
+            {/* Conversion rate: approved / offer_sent */}
+            {(() => {
+              const sent = proyectos.filter(p => ['offer_sent', 'approved', 'working', 'finished', 'pending_payment', 'paid', 'rejected'].includes(p.estado)).length;
+              const approved = proyectos.filter(p => ['approved', 'working', 'finished', 'pending_payment', 'paid'].includes(p.estado)).length;
+              const rate = sent > 0 ? Math.round((approved / sent) * 100) : null;
+              return rate !== null ? (
+                <MiniStat label="Conversion" value={`${rate}%`} color={rate >= 60 ? 'text-green-700' : rate >= 40 ? 'text-yellow-600' : 'text-red-600'} />
+              ) : null;
+            })()}
+            {/* Avg project value (paid) */}
+            {(() => {
+              const pagados = proyectos.filter(p => p.estado === 'paid' && p.oferta?.precioTotal);
+              if (pagados.length === 0) return null;
+              const avg = pagados.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0) / pagados.length;
+              return <MiniStat label="Avg Value" value={`€${avg.toFixed(0)}`} color="text-blue-700" />;
+            })()}
+            {/* Pipeline value (offer_sent + approved + working) */}
+            {(() => {
+              const pipeline = proyectos.filter(p => ['offer_sent', 'approved', 'working'].includes(p.estado));
+              const val = pipeline.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0);
+              return val > 0 ? <MiniStat label="Pipeline" value={`€${val.toFixed(0)}`} color="text-indigo-700" /> : null;
+            })()}
           </div>
         )}
 
@@ -266,6 +309,15 @@ export default function Dashboard() {
           )}
 
           <span className="text-xs text-gray-400">{filtered.length} project{filtered.length !== 1 ? 's' : ''}</span>
+
+          {/* Export CSV */}
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-xs font-semibold transition"
+            title="Export all projects to CSV"
+          >
+            <Download size={14} /> Export CSV
+          </button>
         </div>
       </div>
 

@@ -1545,6 +1545,61 @@ export default function ProjectPage() {
           </div>
         )}
 
+        {/* ── STATE HISTORY TIMELINE ── */}
+        {proyecto.historialEstados && proyecto.historialEstados.length > 0 && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+              <span className="text-gray-500">📋</span> Project Timeline
+            </h2>
+            <div className="relative">
+              {/* Vertical line */}
+              <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-200" />
+              <div className="space-y-4">
+                {[...proyecto.historialEstados].reverse().map((entry, idx) => {
+                  const estadoColors = {
+                    created: 'bg-blue-500', offer_ready: 'bg-purple-500', offer_sent: 'bg-indigo-500',
+                    approved: 'bg-green-500', working: 'bg-yellow-500', finished: 'bg-teal-500',
+                    pending_payment: 'bg-orange-500', paid: 'bg-green-700', rejected: 'bg-red-500',
+                  };
+                  const estadoLabels = {
+                    created: 'Created', offer_ready: 'Offer Ready', offer_sent: 'Offer Sent',
+                    approved: 'Approved', working: 'Working', finished: 'Finished',
+                    pending_payment: 'Pending Payment', paid: 'Paid', rejected: 'Rejected',
+                  };
+                  const color = estadoColors[entry.estadoNuevo] || 'bg-gray-400';
+                  const label = estadoLabels[entry.estadoNuevo] || entry.estadoNuevo;
+                  return (
+                    <div key={idx} className="flex items-start gap-4 pl-2">
+                      {/* Dot */}
+                      <div className={`relative z-10 w-5 h-5 rounded-full flex-shrink-0 mt-0.5 ${color} ring-2 ring-white shadow`} />
+                      {/* Content */}
+                      <div className="flex-1 bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-100">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            {entry.estadoAnterior && (
+                              <>
+                                <span className="text-xs text-gray-400">{estadoLabels[entry.estadoAnterior] || entry.estadoAnterior}</span>
+                                <span className="text-gray-300 text-xs">→</span>
+                              </>
+                            )}
+                            <span className={`text-xs font-bold text-white px-2 py-0.5 rounded-full ${color}`}>{label}</span>
+                          </div>
+                          <span className="text-xs text-gray-400">
+                            {new Date(entry.fecha).toLocaleDateString('nl-BE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        {entry.comentario && (
+                          <p className="text-xs text-gray-500 mt-1 italic">"{entry.comentario}"</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Sin contenido */}
         {(!proyecto.planos || proyecto.planos.length === 0) && 
          (!proyecto.fotosLocalizacion || proyecto.fotosLocalizacion.length === 0) &&

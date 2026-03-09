@@ -1,26 +1,59 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const ProjectContext = createContext();
 
+const STORAGE_KEY = 'wizard_draft';
+
+const defaultData = {
+  nombreCasa: '',
+  direccion: '',
+  straat: '',
+  nr: '',
+  postcode: '',
+  stad: '',
+  ofertaDirectaCliente: true,
+  extraInfo: '',
+  fechaInicio: '',
+  planos: [],
+  ruimtes: [],
+  fotosLocalizacion: [],
+  clienteId: '',
+  tituloPersonalizado: '',
+};
+
 export const ProjectProvider = ({ children }) => {
-  const [projectData, setProjectData] = useState({
-    nombreCasa: '',
-    direccion: '',
-    straat: '',
-    nr: '',
-    postcode: '',
-    stad: '',
-    ofertaDirectaCliente: true,
-    extraInfo: '',
-    fechaInicio: '',
-    planos: [],
-    ruimtes: [],
-    fotosLocalizacion: [],
-    clienteId: '',
-    tituloPersonalizado: '',
+  // Restore draft from localStorage on mount (if any)
+  const [projectData, setProjectData] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return { ...defaultData, ...parsed.data };
+      }
+    } catch (_) {}
+    return { ...defaultData };
   });
 
-  const [pasoActual, setPasoActual] = useState(1);
+  const [pasoActual, setPasoActual] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.paso || 1;
+      }
+    } catch (_) {}
+    return 1;
+  });
+
+  // Persist draft to localStorage whenever data changes
+  useEffect(() => {
+    // Only persist if the user has actually started filling in data
+    if (projectData.nombreCasa || projectData.straat || projectData.ruimtes.length > 0 || projectData.fotosLocalizacion.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: projectData, paso: pasoActual, ts: Date.now() }));
+      } catch (_) {}
+    }
+  }, [projectData, pasoActual]);
 
   const actualizarInfoProyecto = (datos) => {
     setProjectData(prev => ({ ...prev, ...datos }));
@@ -48,22 +81,8 @@ export const ProjectProvider = ({ children }) => {
   };
 
   const resetear = () => {
-    setProjectData({
-      nombreCasa: '',
-      direccion: '',
-      straat: '',
-      nr: '',
-      postcode: '',
-      stad: '',
-      ofertaDirectaCliente: true,
-      extraInfo: '',
-      fechaInicio: '',
-      planos: [],
-      ruimtes: [],
-      fotosLocalizacion: [],
-      clienteId: '',
-      tituloPersonalizado: '',
-    });
+    localStorage.removeItem(STORAGE_KEY);
+    setProjectData({ ...defaultData });
     setPasoActual(1);
   };
 

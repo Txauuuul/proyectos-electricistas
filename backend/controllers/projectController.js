@@ -5,6 +5,7 @@ const { crearNotificacion, notificarAdmins } = require('./notificationController
 
 // Obtener todos los proyectos del usuario actual (para electricistas)
 // O todos los proyectos si es administrador
+// Soporta paginación: ?page=1&limit=20 (sin parámetros → devuelve todos, retrocompatible)
 const obtenerProyectos = async (req, res) => {
   try {
     let query = {};
@@ -13,8 +14,52 @@ const obtenerProyectos = async (req, res) => {
     if (req.usuario.rol === 'electricista') {
       query.usuarioId = req.usuario.id;
     }
-    // Si es administrador, muestra todos
 
+    const { page, limit, search, estado: estadoFiltro } = req.query;
+
+    // Filtro de búsqueda textual (admin)
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      query.$or = [
+        { nombreCasa: regex },
+        { direccion: regex },
+        { tituloAutomatico: regex },
+        { tituloPersonalizado: regex },
+      ];
+    }
+
+    // Filtro por estado
+    if (estadoFiltro) {
+      query.estado = estadoFiltro;
+    }
+
+    // Con paginación
+    if (page && limit) {
+      const pageNum = Math.max(1, parseInt(page) || 1);
+      const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 20));
+      const skip = (pageNum - 1) * limitNum;
+
+      const [proyectos, total] = await Promise.all([
+        Project.find(query)
+          .populate('usuarioId', 'nombre email')
+          .sort({ fechaCreacion: -1 })
+          .skip(skip)
+          .limit(limitNum),
+        Project.countDocuments(query),
+      ]);
+
+      return res.json({
+        proyectos,
+        pagination: {
+          total,
+          page: pageNum,
+          limit: limitNum,
+          pages: Math.ceil(total / limitNum),
+        },
+      });
+    }
+
+    // Sin paginación (retrocompatible — devuelve array plano)
     const proyectos = await Project.find(query).populate('usuarioId', 'nombre email');
     res.json(proyectos);
   } catch (error) {
@@ -215,6 +260,7 @@ module.exports = {
   firmarReapertura,
   crearPropuestaCliente,
   previewTitulo,
+  exportarCSV,
 };
 
 // POST /api/proyectos/:id/info-adicional — Add additional info after signing
@@ -443,6 +489,62 @@ async function crearPropuestaCliente(req, res) {
     res.json({ mensaje: 'Change proposal submitted', proyecto });
   } catch (err) {
     console.error('❌ Error creating proposal:', err);
+    res.status(500).json({ error: err.message });
+  }
+}
+
+// GET /api/proyectos/export/csv — Export all projects as CSV (admin only)
+async function exportarCSV(req, res) {
+  try {
+    if (req.usuario.rol !== 'administrador') {
+      return res.status(403).json({ error: 'Only administrators can export data' });
+    }
+
+    const proyectos = await Project.find({})
+      .populate('usuarioId', 'nombre email')
+      .lean();
+
+    const ESTADO_LABELS = {
+      created: 'Created', offer_ready: 'Offer Ready', offer_sent: 'Offer Sent',
+      approved: 'Approved', working: 'Working', finished: 'Finished',
+      pending_payment: 'Pending Payment', paid: 'Paid', rejected: 'Rejected',
+    };
+
+    const escape = (val) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val).replace(/"/g, '""');
+      return str.includes(',') || str.includes('"') || str.includes('\n') ? `"${str}"` : str;
+    };
+
+    const headers = [
+      'ID', 'Auto Title', 'Custom Title', 'Address', 'Client Name',
+      'Client Email', 'State', 'Start Date', 'Created At',
+      'Floor Plans', 'Photos', 'Total Price (€)', 'Rooms',
+    ];
+
+    const rows = proyectos.map(p => [
+      escape(p._id),
+      escape(p.tituloAutomatico),
+      escape(p.tituloPersonalizado),
+      escape(p.direccion || [p.straat, p.nr, p.postcode, p.stad].filter(Boolean).join(', ')),
+      escape(p.usuarioId?.nombre || ''),
+      escape(p.usuarioId?.email || ''),
+      escape(ESTADO_LABELS[p.estado] || p.estado),
+      escape(p.fechaInicio ? new Date(p.fechaInicio).toLocaleDateString('nl-BE') : ''),
+      escape(p.fechaCreacion ? new Date(p.fechaCreacion).toLocaleDateString('nl-BE') : ''),
+      escape(p.planos?.length || 0),
+      escape(p.fotosLocalizacion?.length || 0),
+      escape(p.oferta?.precioTotal?.toFixed(2) || ''),
+      escape(p.ruimtes?.length || 0),
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="proyectos-${new Date().toISOString().slice(0,10)}.csv"`);
+    res.send('\uFEFF' + csv); // BOM para que Excel abra bien el UTF-8
+  } catch (err) {
+    console.error('❌ Error exporting CSV:', err);
     res.status(500).json({ error: err.message });
   }
 }

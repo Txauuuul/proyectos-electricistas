@@ -1,9 +1,24 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
+// Password must be ≥8 chars, contain at least 1 uppercase and 1 digit
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
 const registrar = async (req, res) => {
   try {
     const { nombre, email, contrasena, rol } = req.body;
+
+    // Validate required fields
+    if (!nombre || !email || !contrasena) {
+      return res.status(400).json({ error: 'Name, email and password are required' });
+    }
+
+    // Validate password complexity
+    if (!PASSWORD_REGEX.test(contrasena)) {
+      return res.status(400).json({
+        error: 'Password must be at least 8 characters and include at least 1 uppercase letter and 1 number',
+      });
+    }
 
     // Validar que el usuario no exista
     const usuarioExistente = await User.findOne({ email });

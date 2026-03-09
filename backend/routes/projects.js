@@ -10,6 +10,7 @@ const {
   firmarReapertura,
   crearPropuestaCliente,
   previewTitulo,
+  exportarCSV,
 } = require('../controllers/projectController');
 const {
   obtenerOferta,
@@ -32,6 +33,7 @@ router.use(verificarToken);
 // Base project CRUD
 router.get('/', obtenerProyectos);
 router.get('/preview-titulo', previewTitulo);
+router.get('/export/csv', exportarCSV);
 router.get('/:id', obtenerProyecto);
 router.post('/', crearProyecto);
 router.put('/:id', actualizarProyecto);

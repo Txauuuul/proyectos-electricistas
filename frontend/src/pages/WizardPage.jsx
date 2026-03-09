@@ -6,18 +6,35 @@ import Step1 from '../components/wizard/Step1';
 import Step2 from '../components/wizard/Step2';
 import Step3 from '../components/wizard/Step3';
 import Step4 from '../components/wizard/Step4';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Save } from 'lucide-react';
 
 export default function WizardPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const { pasoActual, setPasoActual, projectData, resetear } = useProject();
+  const [draftBanner, setDraftBanner] = useState(false);
 
   useEffect(() => {
     if (!token) {
       navigate('/login');
     }
   }, [token, navigate]);
+
+  // Show banner if a draft was found in localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('wizard_draft');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const ageMs = Date.now() - (parsed.ts || 0);
+        const ageHours = ageMs / (1000 * 60 * 60);
+        // Show banner only if draft is less than 48h old and has some data
+        if (ageHours < 48 && (parsed.data?.nombreCasa || parsed.data?.straat)) {
+          setDraftBanner(true);
+        }
+      }
+    } catch (_) {}
+  }, []);
 
   const pasos = [
     { numero: 1, titulo: 'Projectinfo' },
@@ -51,6 +68,22 @@ export default function WizardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Draft restored banner */}
+      {draftBanner && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between">
+          <p className="text-sm text-amber-800 flex items-center gap-2">
+            <Save size={15} />
+            <strong>Draft restored.</strong> Your previous progress has been recovered automatically.
+          </p>
+          <button
+            onClick={() => { resetear(); setDraftBanner(false); }}
+            className="text-xs text-amber-700 hover:text-amber-900 underline font-semibold"
+          >
+            Start fresh
+          </button>
+        </div>
+      )}
+
       {/* Header con progreso */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
