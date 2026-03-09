@@ -11,6 +11,8 @@ import MyProfile from './pages/MyProfile';
 import MyClients from './pages/MyClients';
 import AdminClients from './pages/AdminClients';
 import AdminClientDetail from './pages/AdminClientDetail';
+import CalendarPage from './pages/CalendarPage';
+import AdminElectricianStats from './pages/AdminElectricianStats';
 import Navbar from './components/Navbar';
 
 function AuthLayout() {
@@ -43,6 +45,8 @@ function App() {
               <Route path="/mis-clientes" element={<MyClients />} />
               <Route path="/admin/clientes" element={<AdminClients />} />
               <Route path="/admin/clientes/:id" element={<AdminClientDetail />} />
+              <Route path="/admin/calendario" element={<CalendarPage />} />
+              <Route path="/admin/electricistas" element={<AdminElectricianStats />} />
             </Route>
 
             <Route path="/" element={<Navigate to="/login" />} />

@@ -230,4 +230,37 @@ module.exports = {
   notifyContractSigned,
   notifyProjectFinished,
   notifyPaymentReceived,
+  sendReminderOfertaSinRespuesta,
 };
+
+// 5. Reminder: offer sent but no client response
+async function sendReminderOfertaSinRespuesta(project, electrician, diasEspera) {
+  const transporter = createTransporter();
+  if (!transporter) return console.log('📧 [SKIP] Email not configured - offer reminder');
+
+  const content = `
+    <p>Dear ${electrician.nombre},</p>
+    <p>This is a friendly reminder that your proposal for project <strong>${project.nombreCasa}</strong> has been waiting for your response for <strong>${diasEspera} days</strong>.</p>
+    <div class="info-box">
+      <p><strong>Project:</strong> ${project.nombreCasa}</p>
+      <p><strong>Address:</strong> ${project.direccion}</p>
+      ${project.oferta?.precioTotal ? `<p><strong>Total Amount:</strong> €${project.oferta.precioTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>` : ''}
+    </div>
+    <a href="${FRONTEND_URL}/proyecto/${project._id}/ver-oferta" class="button">View & Sign Proposal</a>
+    <p>If you have any questions, please don't hesitate to contact us.</p>
+    <p>Best regards,<br>${COMPANY_NAME}</p>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"${COMPANY_NAME}" <${COMPANY_EMAIL}>`,
+      to: electrician.email,
+      subject: `⏰ Reminder: Your proposal is waiting — ${project.nombreCasa}`,
+      html: baseTemplate('Proposal Reminder', content),
+    });
+    console.log('📧 ✅ Offer reminder sent to', electrician.email);
+  } catch (error) {
+    console.error('📧 ❌ Error sending offer reminder:', error.message);
+  }
+}
+

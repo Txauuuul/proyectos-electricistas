@@ -1,15 +1,19 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Save, CheckCircle, AlertCircle, Lock, Users, Upload, X } from 'lucide-react';
+import { Save, CheckCircle, AlertCircle, Lock, Users, Upload, X, Euro, TrendingUp } from 'lucide-react';
 
 export default function MyProfile() {
-  const { token } = useAuth();
+  const { token, usuario } = useAuth();
   const navigate = useNavigate();
   const [perfil, setPerfil] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
+
+  // Commission history
+  const [proyectosPagados, setProyectosPagados] = useState([]);
+  const [cargandoComisiones, setCargandoComisiones] = useState(false);
 
   // Password change
   const [contrasenaActual, setContrasenaActual] = useState('');
@@ -33,6 +37,18 @@ export default function MyProfile() {
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
     cargarPerfil();
+    // Load paid projects for commission summary (electricistas only)
+    if (usuario?.rol === 'electricista') {
+      setCargandoComisiones(true);
+      fetch(`${API}/proyectos`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : [])
+        .then(data => {
+          const arr = Array.isArray(data) ? data : (data.proyectos || []);
+          setProyectosPagados(arr.filter(p => p.estado === 'paid'));
+        })
+        .catch(console.error)
+        .finally(() => setCargandoComisiones(false));
+    }
   }, [token]);
 
   const cargarPerfil = async () => {
@@ -281,7 +297,7 @@ export default function MyProfile() {
       </div>
 
       {/* My clients shortcut */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
           <Users size={18} /> List clients
         </h2>
@@ -291,6 +307,81 @@ export default function MyProfile() {
           Go to My Clients →
         </button>
       </div>
+
+      {/* Commissions summary (electricistas only) */}
+      {usuario?.rol === 'electricista' && (
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Euro size={18} className="text-green-600" /> My Commissions
+          </h2>
+          {cargandoComisiones ? (
+            <p className="text-sm text-gray-400 text-center py-6">Loading commissions...</p>
+          ) : proyectosPagados.length === 0 ? (
+            <div className="text-center py-8">
+              <TrendingUp size={32} className="text-gray-200 mx-auto mb-2" />
+              <p className="text-sm text-gray-400">No paid projects yet</p>
+              <p className="text-xs text-gray-300 mt-1">Commissions will appear here once projects are marked as paid</p>
+            </div>
+          ) : (
+            <>
+              {/* Summary KPIs */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div className="bg-green-50 rounded-xl p-4 text-center">
+                  <p className="text-xs text-gray-500 mb-1">Projects Paid</p>
+                  <p className="text-2xl font-bold text-green-700">{proyectosPagados.length}</p>
+                </div>
+                <div className="bg-blue-50 rounded-xl p-4 text-center">
+                  <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
+                  <p className="text-2xl font-bold text-blue-700">
+                    €{proyectosPagados.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0).toFixed(0)}
+                  </p>
+                </div>
+                <div className="bg-purple-50 rounded-xl p-4 text-center">
+                  <p className="text-xs text-gray-500 mb-1">Total Commission</p>
+                  <p className="text-2xl font-bold text-purple-700">
+                    €{proyectosPagados.reduce((s, p) => s + (p.commissieResultaat?.totaleCommissie || 0), 0).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase">Project</th>
+                      <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden sm:table-cell">Address</th>
+                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase">Offer Total</th>
+                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase">Commission</th>
+                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden md:table-cell">Date Paid</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {proyectosPagados.map(p => {
+                      const lastPaid = p.historialEstados?.find(h => h.estadoNuevo === 'paid');
+                      return (
+                        <tr key={p._id} className="hover:bg-gray-50">
+                          <td className="px-3 py-2.5 font-semibold text-gray-900">{p.nombreCasa}</td>
+                          <td className="px-3 py-2.5 text-gray-500 hidden sm:table-cell">{p.direccion}</td>
+                          <td className="px-3 py-2.5 text-right font-semibold text-gray-700">
+                            €{(p.oferta?.precioTotal || 0).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-2.5 text-right font-bold text-green-700">
+                            €{(p.commissieResultaat?.totaleCommissie || 0).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-2.5 text-right text-gray-400 hidden md:table-cell text-xs">
+                            {lastPaid ? new Date(lastPaid.fecha).toLocaleDateString() : '—'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
     </div>
   );

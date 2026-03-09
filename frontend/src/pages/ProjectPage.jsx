@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Edit2, X, ZoomIn, ZoomOut, FileText, DollarSign, Flag, Send, CheckCircle, ExternalLink, Upload, MessageSquare, RotateCcw, PenTool, Receipt } from 'lucide-react';
+import { ArrowLeft, Edit2, X, ZoomIn, ZoomOut, FileText, DollarSign, Flag, Send, CheckCircle, ExternalLink, Upload, MessageSquare, RotateCcw, PenTool, Receipt, StickyNote } from 'lucide-react';
 import { fabric } from 'fabric';
 import PlanoEditor from '../components/canvas/PlanoEditor';
+import ChatPanel from '../components/ChatPanel';
 
 // Marker coordinates are stored in the 1200x800 canvas coordinate space.
 // The SVG viewBox="0 0 1200 800" with preserveAspectRatio="xMidYMid meet"
@@ -73,6 +74,11 @@ export default function ProjectPage() {
   });
   const [enviandoFinalizar, setEnviandoFinalizar] = useState(false);
 
+  // Notas internas (admin only)
+  const [notasInternas, setNotasInternas] = useState('');
+  const [guardandoNotas, setGuardandoNotas] = useState(false);
+  const [notasGuardadas, setNotasGuardadas] = useState(false);
+
   const recargarProyecto = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}`, {
@@ -81,9 +87,26 @@ export default function ProjectPage() {
       if (!response.ok) throw new Error('Error al cargar proyecto');
       const data = await response.json();
       setProyecto(data);
+      // Sync notas internas when project reloads
+      setNotasInternas(data.notasInternas || '');
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleGuardarNotas = async () => {
+    if (usuario?.rol !== 'administrador') return;
+    setGuardandoNotas(true);
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notasInternas }),
+      });
+      setNotasGuardadas(true);
+      setTimeout(() => setNotasGuardadas(false), 2500);
+    } catch (e) { console.error(e); }
+    finally { setGuardandoNotas(false); }
   };
 
   const abrirPopupFinalizar = async () => {
@@ -174,6 +197,7 @@ export default function ProjectPage() {
 
         const data = await response.json();
         setProyecto(data);
+        setNotasInternas(data.notasInternas || '');
       } catch (err) {
         setError(err.message);
         console.error(err);
@@ -476,18 +500,46 @@ export default function ProjectPage() {
             <ArrowLeft size={24} className="text-gray-600" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{proyecto.nombreCasa}</h1>
-            <p className="text-gray-600 mt-1">{proyecto.direccion}</p>
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 truncate">{proyecto.nombreCasa}</h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">{proyecto.direccion}</p>
           </div>
         </div>
       </header>
 
+      {/* ── STATUS BANNER (electricista only) ── */}
+      {usuario?.rol !== 'administrador' && (() => {
+        const bannerMap = {
+          created: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800', icon: '📋', title: 'Project submitted', sub: 'Your project is waiting for the admin to review it and prepare an offer.' },
+          offer_ready: { bg: 'bg-purple-50 border-purple-200', text: 'text-purple-800', icon: '📄', title: 'Offer being prepared', sub: 'The admin is preparing your project offer.' },
+          offer_sent: { bg: 'bg-indigo-50 border-indigo-300', text: 'text-indigo-900', icon: '✍️', title: 'Offer pending your signature!', sub: 'Scroll down to review and sign the offer to get started.' },
+          approved: { bg: 'bg-green-50 border-green-200', text: 'text-green-800', icon: '✅', title: 'Offer approved!', sub: 'The client has signed the offer. Installation can begin.' },
+          working: { bg: 'bg-yellow-50 border-yellow-200', text: 'text-yellow-900', icon: '🔧', title: 'Installation in progress', sub: 'Work is currently underway on this project.' },
+          finished: { bg: 'bg-teal-50 border-teal-200', text: 'text-teal-800', icon: '🏁', title: 'Work finished', sub: 'Installation complete. Awaiting payment processing.' },
+          pending_payment: { bg: 'bg-orange-50 border-orange-200', text: 'text-orange-800', icon: '💳', title: 'Payment pending', sub: 'Work is complete. Payment is being processed.' },
+          paid: { bg: 'bg-green-50 border-green-300', text: 'text-green-900', icon: '🎉', title: 'Project complete — Paid!', sub: 'All done. Thank you for your work on this project!' },
+          rejected: { bg: 'bg-red-50 border-red-200', text: 'text-red-800', icon: '❌', title: 'Project rejected', sub: 'This project was not approved. Contact the admin for details.' },
+        };
+        const b = bannerMap[proyecto.estado];
+        if (!b) return null;
+        return (
+          <div className={`border-b ${b.bg}`}>
+            <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3 ${b.text}`}>
+              <span className="text-xl flex-shrink-0">{b.icon}</span>
+              <div>
+                <p className="font-bold text-sm sm:text-base">{b.title}</p>
+                <p className="text-xs sm:text-sm opacity-80">{b.sub}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Contenido */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
         {/* Información General */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Project Information</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-gray-600">Start Date</p>
               <p className="text-lg font-semibold text-gray-900">
@@ -1596,6 +1648,46 @@ export default function ProjectPage() {
                   );
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── PROJECT CHAT ── */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <MessageSquare size={20} className="text-blue-600" /> Project Chat
+          </h2>
+          <ChatPanel proyectoId={id} />
+        </div>
+
+        {/* ── NOTAS INTERNAS (admin only) ── */}
+        {usuario?.rol === 'administrador' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl shadow-sm p-5 mb-8">
+            <h2 className="text-lg font-bold text-amber-900 mb-3 flex items-center gap-2">
+              <StickyNote size={18} className="text-amber-600" /> Internal Notes
+              <span className="ml-1 text-xs font-normal text-amber-500">(Admin only — not visible to electrician)</span>
+            </h2>
+            <textarea
+              value={notasInternas}
+              onChange={e => setNotasInternas(e.target.value)}
+              onBlur={handleGuardarNotas}
+              rows={5}
+              placeholder="Add internal notes about this project (visible to admins only)..."
+              className="w-full px-3 py-2 border border-amber-200 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 resize-y"
+            />
+            <div className="flex items-center justify-between mt-2">
+              {notasGuardadas && (
+                <span className="text-xs text-green-600 flex items-center gap-1">
+                  <CheckCircle size={12} /> Saved
+                </span>
+              )}
+              <button
+                onClick={handleGuardarNotas}
+                disabled={guardandoNotas}
+                className="ml-auto px-4 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition"
+              >
+                {guardandoNotas ? 'Saving...' : 'Save Notes'}
+              </button>
             </div>
           </div>
         )}

@@ -201,6 +201,11 @@ const actualizarProyecto = async (req, res) => {
       campos.ruimtes = req.body.ruimtes;
     }
 
+    // notasInternas — only admins can save internal notes
+    if (req.body.notasInternas !== undefined && req.usuario.rol === 'administrador') {
+      campos.notasInternas = req.body.notasInternas;
+    }
+
     // findByIdAndUpdate with $set bypasses Mongoose change-tracking entirely,
     // so Mixed-typed nested fields (dataDibujo, marcadores) are always written.
     const proyectoActualizado = await Project.findByIdAndUpdate(

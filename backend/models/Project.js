@@ -319,6 +319,12 @@ const ProjectSchema = new mongoose.Schema({
     type: CommissieResultaatSchema,
     default: null,
   },
+
+  // Private internal notes — visible to admins only, never shown to electricians
+  notasInternas: {
+    type: String,
+    default: '',
+  },
 });
 
 module.exports = mongoose.model('Project', ProjectSchema);

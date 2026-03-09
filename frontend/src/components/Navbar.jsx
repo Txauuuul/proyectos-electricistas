@@ -11,6 +11,8 @@ import {
   Menu,
   X,
   Zap,
+  Calendar,
+  BarChart2,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -106,6 +108,8 @@ export default function Navbar() {
   const adminLinks = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/clientes', label: 'Clients', icon: Users },
+    { path: '/admin/calendario', label: 'Calendar', icon: Calendar },
+    { path: '/admin/electricistas', label: 'Team Stats', icon: BarChart2 },
   ];
 
   const clientLinks = [

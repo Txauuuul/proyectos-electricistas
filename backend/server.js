@@ -9,6 +9,9 @@ const projectRoutes = require('./routes/projects');
 const profileRoutes = require('./routes/profile');
 const endClientRoutes = require('./routes/endClients');
 const notificationRoutes = require('./routes/notifications');
+const chatRoutes = require('./routes/chat');
+const adminRoutes = require('./routes/admin');
+const { iniciarRecordatorios } = require('./services/reminderService');
 
 const app = express();
 
@@ -64,6 +67,8 @@ app.use('/api/proyectos', projectRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/clientes', endClientRoutes);
 app.use('/api/notificaciones', notificationRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/admin', adminRoutes);
 
 
 // Health check
@@ -81,4 +86,6 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  // Start the daily reminder cron job
+  iniciarRecordatorios();
 });
