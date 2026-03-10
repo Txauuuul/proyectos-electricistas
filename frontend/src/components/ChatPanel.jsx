@@ -6,7 +6,7 @@ const ROL_COLORS = {
   administrador: 'bg-blue-100 text-blue-900',
   electricista: 'bg-green-100 text-green-900',
 };
-const ROL_LABELS = { administrador: 'Admin', electricista: 'Electrician' };
+const ROL_LABELS = { administrador: 'Admin', electricista: 'Elektricien' };
 
 function formatTime(fechaStr) {
   const d = new Date(fechaStr);
@@ -39,10 +39,10 @@ export default function ChatPanel({ proyectoId }) {
         const data = await res.json();
         setMensajes(data);
       } else {
-        setError('Could not load messages');
+        setError('Berichten konden niet worden geladen');
       }
     } catch {
-      setError('Connection error');
+      setError('Verbindingsfout');
     } finally {
       setCargando(false);
     }
@@ -80,10 +80,10 @@ export default function ChatPanel({ proyectoId }) {
         inputRef.current?.focus();
       } else {
         const d = await res.json();
-        setError(d.error || d.mensaje || 'Could not send');
+        setError(d.error || d.mensaje || 'Bericht kon niet worden verzonden');
       }
     } catch {
-      setError('Connection error');
+      setError('Verbindingsfout');
     } finally {
       setEnviando(false);
     }
@@ -102,13 +102,13 @@ export default function ChatPanel({ proyectoId }) {
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50 rounded-t-xl">
         <div className="flex items-center gap-2">
           <MessageCircle size={18} className="text-blue-600" />
-          <span className="font-bold text-gray-900 text-sm">Project Chat</span>
-          <span className="text-xs text-gray-400 hidden sm:inline">— Admin ↔ Electrician</span>
+          <span className="font-bold text-gray-900 text-sm">Projectchat</span>
+          <span className="text-xs text-gray-400 hidden sm:inline">— Admin ↔ Elektricien</span>
         </div>
         <button
           onClick={() => cargarMensajes(false)}
           className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-          title="Refresh"
+          title="Vernieuwen"
         >
           <RefreshCw size={14} />
         </button>
@@ -127,8 +127,8 @@ export default function ChatPanel({ proyectoId }) {
         ) : mensajes.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <MessageCircle size={32} className="text-gray-200 mb-2" />
-            <p className="text-sm text-gray-400">No messages yet</p>
-            <p className="text-xs text-gray-300 mt-1">Start the conversation below</p>
+            <p className="text-sm text-gray-400">Nog geen berichten</p>
+            <p className="text-xs text-gray-300 mt-1">Start hieronder het gesprek</p>
           </div>
         ) : (
           mensajes.map((m) => {
@@ -154,7 +154,7 @@ export default function ChatPanel({ proyectoId }) {
                   </div>
                   <div className={`text-[10px] text-gray-400 mt-0.5 ${isOwn ? 'text-right' : 'text-left'}`}>
                     {formatTime(m.fechaCreacion)}
-                    {isOwn && !m.leido && <span className="ml-1 text-blue-400">• unread</span>}
+                    {isOwn && !m.leido && <span className="ml-1 text-blue-400">• ongelezen</span>}
                   </div>
                 </div>
               </div>
@@ -173,7 +173,7 @@ export default function ChatPanel({ proyectoId }) {
           onKeyDown={onKeyDown}
           rows={1}
           maxLength={2000}
-          placeholder="Type a message... (Enter to send)"
+          placeholder="Typ een bericht... (Enter om te verzenden)"
           disabled={enviando}
           className="flex-1 resize-none border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition disabled:opacity-50"
           style={{ maxHeight: '80px' }}

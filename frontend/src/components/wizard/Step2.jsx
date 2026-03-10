@@ -288,7 +288,7 @@ export default function Step2() {
           onClick={handleVoegRuimteToe}
           className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition text-sm"
         >
-          <Plus size={18} /> VOEG RUIMTE TOE (MET PLAN) &nbsp;<span className="font-normal opacity-80">(add another space)</span>
+          <Plus size={18} /> VOEG RUIMTE TOE (MET PLAN) &nbsp;<span className="font-normal opacity-80">(nog een ruimte toevoegen)</span>
         </button>
 
         {/* AFRONDEN */}
@@ -297,7 +297,7 @@ export default function Step2() {
           disabled={saving}
           className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition text-sm"
         >
-          {saving ? "Bezig met opslaan..." : <><CheckCircle size={18} /> AFRONDEN (submit)</>}
+          {saving ? "Bezig met opslaan..." : <><CheckCircle size={18} /> AFRONDEN (verzenden)</>}
         </button>
 
         {/* vorige stap */}

@@ -13,6 +13,7 @@ export default function MyClients() {
   const [busqueda, setBusqueda] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editando, setEditando] = useState(null);
+  const [selectedClienteId, setSelectedClienteId] = useState(null);
   const [clienteDetalle, setClienteDetalle] = useState(null);
   const [form, setForm] = useState({
     nombre: '', apellidos: '', empresa: '', direccion: '',
@@ -61,7 +62,7 @@ export default function MyClients() {
   };
 
   const handleSave = async () => {
-    if (!form.nombre.trim()) { alert('Name is required'); return; }
+    if (!form.nombre.trim()) { alert('Naam is verplicht'); return; }
     setGuardando(true);
     try {
       const url = editando ? `${API}/clientes/${editando}` : `${API}/clientes`;
@@ -76,28 +77,32 @@ export default function MyClients() {
       resetForm();
       await cargarClientes();
     } catch (err) {
-      alert('Error: ' + err.message);
+      alert('Fout: ' + err.message);
     } finally {
       setGuardando(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this client? Projects associated will not be deleted.')) return;
+    if (!window.confirm('Deze klant verwijderen? Gekoppelde projecten worden niet verwijderd.')) return;
     try {
       const res = await fetch(`${API}/clientes/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Error');
+      if (!res.ok) throw new Error('Fout');
       setClientes(prev => prev.filter(c => c._id !== id));
-      if (clienteDetalle?._id === id) setClienteDetalle(null);
+      if (selectedClienteId === id) {
+        setClienteDetalle(null);
+        setSelectedClienteId(null);
+      }
     } catch (err) {
-      alert('Error deleting client');
+      alert('Fout bij verwijderen van klant');
     }
   };
 
   const verDetalle = async (id) => {
+    setSelectedClienteId(id);
     try {
       const res = await fetch(`${API}/clientes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -116,19 +121,22 @@ export default function MyClients() {
       (c.email || '').toLowerCase().includes(q);
   });
 
+  const selectedClienteResumen = clientes.find(c => c._id === selectedClienteId) || null;
+  const selectedClienteData = clienteDetalle?.cliente || clienteDetalle || selectedClienteResumen || null;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Clients</h1>
-          <p className="text-gray-600">Manage the end-customers for your projects.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Mijn klanten</h1>
+          <p className="text-gray-600">Beheer de eindklanten van uw projecten.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 lg:items-center">
           <div className="relative min-w-[280px]">
             <Search size={18} className="absolute left-3 top-3 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by name, company or email..."
+              placeholder="Zoek op naam, bedrijf of e-mail..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white"
@@ -138,25 +146,25 @@ export default function MyClients() {
             onClick={openCreate}
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold"
           >
-            <Plus size={18} /> New Client
+            <Plus size={18} /> Nieuwe klant
           </button>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-5 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-gray-700">Client overview</p>
+          <p className="text-sm font-semibold text-gray-700">Klantenoverzicht</p>
           <p className="text-sm text-gray-500">
-            {filtrados.length} client{filtrados.length !== 1 ? 's' : ''} shown
-            {busqueda ? ` for “${busqueda}”` : ''}
+            {filtrados.length} klant{filtrados.length !== 1 ? 'en' : ''} weergegeven
+            {busqueda ? ` voor “${busqueda}”` : ''}
           </p>
         </div>
         {clienteDetalle && (
           <button
-            onClick={() => setClienteDetalle(null)}
+            onClick={() => { setClienteDetalle(null); setSelectedClienteId(null); }}
             className="px-4 py-2 text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl self-start md:self-auto"
           >
-            Clear selected client
+            Geselecteerde klant wissen
           </button>
         )}
       </div>
@@ -166,41 +174,41 @@ export default function MyClients() {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-6">
             <div>
               <h2 className="font-bold text-gray-900 text-2xl mb-2">
-                {clienteDetalle.cliente?.nombre || clienteDetalle.nombre} {clienteDetalle.cliente?.apellidos || clienteDetalle.apellidos || ''}
+                {selectedClienteData?.nombre || ''} {selectedClienteData?.apellidos || ''}
               </h2>
               <p className="text-sm text-gray-500">
-                {(clienteDetalle.cliente?.empresa || clienteDetalle.empresa) || 'Private client'}
+                {selectedClienteData?.empresa || 'Particuliere klant'}
               </p>
             </div>
             <div className="flex gap-3">
               <button
-                onClick={() => openEdit(clienteDetalle.cliente || clienteDetalle)}
+                onClick={() => openEdit(selectedClienteData)}
                 className="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl font-semibold text-sm"
               >
-                Edit client
+                Klant bewerken
               </button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 text-sm mb-6">
             {(clienteDetalle.cliente?.telefono || clienteDetalle.telefono) && (
-              <InfoRow icon={Phone} label="Phone" value={clienteDetalle.cliente?.telefono || clienteDetalle.telefono} />
+              <InfoRow icon={Phone} label="Telefoon" value={clienteDetalle.cliente?.telefono || clienteDetalle.telefono} />
             )}
             {(clienteDetalle.cliente?.email || clienteDetalle.email) && (
-              <InfoRow icon={Mail} label="Email" value={clienteDetalle.cliente?.email || clienteDetalle.email} />
+              <InfoRow icon={Mail} label="E-mail" value={clienteDetalle.cliente?.email || clienteDetalle.email} />
             )}
             {(clienteDetalle.cliente?.direccion || clienteDetalle.direccion) && (
-              <InfoRow icon={MapPin} label="Address" value={clienteDetalle.cliente?.direccion || clienteDetalle.direccion} />
+              <InfoRow icon={MapPin} label="Adres" value={clienteDetalle.cliente?.direccion || clienteDetalle.direccion} />
             )}
             {(clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad) && (
-              <InfoRow icon={MapPin} label="City" value={clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad} />
+              <InfoRow icon={MapPin} label="Stad" value={clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad} />
             )}
           </div>
 
           {clienteDetalle.proyectos && clienteDetalle.proyectos.length > 0 && (
             <div>
               <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <FileText size={16} /> Projects ({clienteDetalle.proyectos.length})
+                <FileText size={16} /> Projecten ({clienteDetalle.proyectos.length})
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {clienteDetalle.proyectos.map(p => (
@@ -221,12 +229,12 @@ export default function MyClients() {
 
       <div>
         {cargando ? (
-          <p className="text-gray-500 py-12 text-center">Loading...</p>
+          <p className="text-gray-500 py-12 text-center">Laden...</p>
         ) : filtrados.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border p-12 text-center">
             <User size={48} className="text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500">
-              {busqueda ? 'No clients match your search' : 'No clients yet. Create your first one!'}
+              {busqueda ? 'Geen klanten gevonden voor uw zoekopdracht' : 'Nog geen klanten. Maak uw eerste klant aan!'}
             </p>
           </div>
         ) : (
@@ -235,7 +243,7 @@ export default function MyClients() {
               <div
                 key={c._id}
                 className={`bg-white rounded-2xl shadow-sm border p-5 hover:shadow-md transition cursor-pointer ${
-                  clienteDetalle?._id === c._id ? 'ring-2 ring-blue-500 border-blue-200' : 'border-gray-200'
+                  selectedClienteId === c._id ? 'ring-2 ring-blue-500 border-blue-200' : 'border-gray-200'
                 }`}
                 onClick={() => verDetalle(c._id)}
               >
@@ -246,7 +254,7 @@ export default function MyClients() {
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-900 text-lg truncate">{c.nombre} {c.apellidos || ''}</p>
-                      <p className="text-sm text-gray-500 truncate">{c.empresa || 'Private client'}</p>
+                      <p className="text-sm text-gray-500 truncate">{c.empresa || 'Particuliere klant'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -266,15 +274,15 @@ export default function MyClients() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
-                  <InfoRow icon={Phone} label="Phone" value={c.telefono || '—'} />
-                  <InfoRow icon={Mail} label="Email" value={c.email || '—'} />
-                  <InfoRow icon={MapPin} label="City" value={c.ciudad || '—'} />
-                  <InfoRow icon={FileText} label="Projects" value={`${c.projectCount || 0} project${(c.projectCount || 0) !== 1 ? 's' : ''}`} />
+                  <InfoRow icon={Phone} label="Telefoon" value={c.telefono || '—'} />
+                  <InfoRow icon={Mail} label="E-mail" value={c.email || '—'} />
+                  <InfoRow icon={MapPin} label="Stad" value={c.ciudad || '—'} />
+                  <InfoRow icon={FileText} label="Projecten" value={`${c.projectCount || 0} project${(c.projectCount || 0) !== 1 ? 'en' : ''}`} />
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-400">Click to view full client details</p>
-                  <span className="text-sm font-semibold text-blue-600">Open</span>
+                  <p className="text-xs text-gray-400">Klik om alle klantgegevens te bekijken</p>
+                  <span className="text-sm font-semibold text-blue-600">Openen</span>
                 </div>
               </div>
             ))}
@@ -288,7 +296,7 @@ export default function MyClients() {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b flex justify-between items-center">
               <h2 className="text-lg font-bold text-gray-900">
-                {editando ? 'Edit Client' : 'New Client'}
+                {editando ? 'Klant bewerken' : 'Nieuwe klant'}
               </h2>
               <button onClick={() => { setModalOpen(false); resetForm(); }} className="text-gray-400 hover:text-gray-700">
                 <X size={20} />
@@ -297,7 +305,7 @@ export default function MyClients() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">First Name *</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Voornaam *</label>
                   <input
                     type="text" value={form.nombre}
                     onChange={(e) => setForm(prev => ({ ...prev, nombre: e.target.value }))}
@@ -305,7 +313,7 @@ export default function MyClients() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Last Name</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Achternaam</label>
                   <input
                     type="text" value={form.apellidos}
                     onChange={(e) => setForm(prev => ({ ...prev, apellidos: e.target.value }))}
@@ -314,7 +322,7 @@ export default function MyClients() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Company</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Bedrijf</label>
                 <input
                   type="text" value={form.empresa}
                   onChange={(e) => setForm(prev => ({ ...prev, empresa: e.target.value }))}
@@ -322,7 +330,7 @@ export default function MyClients() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Adres</label>
                 <input
                   type="text" value={form.direccion}
                   onChange={(e) => setForm(prev => ({ ...prev, direccion: e.target.value }))}
@@ -331,7 +339,7 @@ export default function MyClients() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Postal Code</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Postcode</label>
                   <input
                     type="text" value={form.codigoPostal}
                     onChange={(e) => setForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
@@ -339,7 +347,7 @@ export default function MyClients() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">City</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Stad</label>
                   <input
                     type="text" value={form.ciudad}
                     onChange={(e) => setForm(prev => ({ ...prev, ciudad: e.target.value }))}
@@ -349,7 +357,7 @@ export default function MyClients() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Telefoon</label>
                   <input
                     type="text" value={form.telefono}
                     onChange={(e) => setForm(prev => ({ ...prev, telefono: e.target.value }))}
@@ -357,7 +365,7 @@ export default function MyClients() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">E-mail</label>
                   <input
                     type="email" value={form.email}
                     onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))}
@@ -366,7 +374,7 @@ export default function MyClients() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Notes</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Notities</label>
                 <textarea
                   value={form.notas}
                   onChange={(e) => setForm(prev => ({ ...prev, notas: e.target.value }))}
@@ -380,14 +388,14 @@ export default function MyClients() {
                 onClick={() => { setModalOpen(false); resetForm(); }}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold text-gray-700"
               >
-                Cancel
+                Annuleren
               </button>
               <button
                 onClick={handleSave}
                 disabled={guardando}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50"
               >
-                {guardando ? 'Saving...' : 'Save'}
+                {guardando ? 'Opslaan...' : 'Opslaan'}
               </button>
             </div>
           </div>

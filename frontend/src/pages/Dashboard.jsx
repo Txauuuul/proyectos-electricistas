@@ -5,6 +5,45 @@ import {
   Plus, Eye, Search, FileText, Send, CheckCircle, DollarSign, Flag, RefreshCw, Download, TrendingUp,
 } from 'lucide-react';
 
+const CLIENT_CARD_PALETTE = [
+  {
+    card: 'bg-rose-100 border-rose-300 hover:border-rose-400',
+    chip: 'bg-rose-200 text-rose-800',
+  },
+  {
+    card: 'bg-orange-100 border-orange-300 hover:border-orange-400',
+    chip: 'bg-orange-200 text-orange-800',
+  },
+  {
+    card: 'bg-amber-100 border-amber-300 hover:border-amber-400',
+    chip: 'bg-amber-200 text-amber-800',
+  },
+  {
+    card: 'bg-emerald-100 border-emerald-300 hover:border-emerald-400',
+    chip: 'bg-emerald-200 text-emerald-800',
+  },
+  {
+    card: 'bg-teal-100 border-teal-300 hover:border-teal-400',
+    chip: 'bg-teal-200 text-teal-800',
+  },
+  {
+    card: 'bg-sky-100 border-sky-300 hover:border-sky-400',
+    chip: 'bg-sky-200 text-sky-800',
+  },
+  {
+    card: 'bg-indigo-100 border-indigo-300 hover:border-indigo-400',
+    chip: 'bg-indigo-200 text-indigo-800',
+  },
+  {
+    card: 'bg-violet-100 border-violet-300 hover:border-violet-400',
+    chip: 'bg-violet-200 text-violet-800',
+  },
+  {
+    card: 'bg-fuchsia-100 border-fuchsia-300 hover:border-fuchsia-400',
+    chip: 'bg-fuchsia-200 text-fuchsia-800',
+  },
+];
+
 export default function Dashboard() {
   const { usuario, token } = useAuth();
   const navigate = useNavigate();
@@ -37,7 +76,7 @@ export default function Dashboard() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/export/csv`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Export failed');
+      if (!res.ok) throw new Error('Export mislukt');
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -48,23 +87,23 @@ export default function Dashboard() {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      alert('Error exporting CSV: ' + err.message);
+      alert('Fout bij exporteren van CSV: ' + err.message);
     }
   };
 
   const getStatusInfo = (estado) => {
     const map = {
-      created:         { bg: 'bg-blue-500',    label: 'Created',         col: 'bg-blue-50 border-blue-200' },
-      offer_ready:     { bg: 'bg-purple-500',   label: 'Offer Ready',     col: 'bg-purple-50 border-purple-200' },
-      offer_sent:      { bg: 'bg-indigo-500',   label: 'Offer Sent',      col: 'bg-indigo-50 border-indigo-200' },
-      approved:        { bg: 'bg-green-500',     label: 'Approved',        col: 'bg-green-50 border-green-200' },
-      working:         { bg: 'bg-yellow-500',    label: 'Working',         col: 'bg-yellow-50 border-yellow-200' },
-      finished:        { bg: 'bg-teal-500',      label: 'Finished',        col: 'bg-teal-50 border-teal-200' },
-      pending_payment: { bg: 'bg-orange-500',    label: 'Pending Payment', col: 'bg-orange-50 border-orange-200' },
-      paid:            { bg: 'bg-green-700',     label: 'Paid',            col: 'bg-green-50 border-green-300' },
-      rejected:        { bg: 'bg-red-500',       label: 'Rejected',        col: 'bg-red-50 border-red-200' },
+      created:         { bg: 'bg-blue-500',    label: 'Aangemaakt',        col: 'bg-white border-gray-200' },
+      offer_ready:     { bg: 'bg-purple-500',  label: 'Offerte klaar',     col: 'bg-white border-gray-200' },
+      offer_sent:      { bg: 'bg-indigo-500',  label: 'Offerte verzonden', col: 'bg-white border-gray-200' },
+      approved:        { bg: 'bg-green-500',   label: 'Goedgekeurd',       col: 'bg-white border-gray-200' },
+      working:         { bg: 'bg-yellow-500',  label: 'In uitvoering',     col: 'bg-white border-gray-200' },
+      finished:        { bg: 'bg-teal-500',    label: 'Afgerond',          col: 'bg-white border-gray-200' },
+      pending_payment: { bg: 'bg-orange-500',  label: 'Wacht op betaling', col: 'bg-white border-gray-200' },
+      paid:            { bg: 'bg-green-700',   label: 'Betaald',           col: 'bg-white border-gray-200' },
+      rejected:        { bg: 'bg-red-500',     label: 'Afgewezen',         col: 'bg-white border-gray-200' },
     };
-    return map[estado] || { bg: 'bg-gray-500', label: estado, col: 'bg-gray-50 border-gray-200' };
+    return map[estado] || { bg: 'bg-gray-500', label: estado, col: 'bg-white border-gray-200' };
   };
 
   const getPlanCount = (proyecto) => {
@@ -77,6 +116,16 @@ export default function Dashboard() {
     const topLevelPhotos = proyecto.fotosLocalizacion?.length || 0;
     const roomPhotos = proyecto.ruimtes?.reduce((sum, room) => sum + (room.fotos?.length || 0), 0) || 0;
     return topLevelPhotos + roomPhotos;
+  };
+
+  const getProjectAmount = (proyecto) => (
+    proyecto.oferta?.precioTotalEstimado || proyecto.oferta?.precioTotal || 0
+  );
+
+  const getClientCardTheme = (proyecto) => {
+    const seed = proyecto.usuarioId?._id || proyecto.usuarioId?.nombre || proyecto._id || 'default';
+    const hash = [...String(seed)].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return CLIENT_CARD_PALETTE[hash % CLIENT_CARD_PALETTE.length];
   };
 
   // =======================
@@ -101,8 +150,8 @@ export default function Dashboard() {
           setProyectos(prev => prev.map(p => p._id === proyectoId ? updated : p));
         }
       }
-      alert(successMsg || 'Done!');
-    } catch (err) { alert('Error: ' + err.message); }
+      alert(successMsg || 'Klaar!');
+    } catch (err) { alert('Fout: ' + err.message); }
   };
 
   const API = import.meta.env.VITE_API_URL;
@@ -115,24 +164,24 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Projects</h1>
-            <p className="text-gray-600">{proyectos.length} project{proyectos.length !== 1 ? 's' : ''}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Mijn projecten</h1>
+            <p className="text-gray-600">{proyectos.length} project{proyectos.length !== 1 ? 'en' : ''}</p>
           </div>
           <button
             onClick={() => navigate('/nuevo-proyecto')}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
           >
-            <Plus size={18} /> New Project
+            <Plus size={18} /> Nieuw project
           </button>
         </div>
 
         {cargando ? (
-          <p className="text-gray-500 text-center py-12">Loading projects...</p>
+          <p className="text-gray-500 text-center py-12">Projecten laden...</p>
         ) : proyectos.length === 0 ? (
           <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">No projects yet</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Nog geen projecten</h3>
             <button onClick={() => navigate('/nuevo-proyecto')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold inline-flex gap-2">
-              <Plus size={18} /> Create First Project
+              <Plus size={18} /> Eerste project aanmaken
             </button>
           </div>
         ) : (
@@ -154,7 +203,7 @@ export default function Dashboard() {
 
                   <div className="text-xs text-gray-500 space-y-1 mb-4">
                     <p><strong>Start:</strong> {new Date(p.fechaInicio).toLocaleDateString()}</p>
-                    <p><strong>Plans:</strong> {getPlanCount(p)} &nbsp; <strong>Photos:</strong> {getPhotoCount(p)}</p>
+                    <p><strong>Plannen:</strong> {getPlanCount(p)} &nbsp; <strong>Foto's:</strong> {getPhotoCount(p)}</p>
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -162,14 +211,14 @@ export default function Dashboard() {
                       onClick={() => navigate(`/proyecto/${p._id}`)}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold text-sm flex gap-2 items-center justify-center"
                     >
-                      <Eye size={16} /> View Project
+                      <Eye size={16} /> Project bekijken
                     </button>
                     {p.estado === 'offer_sent' && (
                       <button
                         onClick={() => navigate(`/proyecto/${p._id}/ver-oferta`)}
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-semibold text-sm flex gap-2 items-center justify-center"
                       >
-                        <FileText size={16} /> View & Sign Offer
+                        <FileText size={16} /> Offerte bekijken en tekenen
                       </button>
                     )}
                     {['working', 'pending_payment', 'paid', 'finished'].includes(p.estado) && (
@@ -177,7 +226,7 @@ export default function Dashboard() {
                         onClick={() => navigate(`/proyecto/${p._id}/ver-oferta`)}
                         className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-semibold text-sm flex gap-2 items-center justify-center"
                       >
-                        <CheckCircle size={16} /> View Contract
+                        <CheckCircle size={16} /> Contract bekijken
                       </button>
                     )}
                   </div>
@@ -251,21 +300,21 @@ export default function Dashboard() {
       <div className="flex-shrink-0 bg-white border-b px-6 py-6 space-y-5 shadow-sm">
 
         <div className="flex flex-col items-center text-center gap-2 pb-2">
-          <h1 className="text-3xl font-bold text-gray-900">Project Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Projectdashboard</h1>
           <p className="text-sm text-gray-500 max-w-2xl">
-            Manage all active projects, review the pipeline, and move work forward from one place.
+            Beheer alle actieve projecten, bekijk de pipeline en stuur het werk vooruit vanuit één plek.
           </p>
         </div>
 
         {/* Stats row */}
         {!cargando && proyectos.length > 0 && (
           <div className="flex flex-wrap gap-4 mb-10 justify-center">
-            <MiniStat label="Total" value={proyectos.length} color="text-gray-800" />
-            <MiniStat label="Working" value={proyectos.filter(p => p.estado === 'working').length} color="text-yellow-600" />
-            <MiniStat label="Pending Payment" value={proyectos.filter(p => p.estado === 'pending_payment').length} color="text-orange-600" />
-            <MiniStat label="Paid" value={proyectos.filter(p => p.estado === 'paid').length} color="text-green-700" />
+            <MiniStat label="Totaal" value={proyectos.length} color="text-gray-800" />
+            <MiniStat label="In uitvoering" value={proyectos.filter(p => p.estado === 'working').length} color="text-yellow-600" />
+            <MiniStat label="Wacht op betaling" value={proyectos.filter(p => p.estado === 'pending_payment').length} color="text-orange-600" />
+            <MiniStat label="Betaald" value={proyectos.filter(p => p.estado === 'paid').length} color="text-green-700" />
             <MiniStat
-              label="Revenue"
+              label="Omzet"
               value={`€${proyectos.filter(p => p.estado === 'paid').reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0).toFixed(0)}`}
               color="text-green-700"
             />
@@ -275,7 +324,7 @@ export default function Dashboard() {
               const approved = proyectos.filter(p => ['approved', 'working', 'finished', 'pending_payment', 'paid'].includes(p.estado)).length;
               const rate = sent > 0 ? Math.round((approved / sent) * 100) : null;
               return rate !== null ? (
-                <MiniStat label="Conversion" value={`${rate}%`} color={rate >= 60 ? 'text-green-700' : rate >= 40 ? 'text-yellow-600' : 'text-red-600'} />
+                <MiniStat label="Conversie" value={`${rate}%`} color={rate >= 60 ? 'text-green-700' : rate >= 40 ? 'text-yellow-600' : 'text-red-600'} />
               ) : null;
             })()}
             {/* Avg project value (paid) */}
@@ -283,7 +332,7 @@ export default function Dashboard() {
               const pagados = proyectos.filter(p => p.estado === 'paid' && p.oferta?.precioTotal);
               if (pagados.length === 0) return null;
               const avg = pagados.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0) / pagados.length;
-              return <MiniStat label="Avg Value" value={`€${avg.toFixed(0)}`} color="text-blue-700" />;
+              return <MiniStat label="Gem. waarde" value={`€${avg.toFixed(0)}`} color="text-blue-700" />;
             })()}
             {/* Pipeline value (offer_sent + approved + working) */}
             {(() => {
@@ -300,7 +349,7 @@ export default function Dashboard() {
             <Search size={15} className="absolute left-2.5 top-2.5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder="Zoek projecten..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-72"
@@ -308,27 +357,27 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-gray-600">Sort:</label>
+            <label className="text-sm font-semibold text-gray-600">Sorteren:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option value="fecha-desc">Newest First</option>
-              <option value="fecha-asc">Oldest First</option>
-              <option value="cliente">Client A-Z</option>
+              <option value="fecha-desc">Nieuwste eerst</option>
+              <option value="fecha-asc">Oudste eerst</option>
+              <option value="cliente">Klant A-Z</option>
             </select>
           </div>
 
           {clientesUnicos.length > 0 && (
           <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-gray-600">Client:</label>
+              <label className="text-sm font-semibold text-gray-600">Klant:</label>
               <select
                 value={filtroCliente}
                 onChange={(e) => setFiltroCliente(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="">All</option>
+                <option value="">Alle</option>
                 {clientesUnicos.map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -336,14 +385,14 @@ export default function Dashboard() {
             </div>
           )}
 
-          <span className="text-xs text-gray-400">{filtered.length} project{filtered.length !== 1 ? 's' : ''}</span>
+          <span className="text-xs text-gray-400">{filtered.length} project{filtered.length !== 1 ? 'en' : ''}</span>
         </div>
       </div>
 
       {/* ── Kanban board ── */}
       {cargando ? (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500">Loading projects...</p>
+          <p className="text-gray-500">Projecten laden...</p>
         </div>
       ) : (
         <div className="flex-1 overflow-x-auto overflow-y-hidden flex justify-center items-start px-4 py-6">
@@ -370,14 +419,19 @@ export default function Dashboard() {
                   {/* Card list — this column scrolls independently */}
                   <div className="flex-1 overflow-y-auto min-h-0 p-3 space-y-3">
                     {cards.length === 0 && (
-                      <p className="text-gray-400 text-xs text-center py-6 select-none">No projects</p>
+                      <p className="text-gray-400 text-xs text-center py-6 select-none">Geen projecten</p>
                     )}
                     {cards.map(p => (
                       <div
                         key={p._id}
-                        className="bg-white rounded-xl shadow-sm border p-4 hover:shadow-md transition cursor-pointer"
+                        className={`rounded-xl shadow-sm border p-4 hover:shadow-md transition cursor-pointer ${getClientCardTheme(p).card}`}
                         onClick={() => navigate(`/proyecto/${p._id}`)}
                       >
+                        <div className="mb-3">
+                          <span className={`inline-flex px-3 py-1 rounded-full font-bold text-sm ${getClientCardTheme(p).chip}`}>
+                            {p.usuarioId?.nombre || '—'}
+                          </span>
+                        </div>
                         <p className="font-semibold text-gray-900 text-sm mb-2 truncate">
                           {p.tituloAutomatico || p.nombreCasa}
                         </p>
@@ -386,8 +440,6 @@ export default function Dashboard() {
                         )}
                         <p className="text-xs text-gray-500 truncate mb-3">{p.direccion}</p>
                         <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
-                          <span>{p.usuarioId?.nombre || '—'}</span>
-                          <span>•</span>
                           <span>{new Date(p.fechaInicio).toLocaleDateString()}</span>
                         </div>
 
@@ -398,23 +450,23 @@ export default function Dashboard() {
                               onClick={() => navigate(`/proyecto/${p._id}/preparar-oferta`)}
                               className="text-[10px] px-2 py-1 bg-purple-100 text-purple-700 rounded font-semibold hover:bg-purple-200 flex items-center gap-1"
                             >
-                              <FileText size={10} /> Offer
+                              <FileText size={10} /> Offerte
                             </button>
                           )}
                           {state === 'offer_ready' && (
                             <button
-                              onClick={() => handleAction(`${API}/proyectos/${p._id}/enviar-oferta`, 'Send offer to client?', 'Offer sent!', p._id)}
+                              onClick={() => handleAction(`${API}/proyectos/${p._id}/enviar-oferta`, 'Offerte naar klant verzenden?', 'Offerte verzonden!', p._id)}
                               className="text-[10px] px-2 py-1 bg-indigo-100 text-indigo-700 rounded font-semibold hover:bg-indigo-200 flex items-center gap-1"
                             >
-                              <Send size={10} /> Send
+                              <Send size={10} /> Verzenden
                             </button>
                           )}
                           {state === 'pending_payment' && (
                             <button
-                              onClick={() => handleAction(`${API}/proyectos/${p._id}/marcar-pagado`, 'Mark as paid?', 'Marked paid!', p._id)}
+                              onClick={() => handleAction(`${API}/proyectos/${p._id}/marcar-pagado`, 'Markeren als betaald?', 'Gemarkeerd als betaald!', p._id)}
                               className="text-[10px] px-2 py-1 bg-emerald-100 text-emerald-700 rounded font-semibold hover:bg-emerald-200 flex items-center gap-1"
                             >
-                              <DollarSign size={10} /> Paid
+                              <DollarSign size={10} /> Betaald
                             </button>
                           )}
                           {['working', 'paid', 'pending_payment'].includes(state) && (
@@ -422,15 +474,22 @@ export default function Dashboard() {
                               onClick={() => navigate(`/proyecto/${p._id}`)}
                               className="text-[10px] px-2 py-1 bg-amber-100 text-amber-700 rounded font-semibold hover:bg-amber-200 flex items-center gap-1"
                             >
-                              <RefreshCw size={10} /> Reopen
+                              <RefreshCw size={10} /> Heropenen
                             </button>
                           )}
                         </div>
 
+                        {/* Amount due for pending payment projects */}
+                        {state === 'pending_payment' && getProjectAmount(p) > 0 && (
+                          <div className="mt-2 text-xs font-bold text-orange-700 bg-orange-50 rounded px-2 py-1 text-center">
+                            Openstaand: €{getProjectAmount(p).toFixed(2)}
+                          </div>
+                        )}
+
                         {/* Revenue for paid projects */}
                         {state === 'paid' && p.oferta?.precioTotal && (
                           <div className="mt-2 text-xs font-bold text-green-700 bg-green-50 rounded px-2 py-1 text-center">
-                            Revenue: €{(p.oferta.precioTotal || 0).toFixed(2)}
+                            Omzet: €{getProjectAmount(p).toFixed(2)}
                           </div>
                         )}
                       </div>

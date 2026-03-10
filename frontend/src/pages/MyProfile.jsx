@@ -56,7 +56,7 @@ export default function MyProfile() {
       const res = await fetch(`${API}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Error loading profile');
+      if (!res.ok) throw new Error('Fout bij laden van profiel');
       const data = await res.json();
       setPerfil(data);
     } catch (err) {
@@ -79,12 +79,12 @@ export default function MyProfile() {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(perfil),
       });
-      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Error saving profile'); }
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Fout bij opslaan van profiel'); }
       const data = await res.json();
       setPerfil(data);
       const stored = JSON.parse(localStorage.getItem('usuario') || '{}');
       localStorage.setItem('usuario', JSON.stringify({ ...stored, nombre: data.nombre }));
-      setMensaje({ type: 'success', text: 'Profile saved successfully!' });
+      setMensaje({ type: 'success', text: 'Profiel succesvol opgeslagen!' });
       setTimeout(() => setMensaje(null), 3000);
     } catch (err) {
       setMensaje({ type: 'error', text: err.message });
@@ -96,13 +96,13 @@ export default function MyProfile() {
   const handleCambioContrasena = async () => {
     setMensajePass(null);
     if (!contrasenaActual || !nuevaContrasena || !confirmarContrasena) {
-      setMensajePass({ type: 'error', text: 'Please fill in all password fields.' }); return;
+      setMensajePass({ type: 'error', text: 'Vul alle wachtwoordvelden in.' }); return;
     }
     if (nuevaContrasena !== confirmarContrasena) {
-      setMensajePass({ type: 'error', text: 'New passwords do not match.' }); return;
+      setMensajePass({ type: 'error', text: 'Nieuwe wachtwoorden komen niet overeen.' }); return;
     }
     if (nuevaContrasena.length < 6) {
-      setMensajePass({ type: 'error', text: 'New password must be at least 6 characters.' }); return;
+      setMensajePass({ type: 'error', text: 'Nieuw wachtwoord moet minstens 6 tekens bevatten.' }); return;
     }
     setCambioPass(true);
     try {
@@ -112,8 +112,8 @@ export default function MyProfile() {
         body: JSON.stringify({ contrasenaActual, nuevaContrasena }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error');
-      setMensajePass({ type: 'success', text: 'Password updated successfully!' });
+      if (!res.ok) throw new Error(data.error || 'Fout');
+      setMensajePass({ type: 'success', text: 'Wachtwoord succesvol bijgewerkt!' });
       setContrasenaActual(''); setNuevaContrasena(''); setConfirmarContrasena('');
       setTimeout(() => setMensajePass(null), 4000);
     } catch (err) {
@@ -126,7 +126,7 @@ export default function MyProfile() {
   if (cargando) {
     return (
       <div className="flex items-center justify-center py-24">
-        <p className="text-gray-600">Loading profile...</p>
+        <p className="text-gray-600">Profiel laden...</p>
       </div>
     );
   }
@@ -148,13 +148,13 @@ export default function MyProfile() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">
-              My administration panel
+              Mijn administratiepaneel
               <span className="ml-2 inline-block w-3 h-3 rounded-full bg-purple-500 align-middle" />
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Keep your personal and business information up to date.</p>
+            <p className="text-sm text-gray-500 mt-1">Houd uw persoonlijke en bedrijfsgegevens up-to-date.</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500">Profile completeness</p>
+            <p className="text-xs text-gray-500">Profielvolledigheid</p>
             <p className={`text-lg font-bold ${pct === 100 ? 'text-green-600' : 'text-orange-500'}`}>{pct}%</p>
             <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
               <div className={`h-2 rounded-full transition-all ${pct === 100 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${pct}%` }} />
@@ -182,7 +182,7 @@ export default function MyProfile() {
             <div
               onClick={() => logoRef.current?.click()}
               className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition overflow-hidden shrink-0"
-              title="Upload your logo"
+              title="Upload uw logo"
             >
               {perfil.logo ? (
                 <img src={perfil.logo} alt="logo" className="w-full h-full object-contain" />
@@ -194,7 +194,7 @@ export default function MyProfile() {
               )}
             </div>
             {perfil.logo && (
-              <button onClick={() => handleChange('logo', '')} className="text-red-500 hover:text-red-700 p-1" title="Remove logo">
+              <button onClick={() => handleChange('logo', '')} className="text-red-500 hover:text-red-700 p-1" title="Logo verwijderen">
                 <X size={16} />
               </button>
             )}
@@ -207,10 +207,10 @@ export default function MyProfile() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6">
           {/* Left: 4 identity fields */}
           <div className="space-y-4">
-            <Field label="Voornaam (First name) *" value={perfil.nombre || ''} onChange={v => handleChange('nombre', v)} />
-            <Field label="Achternaam (Last name) *" value={perfil.apellidos || ''} onChange={v => handleChange('apellidos', v)} />
-            <Field label="Bedrijfsnaam (Company) *" value={perfil.empresa || ''} onChange={v => handleChange('empresa', v)} />
-            <Field label="BTW nummer (VAT / NIF) *" value={perfil.nif || ''} onChange={v => handleChange('nif', v)} />
+            <Field label="Voornaam *" value={perfil.nombre || ''} onChange={v => handleChange('nombre', v)} />
+            <Field label="Achternaam *" value={perfil.apellidos || ''} onChange={v => handleChange('apellidos', v)} />
+            <Field label="Bedrijfsnaam *" value={perfil.empresa || ''} onChange={v => handleChange('empresa', v)} />
+            <Field label="BTW-nummer *" value={perfil.nif || ''} onChange={v => handleChange('nif', v)} />
           </div>
           {/* Right: 5 contact fields */}
           <div className="space-y-4">
@@ -225,7 +225,7 @@ export default function MyProfile() {
         {/* Address row: Straat + Nr */}
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="col-span-2">
-            <Field label="Straat (Street) *" value={perfil.direccion || ''} onChange={v => handleChange('direccion', v)} />
+            <Field label="Straat *" value={perfil.direccion || ''} onChange={v => handleChange('direccion', v)} />
           </div>
           <div>
             <Field label="Nr." value={perfil.huisnummer || ''} onChange={v => handleChange('huisnummer', v)} />
@@ -233,7 +233,7 @@ export default function MyProfile() {
         </div>
         <div className="grid grid-cols-2 gap-4 mb-6">
           <Field label="Postcode *" value={perfil.codigoPostal || ''} onChange={v => handleChange('codigoPostal', v)} />
-          <Field label="Stad (City) *" value={perfil.ciudad || ''} onChange={v => handleChange('ciudad', v)} />
+          <Field label="Stad *" value={perfil.ciudad || ''} onChange={v => handleChange('ciudad', v)} />
         </div>
 
         {/* Login display */}
@@ -252,7 +252,7 @@ export default function MyProfile() {
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
           >
             <Save size={18} />
-            {guardando ? 'Saving...' : 'Save Profile'}
+            {guardando ? 'Opslaan...' : 'Profiel opslaan'}
           </button>
         </div>
       </div>
@@ -260,7 +260,7 @@ export default function MyProfile() {
       {/* Password change */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Lock size={18} /> Password change
+          <Lock size={18} /> Wachtwoord wijzigen
         </h2>
         {mensajePass && (
           <div className={`mb-4 p-3 rounded-lg flex items-center gap-2 text-sm ${
@@ -272,17 +272,17 @@ export default function MyProfile() {
         )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Current password</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Huidig wachtwoord</label>
             <input type="password" value={contrasenaActual} onChange={e => setContrasenaActual(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="••••••••" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">New password</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Nieuw wachtwoord</label>
             <input type="password" value={nuevaContrasena} onChange={e => setNuevaContrasena(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="••••••••" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Confirm new password</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Bevestig nieuw wachtwoord</label>
             <input type="password" value={confirmarContrasena} onChange={e => setConfirmarContrasena(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="••••••••" />
           </div>
@@ -291,7 +291,7 @@ export default function MyProfile() {
           <button onClick={handleCambioContrasena} disabled={cambioPass}
             className="flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-semibold text-sm disabled:opacity-50 transition">
             <Lock size={16} />
-            {cambioPass ? 'Updating...' : 'Update password'}
+            {cambioPass ? 'Bijwerken...' : 'Wachtwoord bijwerken'}
           </button>
         </div>
       </div>
@@ -299,12 +299,12 @@ export default function MyProfile() {
       {/* My clients shortcut */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <Users size={18} /> List clients
+          <Users size={18} /> Klantenlijst
         </h2>
-        <p className="text-sm text-gray-500 mb-4">Manage the end-clients you have registered in the platform.</p>
+        <p className="text-sm text-gray-500 mb-4">Beheer de eindklanten die u op het platform hebt geregistreerd.</p>
         <button onClick={() => navigate('/mis-clientes')}
           className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition">
-          Go to My Clients →
+          Ga naar mijn klanten →
         </button>
       </div>
 
@@ -312,26 +312,26 @@ export default function MyProfile() {
       {usuario?.rol === 'electricista' && (
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Euro size={18} className="text-green-600" /> My Commissions
+            <Euro size={18} className="text-green-600" /> Mijn commissies
           </h2>
           {cargandoComisiones ? (
-            <p className="text-sm text-gray-400 text-center py-6">Loading commissions...</p>
+            <p className="text-sm text-gray-400 text-center py-6">Commissies laden...</p>
           ) : proyectosPagados.length === 0 ? (
             <div className="text-center py-8">
               <TrendingUp size={32} className="text-gray-200 mx-auto mb-2" />
-              <p className="text-sm text-gray-400">No paid projects yet</p>
-              <p className="text-xs text-gray-300 mt-1">Commissions will appear here once projects are marked as paid</p>
+              <p className="text-sm text-gray-400">Nog geen betaalde projecten</p>
+              <p className="text-xs text-gray-300 mt-1">Commissies verschijnen hier zodra projecten als betaald zijn gemarkeerd</p>
             </div>
           ) : (
             <>
               {/* Summary KPIs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="bg-green-50 rounded-xl p-4 text-center">
-                  <p className="text-xs text-gray-500 mb-1">Projects Paid</p>
+                  <p className="text-xs text-gray-500 mb-1">Betaalde projecten</p>
                   <p className="text-2xl font-bold text-green-700">{proyectosPagados.length}</p>
                 </div>
                 <div className="bg-purple-50 rounded-xl p-4 text-center">
-                  <p className="text-xs text-gray-500 mb-1">Total Commission</p>
+                  <p className="text-xs text-gray-500 mb-1">Totale commissie</p>
                   <p className="text-2xl font-bold text-purple-700">
                     €{proyectosPagados.reduce((s, p) => s + (p.commissieResultaat?.totaleCommissie || 0), 0).toFixed(2)}
                   </p>
@@ -344,9 +344,9 @@ export default function MyProfile() {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase">Project</th>
-                      <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden sm:table-cell">Address</th>
-                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase">Commission</th>
-                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden md:table-cell">Date Paid</th>
+                      <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden sm:table-cell">Adres</th>
+                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase">Commissie</th>
+                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden md:table-cell">Betaald op</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">

@@ -107,15 +107,15 @@ export default function Navbar() {
 
   const adminLinks = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/clientes', label: 'Clients', icon: Users },
-    { path: '/admin/calendario', label: 'Calendar', icon: Calendar },
-    { path: '/admin/electricistas', label: 'Team Stats', icon: BarChart2 },
+    { path: '/admin/clientes', label: 'Klanten', icon: Users },
+    { path: '/admin/calendario', label: 'Kalender', icon: Calendar },
+    { path: '/admin/electricistas', label: 'Teamstatistieken', icon: BarChart2 },
   ];
 
   const clientLinks = [
-    { path: '/mi-perfil', label: 'My Profile', icon: User },
-    { path: '/dashboard', label: 'My Projects', icon: FolderOpen },
-    { path: '/mis-clientes', label: 'My Clients', icon: Users },
+    { path: '/mi-perfil', label: 'Mijn profiel', icon: User },
+    { path: '/dashboard', label: 'Mijn projecten', icon: FolderOpen },
+    { path: '/mis-clientes', label: 'Mijn klanten', icon: Users },
   ];
 
   const links = esAdmin ? adminLinks : clientLinks;
@@ -176,19 +176,19 @@ export default function Navbar() {
               {notifOpen && (
                 <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-xl border z-50 max-h-96 overflow-hidden flex flex-col">
                   <div className="p-3 border-b flex justify-between items-center">
-                    <span className="font-bold text-gray-900 text-sm">Notifications</span>
+                    <span className="font-bold text-gray-900 text-sm">Meldingen</span>
                     {notifCount > 0 && (
                       <button
                         onClick={markAllRead}
                         className="text-xs text-blue-600 hover:underline"
                       >
-                        Mark all read
+                        Alles markeren als gelezen
                       </button>
                     )}
                   </div>
                   <div className="overflow-y-auto flex-1">
                     {notificaciones.length === 0 ? (
-                      <p className="p-4 text-sm text-gray-500 text-center">No notifications</p>
+                      <p className="p-4 text-sm text-gray-500 text-center">Geen meldingen</p>
                     ) : (
                       notificaciones.map(n => (
                         <div
@@ -226,7 +226,7 @@ export default function Navbar() {
             <button
               onClick={handleLogout}
               className="p-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition"
-              title="Logout"
+              title="Uitloggen"
             >
               <LogOut size={20} />
             </button>

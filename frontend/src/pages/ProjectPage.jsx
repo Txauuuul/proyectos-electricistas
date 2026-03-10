@@ -355,10 +355,10 @@ export default function ProjectPage() {
 
       setProyecto(data);
       setRuimteEditorAbierto(null);
-      alert('✓ Floor plan saved successfully');
+      alert('✓ Plattegrond succesvol opgeslagen');
     } catch (error) {
       console.error('❌ Save error:', error);
-      alert(`Error saving: ${error.message}`);
+      alert(`Fout bij opslaan: ${error.message}`);
     } finally {
       setGuardandoPlano(false);
     }
@@ -382,16 +382,16 @@ export default function ProjectPage() {
 
   const getNombreEstado = (estado) => {
     const nombres = {
-      created: 'Created',
-      offer_ready: 'Offer Ready',
-      offer_sent: 'Offer Sent',
-      approved: 'Approved',
-      working: 'Working',
-      finished: 'Finished',
-      pending_payment: 'Pending Payment',
-      billed: 'Billed',
-      paid: 'Paid',
-      rejected: 'Rejected',
+      created: 'Aangemaakt',
+      offer_ready: 'Offerte klaar',
+      offer_sent: 'Offerte verzonden',
+      approved: 'Goedgekeurd',
+      working: 'In uitvoering',
+      finished: 'Afgerond',
+      pending_payment: 'Wacht op betaling',
+      billed: 'Gefactureerd',
+      paid: 'Betaald',
+      rejected: 'Afgewezen',
     };
     return nombres[estado] || estado;
   };
@@ -469,7 +469,7 @@ export default function ProjectPage() {
   if (cargando) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600 text-lg">Loading project...</p>
+        <p className="text-gray-600 text-lg">Project laden...</p>
       </div>
     );
   }
@@ -477,12 +477,12 @@ export default function ProjectPage() {
   if (error || !proyecto) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-        <p className="text-red-600 text-lg mb-4">{error || 'Project not found'}</p>
+        <p className="text-red-600 text-lg mb-4">{error || 'Project niet gevonden'}</p>
         <button
           onClick={() => navigate('/dashboard')}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex gap-2 items-center font-semibold"
         >
-          <ArrowLeft size={20} /> Back to Dashboard
+          <ArrowLeft size={20} /> Terug naar dashboard
         </button>
       </div>
     );
@@ -509,15 +509,15 @@ export default function ProjectPage() {
       {/* ── STATUS BANNER (electricista only) ── */}
       {usuario?.rol !== 'administrador' && (() => {
         const bannerMap = {
-          created: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800', icon: '📋', title: 'Project submitted', sub: 'Your project is waiting for the admin to review it and prepare an offer.' },
-          offer_ready: { bg: 'bg-purple-50 border-purple-200', text: 'text-purple-800', icon: '📄', title: 'Offer being prepared', sub: 'The admin is preparing your project offer.' },
-          offer_sent: { bg: 'bg-indigo-50 border-indigo-300', text: 'text-indigo-900', icon: '✍️', title: 'Offer pending your signature!', sub: 'Scroll down to review and sign the offer to get started.' },
-          approved: { bg: 'bg-green-50 border-green-200', text: 'text-green-800', icon: '✅', title: 'Offer approved!', sub: 'The client has signed the offer. Installation can begin.' },
-          working: { bg: 'bg-yellow-50 border-yellow-200', text: 'text-yellow-900', icon: '🔧', title: 'Installation in progress', sub: 'Work is currently underway on this project.' },
-          finished: { bg: 'bg-teal-50 border-teal-200', text: 'text-teal-800', icon: '🏁', title: 'Work finished', sub: 'Installation complete. Awaiting payment processing.' },
-          pending_payment: { bg: 'bg-orange-50 border-orange-200', text: 'text-orange-800', icon: '💳', title: 'Payment pending', sub: 'Work is complete. Payment is being processed.' },
-          paid: { bg: 'bg-green-50 border-green-300', text: 'text-green-900', icon: '🎉', title: 'Project complete — Paid!', sub: 'All done. Thank you for your work on this project!' },
-          rejected: { bg: 'bg-red-50 border-red-200', text: 'text-red-800', icon: '❌', title: 'Project rejected', sub: 'This project was not approved. Contact the admin for details.' },
+          created: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800', icon: '📋', title: 'Project ingediend', sub: 'Uw project wacht op beoordeling door de admin en op de voorbereiding van een offerte.' },
+          offer_ready: { bg: 'bg-purple-50 border-purple-200', text: 'text-purple-800', icon: '📄', title: 'Offerte wordt voorbereid', sub: 'De admin bereidt uw projectofferte voor.' },
+          offer_sent: { bg: 'bg-indigo-50 border-indigo-300', text: 'text-indigo-900', icon: '✍️', title: 'Offerte wacht op uw handtekening!', sub: 'Scroll naar beneden om de offerte te bekijken en te ondertekenen.' },
+          approved: { bg: 'bg-green-50 border-green-200', text: 'text-green-800', icon: '✅', title: 'Offerte goedgekeurd!', sub: 'De klant heeft de offerte ondertekend. De installatie kan beginnen.' },
+          working: { bg: 'bg-yellow-50 border-yellow-200', text: 'text-yellow-900', icon: '🔧', title: 'Installatie in uitvoering', sub: 'Er wordt momenteel aan dit project gewerkt.' },
+          finished: { bg: 'bg-teal-50 border-teal-200', text: 'text-teal-800', icon: '🏁', title: 'Werk afgerond', sub: 'De installatie is voltooid. Betalingsverwerking is nog lopende.' },
+          pending_payment: { bg: 'bg-orange-50 border-orange-200', text: 'text-orange-800', icon: '💳', title: 'Betaling in afwachting', sub: 'Het werk is afgerond. De betaling wordt verwerkt.' },
+          paid: { bg: 'bg-green-50 border-green-300', text: 'text-green-900', icon: '🎉', title: 'Project voltooid — betaald!', sub: 'Alles is klaar. Bedankt voor uw werk aan dit project!' },
+          rejected: { bg: 'bg-red-50 border-red-200', text: 'text-red-800', icon: '❌', title: 'Project afgewezen', sub: 'Dit project werd niet goedgekeurd. Neem contact op met de admin voor meer info.' },
         };
         const b = bannerMap[proyecto.estado];
         if (!b) return null;
@@ -538,12 +538,12 @@ export default function ProjectPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
         {/* Información General */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Project Information</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Projectinformatie</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Start Date</p>
+              <p className="text-sm text-gray-600">Startdatum</p>
               <p className="text-lg font-semibold text-gray-900">
-                {new Date(proyecto.fechaInicio).toLocaleDateString('en-US')}
+                {new Date(proyecto.fechaInicio).toLocaleDateString('nl-BE')}
               </p>
             </div>
             <div>
@@ -556,16 +556,16 @@ export default function ProjectPage() {
                       onChange={(e) => cambiarEstado(e.target.value)}
                       className="px-3 py-1 rounded border border-gray-300 text-sm"
                     >
-                      <option value="created">Created</option>
-                      <option value="offer_ready">Offer Ready</option>
-                      <option value="offer_sent">Offer Sent</option>
-                      <option value="approved">Approved</option>
-                      <option value="working">Working</option>
-                      <option value="finished">Finished</option>
-                      <option value="pending_payment">Pending Payment</option>
-                      <option value="billed">Billed</option>
-                      <option value="paid">Paid</option>
-                      <option value="rejected">Rejected</option>
+                      <option value="created">Aangemaakt</option>
+                      <option value="offer_ready">Offerte klaar</option>
+                      <option value="offer_sent">Offerte verzonden</option>
+                      <option value="approved">Goedgekeurd</option>
+                      <option value="working">In uitvoering</option>
+                      <option value="finished">Afgerond</option>
+                      <option value="pending_payment">Wacht op betaling</option>
+                      <option value="billed">Gefactureerd</option>
+                      <option value="paid">Betaald</option>
+                      <option value="rejected">Afgewezen</option>
                     </select>
                   ) : (
                     <>
@@ -575,7 +575,7 @@ export default function ProjectPage() {
                       <button
                         onClick={() => setEditandoEstado(true)}
                         className="p-1 hover:bg-gray-100 rounded transition"
-                        title="Cambiar estado"
+                        title="Status wijzigen"
                       >
                         <Edit2 size={16} className="text-gray-600" />
                       </button>
@@ -589,17 +589,17 @@ export default function ProjectPage() {
               )}
             </div>
             <div>
-              <p className="text-sm text-gray-600">Rooms</p>
+              <p className="text-sm text-gray-600">Ruimtes</p>
               <p className="text-lg font-semibold text-gray-900">{proyecto.ruimtes?.length || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Floor Plans</p>
+              <p className="text-sm text-gray-600">Plattegronden</p>
               <p className="text-lg font-semibold text-gray-900">
                 {(proyecto.ruimtes?.filter(r => r.platteGrond).length || 0) + (proyecto.planos?.length || 0)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Photos</p>
+              <p className="text-sm text-gray-600">Foto's</p>
               <p className="text-lg font-semibold text-gray-900">
                 {(proyecto.ruimtes?.reduce((s, r) => s + (r.fotos?.length || 0), 0) || 0) + (proyecto.fotosLocalizacion?.length || 0)}
               </p>
@@ -612,20 +612,20 @@ export default function ProjectPage() {
           proyecto.reaperturas?.some(r => !r.aceptado) ? (
             /* Reopen case: pending amendment signature */
             <div className="bg-orange-50 border border-orange-300 rounded-lg shadow-md p-6 mb-8 text-center">
-              <h2 className="text-xl font-bold text-orange-800 mb-2">Amendment pending your signature!</h2>
-              <p className="text-orange-700 mb-1">The administrator has made changes to your project.</p>
-              <p className="text-orange-600 text-sm">Please scroll down to <strong>Amendments / Reopenings</strong> to review and sign the updated documents before work can continue.</p>
+              <h2 className="text-xl font-bold text-orange-800 mb-2">Wijziging wacht op uw handtekening!</h2>
+              <p className="text-orange-700 mb-1">De beheerder heeft wijzigingen aangebracht aan uw project.</p>
+              <p className="text-orange-600 text-sm">Scroll naar beneden naar <strong>Wijzigingen / Heropeningen</strong> om de bijgewerkte documenten te bekijken en te ondertekenen voordat het werk kan doorgaan.</p>
             </div>
           ) : (
             /* Initial offer */
             <div className="bg-indigo-50 border border-indigo-200 rounded-lg shadow-md p-6 mb-8 text-center">
-              <h2 className="text-xl font-bold text-indigo-800 mb-2">You have a pending offer!</h2>
-              <p className="text-indigo-600 mb-4">Review the proposal and sign the contract to get started.</p>
+              <h2 className="text-xl font-bold text-indigo-800 mb-2">U hebt een openstaande offerte!</h2>
+              <p className="text-indigo-600 mb-4">Bekijk het voorstel en onderteken het contract om te starten.</p>
               <button
                 onClick={() => navigate(`/proyecto/${id}/ver-oferta`)}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-lg transition"
               >
-                <FileText size={20} /> View & Sign Offer
+                <FileText size={20} /> Offerte bekijken en tekenen
               </button>
             </div>
           )
@@ -635,32 +635,32 @@ export default function ProjectPage() {
         {proyecto.oferta && (proyecto.oferta.precioTotalEstimado > 0 || proyecto.oferta.precioTotal > 0) && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign size={22} /> Offer Summary
+              <DollarSign size={22} /> Offerteoverzicht
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-gray-500">Estimated Total Price</p>
+                <p className="text-gray-500">Geschatte totaalprijs</p>
                 <p className="text-2xl font-bold text-green-700">€{((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0).toFixed(2)}</p>
               </div>
               {proyecto.oferta.fechaInicioInstalacion && (
                 <div>
-                  <p className="text-gray-500">Installation Start</p>
-                  <p className="font-semibold">{new Date(proyecto.oferta.fechaInicioInstalacion).toLocaleDateString('en-US')}</p>
+                  <p className="text-gray-500">Start installatie</p>
+                  <p className="font-semibold">{new Date(proyecto.oferta.fechaInicioInstalacion).toLocaleDateString('nl-BE')}</p>
                 </div>
               )}
               {proyecto.oferta.duracionEstimadaDias && (
                 <div>
-                  <p className="text-gray-500">Duration</p>
-                  <p className="font-semibold">{proyecto.oferta.duracionEstimadaDias} days</p>
+                  <p className="text-gray-500">Duur</p>
+                  <p className="font-semibold">{proyecto.oferta.duracionEstimadaDias} dagen</p>
                 </div>
               )}
             </div>
             {proyecto.oferta.firmaCliente && (
               <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500 mb-2">Client Signature:</p>
-                <img src={proyecto.oferta.firmaCliente} alt="Signature" className="max-w-xs border rounded-lg shadow-sm" />
+                <p className="text-sm text-gray-500 mb-2">Handtekening van klant:</p>
+                <img src={proyecto.oferta.firmaCliente} alt="Handtekening" className="max-w-xs border rounded-lg shadow-sm" />
                 <p className="text-xs text-gray-400 mt-1">
-                  Signed on {proyecto.oferta.fechaFirma ? new Date(proyecto.oferta.fechaFirma).toLocaleDateString('en-US') : 'N/A'}
+                  Ondertekend op {proyecto.oferta.fechaFirma ? new Date(proyecto.oferta.fechaFirma).toLocaleDateString('nl-BE') : 'N.v.t.'}
                 </p>
               </div>
             )}
@@ -670,7 +670,7 @@ export default function ProjectPage() {
                 onClick={() => navigate(`/proyecto/${id}/${usuario?.rol === 'administrador' ? 'preparar-oferta' : 'ver-oferta'}`)}
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold text-sm transition"
               >
-                <ExternalLink size={16} /> View Full Offer Details
+                <ExternalLink size={16} /> Volledige offerte bekijken
               </button>
             </div>
           </div>
@@ -682,16 +682,16 @@ export default function ProjectPage() {
          proyecto.oferta && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 border-l-4 border-blue-500">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign size={20} className="text-blue-600" /> Financial Summary
+              <DollarSign size={20} className="text-blue-600" /> Financieel overzicht
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Offer Price</p>
+                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Offerteprijs</p>
                 <p className="text-2xl font-bold text-blue-700">€{((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0).toFixed(2)}</p>
               </div>
               {proyecto.commissieResultaat && (
                 <div className="bg-orange-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Commission to Electrician</p>
+                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Commissie voor elektricien</p>
                   <p className="text-2xl font-bold text-orange-700">€{(proyecto.commissieResultaat.totaleCommissie || 0).toFixed(2)}</p>
                   <p className="text-xs text-gray-400 mt-1">
                     {[
@@ -705,19 +705,19 @@ export default function ProjectPage() {
               )}
               {proyecto.commissieResultaat && (
                 <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Net Gain for Company</p>
+                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Netto winst voor bedrijf</p>
                   <p className="text-2xl font-bold text-green-700">
                     €{(((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0) - (proyecto.commissieResultaat.totaleCommissie || 0)).toFixed(2)}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
-                    {(((((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0) - (proyecto.commissieResultaat.totaleCommissie || 0)) / ((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 1) * 100).toFixed(1))}% margin
+                    {(((((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0) - (proyecto.commissieResultaat.totaleCommissie || 0)) / ((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 1) * 100).toFixed(1))}% marge
                   </p>
                 </div>
               )}
             </div>
             {proyecto.commissieResultaat && (
               <div className="border-t pt-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Commission Breakdown</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Commissie-opbouw</p>
                 <div className="flex flex-wrap gap-2 text-sm">
                   {[
                     { key: 'type1', label: 'Type 1', pct: proyecto.commissieResultaat.type1Pct, amt: proyecto.commissieResultaat.type1Commissie },
@@ -736,8 +736,8 @@ export default function ProjectPage() {
             )}
             <div className="mt-4 pt-3 border-t">
               {proyecto.estado === 'paid'
-                ? <p className="text-sm font-semibold text-green-700">✓ Payment received</p>
-                : <p className="text-sm font-semibold text-orange-600">⏳ Awaiting payment</p>}
+                ? <p className="text-sm font-semibold text-green-700">✓ Betaling ontvangen</p>
+                : <p className="text-sm font-semibold text-orange-600">⏳ Wachten op betaling</p>}
             </div>
           </div>
         )}
@@ -745,17 +745,17 @@ export default function ProjectPage() {
         {/* Planos */}
         {proyecto.planos && proyecto.planos.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Floor Plans ({proyecto.planos.length})</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Plattegronden ({proyecto.planos.length})</h2>
             <div className="space-y-8">
               {proyecto.planos.map((plano, idx) => (
                 <div key={idx} className="border-b pb-8 last:border-b-0">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Floor Plan {idx + 1}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Plattegrond {idx + 1}</h3>
                     <button
                       onClick={() => setPlanoEditorAbierto(idx)}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex gap-2 items-center text-sm font-semibold transition"
                     >
-                      <Edit2 size={16} /> Edit
+                      <Edit2 size={16} /> Bewerken
                     </button>
                   </div>
                   
@@ -844,13 +844,13 @@ export default function ProjectPage() {
                   {/* Comentarios */}
                   {plano.comentarios && (
                     <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-                      <p className="text-sm font-semibold text-gray-700 mb-1">Notes:</p>
+                      <p className="text-sm font-semibold text-gray-700 mb-1">Notities:</p>
                       <p className="text-gray-700">{plano.comentarios}</p>
                     </div>
                   )}
 
                   {plano.marcadores && plano.marcadores.length > 0 && (
-                    <p className="text-xs text-gray-400 mt-1">{plano.marcadores.length} marker{plano.marcadores.length !== 1 ? 's' : ''} placed</p>
+                    <p className="text-xs text-gray-400 mt-1">{plano.marcadores.length} markering{plano.marcadores.length !== 1 ? 'en' : ''} geplaatst</p>
                   )}
                 </div>
               ))}
@@ -861,7 +861,7 @@ export default function ProjectPage() {
         {/* Fotos */}
         {proyecto.fotosLocalizacion && proyecto.fotosLocalizacion.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Location Photos ({proyecto.fotosLocalizacion.length})</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Locatiefoto's ({proyecto.fotosLocalizacion.length})</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {proyecto.fotosLocalizacion.map((foto, idx) => (
                 <div 
@@ -888,11 +888,11 @@ export default function ProjectPage() {
         {/* Ruimtes (rooms from new wizard) */}
         {proyecto.ruimtes && proyecto.ruimtes.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Rooms ({proyecto.ruimtes.length})</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Ruimtes ({proyecto.ruimtes.length})</h2>
             <div className="space-y-8">
               {proyecto.ruimtes.map((ruimte, idx) => (
                 <div key={idx} className="border-b pb-8 last:border-b-0">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{ruimte.naam || `Room ${idx + 1}`}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{ruimte.naam || `Ruimte ${idx + 1}`}</h3>
                   {ruimte.omschrijving && (
                     <p className="text-gray-600 text-sm mb-3">{ruimte.omschrijving}</p>
                   )}
@@ -901,26 +901,26 @@ export default function ProjectPage() {
                   {ruimte.platteGrond && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Floor Plan</p>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Plattegrond</p>
                         {usuario?.rol === 'administrador' && (
                           <button
                             onClick={() => setRuimteEditorAbierto(idx)}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg flex gap-1 items-center text-xs font-semibold transition"
                           >
-                            <Edit2 size={13} /> Edit
+                            <Edit2 size={13} /> Bewerken
                           </button>
                         )}
                       </div>
                       <div
                         className="bg-gray-100 rounded-lg overflow-hidden flex justify-center items-center relative cursor-pointer group"
                         style={{ position: 'relative', maxHeight: '400px' }}
-                        onClick={() => { setModalLightbox({ src: ruimte.platteGrond, title: `${ruimte.naam || `Room ${idx + 1}`} – Floor Plan`, marcadores: ruimte.marcadores, drawingSrc: ruimteDrawingUrls[idx] || null }); setZoomLightbox(1); }}
-                        title="Click to enlarge"
+                        onClick={() => { setModalLightbox({ src: ruimte.platteGrond, title: `${ruimte.naam || `Ruimte ${idx + 1}`} – Plattegrond`, marcadores: ruimte.marcadores, drawingSrc: ruimteDrawingUrls[idx] || null }); setZoomLightbox(1); }}
+                        title="Klik om te vergroten"
                       >
                         <div style={{ position: 'relative', display: 'inline-block', width: '100%', paddingBottom: '66.67%' }}>
                           <img
                             src={ruimte.platteGrond}
-                            alt={`Floor plan ${ruimte.naam}`}
+                            alt={`Plattegrond ${ruimte.naam}`}
                             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }}
                           />
                           {/* Freehand drawing overlay */}
@@ -933,7 +933,7 @@ export default function ProjectPage() {
                           )}
                           {/* Zoom hint overlay */}
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center pointer-events-none">
-                            <span className="opacity-0 group-hover:opacity-100 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded transition">🔍 Click to enlarge</span>
+                            <span className="opacity-0 group-hover:opacity-100 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded transition">🔍 Klik om te vergroten</span>
                           </div>
                           {/* Markers */}
                           {ruimte.marcadores && ruimte.marcadores.length > 0 && (
@@ -963,7 +963,7 @@ export default function ProjectPage() {
                       </div>
                       {ruimte.marcadores && ruimte.marcadores.length > 0 && (
                         <p className="text-xs text-gray-500 mt-1">
-                          {ruimte.marcadores.length} marker{ruimte.marcadores.length !== 1 ? 's' : ''} placed
+                          {ruimte.marcadores.length} markering{ruimte.marcadores.length !== 1 ? 'en' : ''} geplaatst
                         </p>
                       )}
                     </div>
@@ -972,17 +972,17 @@ export default function ProjectPage() {
                   {/* Photos */}
                   {ruimte.fotos && ruimte.fotos.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Photos ({ruimte.fotos.length})</p>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Foto's ({ruimte.fotos.length})</p>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                         {ruimte.fotos.map((foto, fi) => (
                           <div
                             key={fi}
                             className="bg-gray-100 rounded-lg overflow-hidden aspect-square cursor-pointer group relative"
-                            onClick={() => { setModalLightbox({ src: foto, title: `${ruimte.naam || `Room ${idx + 1}`} – Photo ${fi + 1}`, marcadores: [] }); setZoomLightbox(1); }}
+                            onClick={() => { setModalLightbox({ src: foto, title: `${ruimte.naam || `Ruimte ${idx + 1}`} – Foto ${fi + 1}`, marcadores: [] }); setZoomLightbox(1); }}
                           >
                             <img
                               src={foto}
-                              alt={`${ruimte.naam} photo ${fi + 1}`}
+                              alt={`${ruimte.naam} foto ${fi + 1}`}
                               className="w-full h-full object-cover transition group-hover:brightness-75"
                             />
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
@@ -1003,10 +1003,10 @@ export default function ProjectPage() {
         {usuario?.rol !== 'administrador' && ['working', 'pending_payment', 'paid'].includes(proyecto.estado) && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <MessageSquare size={22} /> Additional Information
+              <MessageSquare size={22} /> Aanvullende informatie
             </h2>
             <p className="text-sm text-gray-500 mb-4">
-              Send additional details, plans, or photos to the team after signing the contract.
+              Verstuur extra details, plannen of foto's naar het team na ondertekening van het contract.
             </p>
 
             {/* Existing entries */}
@@ -1023,14 +1023,14 @@ export default function ProjectPage() {
                     {info.planos && info.planos.length > 0 && (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
                         {info.planos.map((p, pi) => (
-                          <img key={pi} src={p} alt={`Additional plan ${pi+1}`} className="rounded border object-contain h-32 w-full bg-white" />
+                          <img key={pi} src={p} alt={`Extra plan ${pi+1}`} className="rounded border object-contain h-32 w-full bg-white" />
                         ))}
                       </div>
                     )}
                     {info.fotos && info.fotos.length > 0 && (
                       <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                         {info.fotos.map((f, fi) => (
-                          <img key={fi} src={f} alt={`Additional photo ${fi+1}`} className="rounded border object-cover h-24 w-full" />
+                          <img key={fi} src={f} alt={`Extra foto ${fi+1}`} className="rounded border object-cover h-24 w-full" />
                         ))}
                       </div>
                     )}
@@ -1045,7 +1045,7 @@ export default function ProjectPage() {
                 onClick={() => setMostrarFormInfo(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold transition"
               >
-                <Upload size={16} /> Add Information
+                <Upload size={16} /> Informatie toevoegen
               </button>
             ) : (
               <div className="border border-blue-200 rounded-lg p-4 bg-blue-50 space-y-4">
@@ -1053,12 +1053,12 @@ export default function ProjectPage() {
                   value={infoTexto}
                   onChange={(e) => setInfoTexto(e.target.value)}
                   rows={3}
-                  placeholder="Describe the additional information..."
+                  placeholder="Beschrijf de aanvullende informatie..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Additional Plans</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Extra plannen</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -1073,11 +1073,11 @@ export default function ProjectPage() {
                       className="text-sm"
                     />
                     {infoPlanos.length > 0 && (
-                      <p className="text-xs text-gray-500 mt-1">{infoPlanos.length} plan(s) selected</p>
+                      <p className="text-xs text-gray-500 mt-1">{infoPlanos.length} plan(nen) geselecteerd</p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Additional Photos</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Extra foto's</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -1092,7 +1092,7 @@ export default function ProjectPage() {
                       className="text-sm"
                     />
                     {infoFotos.length > 0 && (
-                      <p className="text-xs text-gray-500 mt-1">{infoFotos.length} photo(s) selected</p>
+                      <p className="text-xs text-gray-500 mt-1">{infoFotos.length} foto('s) geselecteerd</p>
                     )}
                   </div>
                 </div>
@@ -1100,7 +1100,7 @@ export default function ProjectPage() {
                   <button
                     onClick={async () => {
                       if (!infoTexto && infoPlanos.length === 0 && infoFotos.length === 0) {
-                        alert('Please add text, plans or photos.');
+                        alert("Voeg tekst, plannen of foto's toe.");
                         return;
                       }
                       setEnviandoInfo(true);
@@ -1110,26 +1110,26 @@ export default function ProjectPage() {
                           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                           body: JSON.stringify({ texto: infoTexto, planos: infoPlanos, fotos: infoFotos }),
                         });
-                        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Error'); }
-                        alert('Additional information sent successfully!');
+                        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Fout'); }
+                        alert('Aanvullende informatie succesvol verzonden!');
                         setMostrarFormInfo(false);
                         setInfoTexto('');
                         setInfoPlanos([]);
                         setInfoFotos([]);
                         window.location.reload();
-                      } catch (err) { alert('Error: ' + err.message); }
+                      } catch (err) { alert('Fout: ' + err.message); }
                       finally { setEnviandoInfo(false); }
                     }}
                     disabled={enviandoInfo}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
                   >
-                    <Send size={16} /> {enviandoInfo ? 'Sending...' : 'Send'}
+                    <Send size={16} /> {enviandoInfo ? 'Verzenden...' : 'Verzenden'}
                   </button>
                   <button
                     onClick={() => { setMostrarFormInfo(false); setInfoTexto(''); setInfoPlanos([]); setInfoFotos([]); }}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition"
                   >
-                    Cancel
+                    Annuleren
                   </button>
                 </div>
               </div>
@@ -1141,7 +1141,7 @@ export default function ProjectPage() {
         {usuario?.rol === 'administrador' && proyecto.infoAdicional && proyecto.infoAdicional.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <MessageSquare size={22} /> Additional Information from Client
+              <MessageSquare size={22} /> Aanvullende informatie van klant
             </h2>
             <div className="space-y-4">
               {proyecto.infoAdicional.map((info, idx) => (
@@ -1158,7 +1158,7 @@ export default function ProjectPage() {
                   {info.fotos && info.fotos.length > 0 && (
                     <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                       {info.fotos.map((f, fi) => (
-                        <img key={fi} src={f} alt={`Photo ${fi+1}`} className="rounded border object-cover h-24 w-full" />
+                        <img key={fi} src={f} alt={`Foto ${fi+1}`} className="rounded border object-cover h-24 w-full" />
                       ))}
                     </div>
                   )}
@@ -1172,16 +1172,16 @@ export default function ProjectPage() {
         {usuario?.rol !== 'administrador' && ['working', 'pending_payment', 'paid'].includes(proyecto.estado) && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <PenTool size={22} /> Propose Changes
+              <PenTool size={22} /> Wijzigingen voorstellen
             </h2>
             <p className="text-sm text-gray-500 mb-4">
-              Request changes or additional work from the management team.
+              Vraag wijzigingen of extra werk aan bij het beheersysteem.
             </p>
 
             {/* Display previous proposals */}
             {proyecto.propuestasCliente && proyecto.propuestasCliente.length > 0 && (
               <div className="space-y-3 mb-6 bg-gray-50 p-4 rounded-lg">
-                <p className="text-sm font-semibold text-gray-700">Your previous proposals:</p>
+                <p className="text-sm font-semibold text-gray-700">Uw vorige voorstellen:</p>
                 {proyecto.propuestasCliente.map((prop, idx) => (
                   <div key={idx} className="bg-white p-3 rounded border border-gray-200">
                     <p className="text-xs text-gray-400 mb-1">{new Date(prop.fechaCreacion).toLocaleString()}</p>
@@ -1197,7 +1197,7 @@ export default function ProjectPage() {
                 onClick={() => setMostrarFormPropuesta(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-sm font-semibold transition"
               >
-                <PenTool size={16} /> Submit New Proposal
+                <PenTool size={16} /> Nieuw voorstel indienen
               </button>
             ) : (
               <div className="border border-purple-200 rounded-lg p-4 bg-purple-50 space-y-4">
@@ -1205,14 +1205,14 @@ export default function ProjectPage() {
                   value={propuestaDemandas}
                   onChange={(e) => setPropuestaDemandas(e.target.value)}
                   rows={4}
-                  placeholder="Describe the changes or additional work you need..."
+                  placeholder="Beschrijf de wijzigingen of het extra werk dat u nodig hebt..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
                 />
                 <div className="flex gap-3">
                   <button
                     onClick={async () => {
                       if (!propuestaDemandas.trim()) {
-                        alert('Please describe your proposal.');
+                        alert('Beschrijf uw voorstel.');
                         return;
                       }
                       setEnviandoPropuesta(true);
@@ -1222,24 +1222,24 @@ export default function ProjectPage() {
                           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                           body: JSON.stringify({ demandas: propuestaDemandas }),
                         });
-                        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Error'); }
-                        alert('Proposal submitted! The management team will review it soon.');
+                        if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Fout'); }
+                        alert('Voorstel ingediend! Het beheerteam zal dit binnenkort bekijken.');
                         setMostrarFormPropuesta(false);
                         setPropuestaDemandas('');
                         window.location.reload();
-                      } catch (err) { alert('Error: ' + err.message); }
+                      } catch (err) { alert('Fout: ' + err.message); }
                       finally { setEnviandoPropuesta(false); }
                     }}
                     disabled={enviandoPropuesta}
                     className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
                   >
-                    <Send size={16} /> {enviandoPropuesta ? 'Submitting...' : 'Submit Proposal'}
+                    <Send size={16} /> {enviandoPropuesta ? 'Indienen...' : 'Voorstel indienen'}
                   </button>
                   <button
                     onClick={() => { setMostrarFormPropuesta(false); setPropuestaDemandas(''); }}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition"
                   >
-                    Cancel
+                    Annuleren
                   </button>
                 </div>
               </div>
@@ -1251,7 +1251,7 @@ export default function ProjectPage() {
         {usuario?.rol === 'administrador' && proyecto.propuestasCliente && proyecto.propuestasCliente.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <PenTool size={22} /> Client Change Proposals
+              <PenTool size={22} /> Voorstellen van klantwijzigingen
             </h2>
             <div className="space-y-3">
               {proyecto.propuestasCliente.map((prop, idx) => (
@@ -1268,7 +1268,7 @@ export default function ProjectPage() {
         {['working', 'pending_payment', 'paid'].includes(proyecto.estado) && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <RotateCcw size={22} /> Amendments / Reopenings
+              <RotateCcw size={22} /> Wijzigingen / Heropeningen
             </h2>
 
             {/* Existing reopenings */}
@@ -1279,7 +1279,7 @@ export default function ProjectPage() {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${rea.aceptado ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
-                          {rea.aceptado ? 'Signed' : 'Pending Signature'}
+                          {rea.aceptado ? 'Ondertekend' : 'Wacht op handtekening'}
                         </span>
                         <span className="text-xs text-gray-400 ml-2">
                           {new Date(rea.fechaCreacion).toLocaleString()}
@@ -1289,7 +1289,7 @@ export default function ProjectPage() {
                     <p className="text-gray-700 mb-2">{rea.descripcionCambios}</p>
                     {rea.presupuestoItems && rea.presupuestoItems.length > 0 && (
                       <div className="mb-2">
-                        <p className="text-sm font-semibold text-gray-600 mb-1">Additional Budget:</p>
+                        <p className="text-sm font-semibold text-gray-600 mb-1">Extra budget:</p>
                         <ul className="text-sm text-gray-600 space-y-1">
                           {rea.presupuestoItems.map((item, bi) => (
                             <li key={bi} className="flex justify-between">
@@ -1302,15 +1302,15 @@ export default function ProjectPage() {
                     )}
                     {rea.documentoPDF && (
                       <a href={rea.documentoPDF} download className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1 mb-2">
-                        <FileText size={14} /> Download Amendment PDF
+                        <FileText size={14} /> PDF van wijziging downloaden
                       </a>
                     )}
                     {rea.firmaCliente && (
                       <div className="mt-2">
-                        <p className="text-xs text-gray-500">Client Signature:</p>
-                        <img src={rea.firmaCliente} alt="Signature" className="max-w-[200px] border rounded shadow-sm mt-1" />
+                        <p className="text-xs text-gray-500">Handtekening van klant:</p>
+                        <img src={rea.firmaCliente} alt="Handtekening" className="max-w-[200px] border rounded shadow-sm mt-1" />
                         <p className="text-xs text-gray-400 mt-1">
-                          Signed on {rea.fechaFirma ? new Date(rea.fechaFirma).toLocaleString() : 'N/A'}
+                          Ondertekend op {rea.fechaFirma ? new Date(rea.fechaFirma).toLocaleString() : 'N.v.t.'}
                         </p>
                       </div>
                     )}
@@ -1320,7 +1320,7 @@ export default function ProjectPage() {
                       <div className="mt-3 pt-3 border-t">
                         {firmandoReapertura === idx ? (
                           <div className="space-y-3">
-                            <p className="text-sm font-semibold text-gray-700">Sign this amendment:</p>
+                            <p className="text-sm font-semibold text-gray-700">Onderteken deze wijziging:</p>
                             <canvas
                               id={`firma-reapertura-${idx}`}
                               width={400}
@@ -1351,29 +1351,29 @@ export default function ProjectPage() {
                             <div className="flex gap-3">
                               <button
                                 onClick={async () => {
-                                  if (!firmaReaperturaData) { alert('Please sign first.'); return; }
+                                  if (!firmaReaperturaData) { alert('Gelieve eerst te ondertekenen.'); return; }
                                   try {
                                     const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}/reapertura/${idx}/firmar`, {
                                       method: 'POST',
                                       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                                       body: JSON.stringify({ firmaCliente: firmaReaperturaData }),
                                     });
-                                    if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Error'); }
-                                    alert('Amendment signed successfully!');
+                                    if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Fout'); }
+                                    alert('Wijziging succesvol ondertekend!');
                                     setFirmandoReapertura(null);
                                     setFirmaReaperturaData(null);
                                     window.location.reload();
-                                  } catch (err) { alert('Error: ' + err.message); }
+                                  } catch (err) { alert('Fout: ' + err.message); }
                                 }}
                                 className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition"
                               >
-                                <PenTool size={16} /> Confirm Signature
+                                <PenTool size={16} /> Handtekening bevestigen
                               </button>
                               <button
                                 onClick={() => { setFirmandoReapertura(null); setFirmaReaperturaData(null); }}
                                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition"
                               >
-                                Cancel
+                                Annuleren
                               </button>
                             </div>
                           </div>
@@ -1382,7 +1382,7 @@ export default function ProjectPage() {
                             onClick={() => setFirmandoReapertura(idx)}
                             className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-semibold transition"
                           >
-                            <PenTool size={16} /> Sign Amendment
+                            <PenTool size={16} /> Wijziging ondertekenen
                           </button>
                         )}
                       </div>
@@ -1400,22 +1400,22 @@ export default function ProjectPage() {
                     onClick={() => setMostrarFormReapertura(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-lg text-sm font-semibold transition"
                   >
-                    <RotateCcw size={16} /> Create Amendment
+                    <RotateCcw size={16} /> Wijziging aanmaken
                   </button>
                 ) : (
                   <div className="border border-orange-200 rounded-lg p-4 bg-orange-50 space-y-4">
-                    <h3 className="font-semibold text-gray-800">New Amendment</h3>
+                    <h3 className="font-semibold text-gray-800">Nieuwe wijziging</h3>
                     <textarea
                       value={reaperturaDescripcion}
                       onChange={(e) => setReaperturaDescripcion(e.target.value)}
                       rows={3}
-                      placeholder="Describe the changes needed..."
+                      placeholder="Beschrijf de nodige wijzigingen..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none resize-none"
                     />
 
                     {/* Additional budget items */}
                     <div>
-                      <p className="text-sm font-semibold text-gray-700 mb-2">Additional Budget Items</p>
+                      <p className="text-sm font-semibold text-gray-700 mb-2">Extra budgetposten</p>
                       {reaperturaPresupuesto.map((item, idx) => (
                         <div key={idx} className="grid grid-cols-4 gap-2 mb-2">
                           <input
@@ -1426,7 +1426,7 @@ export default function ProjectPage() {
                               u[idx].descripcion = e.target.value;
                               setReaperturaPresupuesto(u);
                             }}
-                            placeholder="Description"
+                            placeholder="Beschrijving"
                             className="col-span-2 px-2 py-1 border rounded text-sm"
                           />
                           <input
@@ -1439,7 +1439,7 @@ export default function ProjectPage() {
                               u[idx].total = u[idx].cantidad * u[idx].precioUnitario;
                               setReaperturaPresupuesto(u);
                             }}
-                            placeholder="Qty"
+                            placeholder="Aantal"
                             className="px-2 py-1 border rounded text-sm text-center"
                           />
                           <div className="flex gap-1">
@@ -1454,7 +1454,7 @@ export default function ProjectPage() {
                                 u[idx].total = u[idx].cantidad * u[idx].precioUnitario;
                                 setReaperturaPresupuesto(u);
                               }}
-                              placeholder="Price"
+                              placeholder="Prijs"
                               className="flex-1 px-2 py-1 border rounded text-sm text-right"
                             />
                             <button
@@ -1470,13 +1470,13 @@ export default function ProjectPage() {
                         onClick={() => setReaperturaPresupuesto([...reaperturaPresupuesto, { descripcion: '', cantidad: 1, precioUnitario: 0, total: 0 }])}
                         className="text-sm text-orange-600 hover:text-orange-800 font-semibold"
                       >
-                        + Add Budget Item
+                        + Budgetpost toevoegen
                       </button>
                     </div>
 
                     {/* PDF upload */}
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Amendment PDF (optional)</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">PDF van wijziging (optioneel)</label>
                       <input
                         type="file"
                         accept="application/pdf"
@@ -1489,13 +1489,13 @@ export default function ProjectPage() {
                         }}
                         className="text-sm"
                       />
-                      {reaperturaPDF && <p className="text-xs text-green-600 mt-1">✅ PDF attached</p>}
+                      {reaperturaPDF && <p className="text-xs text-green-600 mt-1">✅ PDF toegevoegd</p>}
                     </div>
 
                     <div className="flex gap-3">
                       <button
                         onClick={async () => {
-                          if (!reaperturaDescripcion.trim()) { alert('Please add a description.'); return; }
+                          if (!reaperturaDescripcion.trim()) { alert('Voeg een beschrijving toe.'); return; }
                           setEnviandoReapertura(true);
                           try {
                             const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}/reapertura`, {
@@ -1508,26 +1508,26 @@ export default function ProjectPage() {
                                 documentoPDF: reaperturaPDF,
                               }),
                             });
-                            if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Error'); }
-                            alert('Amendment created! The client will be notified.');
+                            if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Fout'); }
+                            alert('Wijziging aangemaakt! De klant wordt op de hoogte gebracht.');
                             setMostrarFormReapertura(false);
                             setReaperturaDescripcion('');
                             setReaperturaPresupuesto([]);
                             setReaperturaPDF(null);
                             window.location.reload();
-                          } catch (err) { alert('Error: ' + err.message); }
+                          } catch (err) { alert('Fout: ' + err.message); }
                           finally { setEnviandoReapertura(false); }
                         }}
                         disabled={enviandoReapertura}
                         className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
                       >
-                        <Send size={16} /> {enviandoReapertura ? 'Creating...' : 'Create Amendment'}
+                        <Send size={16} /> {enviandoReapertura ? 'Aanmaken...' : 'Wijziging aanmaken'}
                       </button>
                       <button
                         onClick={() => { setMostrarFormReapertura(false); setReaperturaDescripcion(''); setReaperturaPresupuesto([]); setReaperturaPDF(null); }}
                         className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition"
                       >
-                        Cancel
+                        Annuleren
                       </button>
                     </div>
                   </div>
@@ -1602,7 +1602,7 @@ export default function ProjectPage() {
         {proyecto.historialEstados && proyecto.historialEstados.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
-              <span className="text-gray-500">📋</span> Project Timeline
+              <span className="text-gray-500">📋</span> Projecttijdlijn
             </h2>
             <div className="relative">
               {/* Vertical line */}
@@ -1615,9 +1615,9 @@ export default function ProjectPage() {
                     pending_payment: 'bg-orange-500', paid: 'bg-green-700', rejected: 'bg-red-500',
                   };
                   const estadoLabels = {
-                    created: 'Created', offer_ready: 'Offer Ready', offer_sent: 'Offer Sent',
-                    approved: 'Approved', working: 'Working', finished: 'Finished',
-                    pending_payment: 'Pending Payment', paid: 'Paid', rejected: 'Rejected',
+                    created: 'Aangemaakt', offer_ready: 'Offerte klaar', offer_sent: 'Offerte verzonden',
+                    approved: 'Goedgekeurd', working: 'In uitvoering', finished: 'Afgerond',
+                    pending_payment: 'Wacht op betaling', paid: 'Betaald', rejected: 'Afgewezen',
                   };
                   const color = estadoColors[entry.estadoNuevo] || 'bg-gray-400';
                   const label = estadoLabels[entry.estadoNuevo] || entry.estadoNuevo;
@@ -1656,7 +1656,7 @@ export default function ProjectPage() {
         {/* ── PROJECT CHAT ── */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <MessageSquare size={20} className="text-blue-600" /> Project Chat
+            <MessageSquare size={20} className="text-blue-600" /> Projectchat
           </h2>
           <ChatPanel proyectoId={id} />
         </div>
@@ -1665,21 +1665,21 @@ export default function ProjectPage() {
         {usuario?.rol === 'administrador' && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl shadow-sm p-5 mb-8">
             <h2 className="text-lg font-bold text-amber-900 mb-3 flex items-center gap-2">
-              <StickyNote size={18} className="text-amber-600" /> Internal Notes
-              <span className="ml-1 text-xs font-normal text-amber-500">(Admin only — not visible to electrician)</span>
+              <StickyNote size={18} className="text-amber-600" /> Interne notities
+              <span className="ml-1 text-xs font-normal text-amber-500">(Alleen admin — niet zichtbaar voor elektricien)</span>
             </h2>
             <textarea
               value={notasInternas}
               onChange={e => setNotasInternas(e.target.value)}
               onBlur={handleGuardarNotas}
               rows={5}
-              placeholder="Add internal notes about this project (visible to admins only)..."
+              placeholder="Voeg interne notities toe over dit project (alleen zichtbaar voor admins)..."
               className="w-full px-3 py-2 border border-amber-200 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 resize-y"
             />
             <div className="flex items-center justify-between mt-2">
               {notasGuardadas && (
                 <span className="text-xs text-green-600 flex items-center gap-1">
-                  <CheckCircle size={12} /> Saved
+                  <CheckCircle size={12} /> Opgeslagen
                 </span>
               )}
               <button
@@ -1687,7 +1687,7 @@ export default function ProjectPage() {
                 disabled={guardandoNotas}
                 className="ml-auto px-4 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white rounded-lg text-sm font-semibold transition"
               >
-                {guardandoNotas ? 'Saving...' : 'Save Notes'}
+                {guardandoNotas ? 'Opslaan...' : 'Notities opslaan'}
               </button>
             </div>
           </div>
@@ -1701,7 +1701,7 @@ export default function ProjectPage() {
                 onClick={() => navigate(`/proyecto/${id}/preparar-oferta`)}
                 className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold text-sm transition"
               >
-                <FileText size={16} /> {proyecto.estado === 'offer_ready' ? 'Edit Offer' : 'Prepare Offer'}
+                <FileText size={16} /> {proyecto.estado === 'offer_ready' ? 'Offerte bewerken' : 'Offerte voorbereiden'}
               </button>
             )}
             {proyecto.estado === 'working' && (
@@ -1709,13 +1709,13 @@ export default function ProjectPage() {
                 onClick={abrirPopupFinalizar}
                 className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition"
               >
-                <CheckCircle size={16} /> Mark Finished
+                <CheckCircle size={16} /> Markeren als afgerond
               </button>
             )}
             {proyecto.estado === 'pending_payment' && (
               <button
                 onClick={async () => {
-                  if (!window.confirm('Mark this project as paid?')) return;
+                  if (!window.confirm('Dit project als betaald markeren?')) return;
                   try {
                     const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}/marcar-pagado`, {
                       method: 'POST',
@@ -1723,18 +1723,18 @@ export default function ProjectPage() {
                     });
                     if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
                     await recargarProyecto();
-                  } catch (err) { alert('Error: ' + err.message); }
+                  } catch (err) { alert('Fout: ' + err.message); }
                 }}
                 className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-sm transition"
               >
-                <DollarSign size={16} /> Mark as Paid
+                <DollarSign size={16} /> Markeren als betaald
               </button>
             )}
             <button
               onClick={handleEliminarProyecto}
               className="ml-auto flex items-center gap-2 px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold text-sm transition"
             >
-              <X size={16} /> Delete Project
+              <X size={16} /> Project verwijderen
             </button>
           </div>
         )}
@@ -1744,7 +1744,7 @@ export default function ProjectPage() {
          (!proyecto.fotosLocalizacion || proyecto.fotosLocalizacion.length === 0) &&
          (!proyecto.ruimtes || proyecto.ruimtes.length === 0) && (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-gray-600 text-lg">This project does not contain floor plans or photos yet</p>
+            <p className="text-gray-600 text-lg">Dit project bevat nog geen plattegronden of foto's</p>
           </div>
         )}
 
@@ -1760,7 +1760,7 @@ export default function ProjectPage() {
             {/* Encabezado del Modal */}
             <div className="bg-gray-900 p-4 flex justify-between items-center border-b border-gray-700">
               <h3 className="text-white font-semibold">
-                Floor Plan {imagenActivaIdx + 1} - Zoom x{zoomLevel.toFixed(1)}
+                Plattegrond {imagenActivaIdx + 1} - Zoom x{zoomLevel.toFixed(1)}
               </h3>
               <button
                 onClick={cerrarModalZoom}
@@ -1857,7 +1857,7 @@ export default function ProjectPage() {
 
             {/* Instrucciones */}
             <div className="bg-gray-800 p-3 text-gray-300 text-sm text-center">
-              💡 Mouse wheel to zoom · Click X to close
+              💡 Gebruik het muiswiel om te zoomen · Klik op X om te sluiten
             </div>
           </div>
         )}
@@ -1877,7 +1877,7 @@ export default function ProjectPage() {
             {/* Encabezado del Modal */}
             <div className="bg-gray-900 p-4 flex justify-between items-center border-b border-gray-700">
               <h3 className="text-white font-semibold">
-                Photo {fotoActivaIdx + 1} - Zoom x{zoomLevelFoto.toFixed(1)}
+                Foto {fotoActivaIdx + 1} - Zoom x{zoomLevelFoto.toFixed(1)}
               </h3>
               <button
                 onClick={cerrarModalFoto}
@@ -2000,23 +2000,23 @@ export default function ProjectPage() {
                 onClick={() => setZoomLightbox(z => Math.max(0.5, z - 0.5))}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition"
               >
-                <ZoomOut size={20} /> Zoom Out
+                <ZoomOut size={20} /> Uitzoomen
               </button>
               <button
                 onClick={() => setZoomLightbox(1)}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded transition"
               >
-                Reset
+                Herstellen
               </button>
               <button
                 onClick={() => setZoomLightbox(z => Math.min(5, z + 0.5))}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition"
               >
-                <ZoomIn size={20} /> Zoom In
+                <ZoomIn size={20} /> Inzoomen
               </button>
             </div>
             <div className="bg-gray-800 p-3 text-gray-300 text-sm text-center">
-              💡 Mouse wheel to zoom · Click outside image to close
+              💡 Gebruik het muiswiel om te zoomen · Klik buiten de afbeelding om te sluiten
             </div>
           </div>
         )}
@@ -2128,7 +2128,7 @@ export default function ProjectPage() {
                           {bedrag > 0 || pct > 0 ? (
                             <>{commissieCalc > 0 ? <span className="font-semibold text-gray-800 not-italic">€ {commissieCalc.toFixed(2)}</span> : <span>€ 0.00</span>}</>
                           ) : (
-                            <span>€ is amount calculated</span>
+                            <span>€ is het berekende bedrag</span>
                           )}
                         </div>
                       </div>
@@ -2160,21 +2160,21 @@ export default function ProjectPage() {
                   onClick={() => setMostrarPopupFinalizar(false)}
                   className="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold text-sm transition"
                 >
-                  Cancel
+                  Annuleren
                 </button>
                 <button
                   onClick={() => handleSubmitFinalizar(false)}
                   disabled={enviandoFinalizar}
                   className="px-5 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-semibold text-sm transition"
                 >
-                  {enviandoFinalizar ? 'Opslaan…' : 'Finalizar (geen e-mail)'}
+                  {enviandoFinalizar ? 'Opslaan…' : 'Afronden (geen e-mail)'}
                 </button>
                 <button
                   onClick={() => handleSubmitFinalizar(true)}
                   disabled={enviandoFinalizar}
                   className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-semibold text-sm transition"
                 >
-                  {enviandoFinalizar ? 'Opslaan…' : 'Finalizar + e-mail client'}
+                  {enviandoFinalizar ? 'Opslaan…' : 'Afronden + e-mail naar klant'}
                 </button>
               </div>
             </div>

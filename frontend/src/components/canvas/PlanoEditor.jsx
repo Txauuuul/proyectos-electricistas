@@ -324,7 +324,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
 
   const limpiarTodo = () => {
     if (!canvasInstanceRef.current) return;
-    if (window.confirm('Are you sure you want to clear everything?')) {
+    if (window.confirm('Weet u zeker dat u alles wilt wissen?')) {
       const canvas = canvasInstanceRef.current;
       // Eliminar objetos uno a uno para preservar el fondo transparente
       // canvas.clear() puede resetear backgroundColor a negro en Fabric.js
@@ -344,13 +344,13 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
       {savedToast && (
         <div className="fixed top-6 right-6 z-[10000] flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-xl shadow-xl animate-fade-in">
           <CheckCircle size={20} />
-          <span className="font-semibold text-sm">Floor plan saved successfully!</span>
+          <span className="font-semibold text-sm">Plattegrond succesvol opgeslagen!</span>
         </div>
       )}
       <div className="bg-white rounded-lg w-full h-full max-w-6xl flex flex-col">
         {/* Header */}
         <div className="bg-gray-900 text-white p-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">✎ {nombrePlano || `Floor Plan ${idxPlano + 1}`}</h2>
+          <h2 className="text-2xl font-bold">✎ {nombrePlano || `Plattegrond ${idxPlano + 1}`}</h2>
           <button
             onClick={onCancel}
             className="p-2 hover:bg-gray-700 rounded-lg transition"
@@ -367,43 +367,43 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
               <button
                 onClick={activarLapiz}
                 className="px-4 py-2 rounded text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition flex gap-2 items-center"
-                title="Draw on the canvas"
+                title="Teken op het canvas"
               >
-                ✏️ Draw
+                ✏️ Tekenen
               </button>
             ) : (
               <button
                 onClick={desactivarLapiz}
                 className="px-4 py-2 rounded text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition flex gap-2 items-center"
               >
-                ✓ Done Drawing
+                ✓ Klaar met tekenen
               </button>
             )}
 
             <button
               onClick={deshacer}
               className="px-4 py-2 rounded text-sm font-semibold bg-gray-600 text-white hover:bg-gray-700 transition flex gap-2 items-center"
-              title="Undo last action"
+              title="Laatste actie ongedaan maken"
             >
-              <RotateCcw size={16} /> Undo
+              <RotateCcw size={16} /> Ongedaan maken
             </button>
 
             <button
               onClick={limpiarTodo}
               className="px-4 py-2 rounded text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition flex gap-2 items-center"
-              title="Clear all drawings"
+              title="Alle tekeningen wissen"
             >
-              <Trash2 size={16} /> Clear
+              <Trash2 size={16} /> Wissen
             </button>
 
             <button
               onClick={handleGuardar}
               disabled={guardando}
               className="px-4 py-2 rounded text-sm font-semibold bg-green-600 hover:bg-green-700 text-white transition flex gap-2 items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Save changes"
+              title="Wijzigingen opslaan"
             >
               <Save size={16} />
-              {guardando ? 'Saving...' : 'Save'}
+              {guardando ? 'Opslaan...' : 'Opslaan'}
             </button>
           </div>
 
@@ -421,7 +421,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
                     ? 'opacity-50 cursor-not-allowed'
                     : 'bg-white hover:bg-gray-200'
                 }`}
-                title={`Add ${tipo.label}`}
+                title={`${tipo.label} toevoegen`}
               >
                 <tipo.icon size={16} /> {tipo.label}
               </button>
@@ -464,13 +464,13 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
             {/* Nombre del Plano */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                📌 Floor Plan Name
+                📌 Naam van de plattegrond
               </label>
               <input
                 type="text"
                 value={nombrePlano}
                 onChange={(e) => setNombrePlano(e.target.value)}
-                placeholder="E.g.: Ground Floor, 1st Floor, etc."
+                placeholder="Bijv.: Gelijkvloers, 1e verdieping, enz."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
               />
             </div>
@@ -478,25 +478,25 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
             {/* Comentarios */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                📝 Notes
+                📝 Notities
               </label>
               <textarea
                 value={comentarios}
                 onChange={(e) => setComentarios(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                 rows="4"
-                placeholder="Special notes about this floor plan..."
+                placeholder="Speciale notities over deze plattegrond..."
               />
             </div>
 
             {/* Marcadores */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                📍 Markers ({marcadores.length})
+                📍 Markeringen ({marcadores.length})
               </label>
               <div className="space-y-1 max-h-48 overflow-y-auto">
                 {marcadores.length === 0 ? (
-                  <p className="text-sm text-gray-500">No markers added</p>
+                  <p className="text-sm text-gray-500">Geen markeringen toegevoegd</p>
                 ) : (
                   marcadores.map((m, idx) => {
                     const tipoLabel = ICON_TYPES.find(t => t.id === m.tipo)?.label || m.tipo;
@@ -517,7 +517,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
                 onClick={onCancel}
                 className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg transition"
               >
-                Cancel
+                Annuleren
               </button>
             </div>
           </div>

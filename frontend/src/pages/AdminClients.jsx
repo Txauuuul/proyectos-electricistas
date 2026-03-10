@@ -37,24 +37,24 @@ export default function AdminClients() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Client Management</h1>
-      <p className="text-gray-600 mb-6">All registered electricians / clients.</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Klantenbeheer</h1>
+      <p className="text-gray-600 mb-6">Alle geregistreerde elektriciens / klanten.</p>
 
       {/* Search */}
       <div className="relative mb-6">
         <Search size={18} className="absolute left-3 top-3 text-gray-400" />
         <input
-          type="text" placeholder="Search by name, email, company..."
+          type="text" placeholder="Zoek op naam, e-mail of bedrijf..."
           value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 
       {cargando ? (
-        <p className="text-gray-500 text-center py-12">Loading...</p>
+        <p className="text-gray-500 text-center py-12">Laden...</p>
       ) : filtrados.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-12 text-center text-gray-500">
-          No clients found
+          Geen klanten gevonden
         </div>
       ) : (
         <div className="space-y-3">
@@ -79,9 +79,9 @@ export default function AdminClients() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-right text-sm">
-                  <p className="text-gray-500">Projects: <span className="font-bold text-gray-900">{e.totalContratosCompletados || 0}</span></p>
+                  <p className="text-gray-500">Projecten: <span className="font-bold text-gray-900">{e.totalContratosCompletados || 0}</span></p>
                   <p className={`text-xs ${e.profileCompleted ? 'text-green-600' : 'text-orange-500'}`}>
-                    {e.profileCompleted ? 'Profile complete' : 'Profile incomplete'}
+                    {e.profileCompleted ? 'Profiel compleet' : 'Profiel onvolledig'}
                   </p>
                 </div>
                 <ChevronRight size={18} className="text-gray-400" />

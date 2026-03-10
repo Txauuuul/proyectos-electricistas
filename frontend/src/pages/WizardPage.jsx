@@ -73,13 +73,13 @@ export default function WizardPage() {
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between">
           <p className="text-sm text-amber-800 flex items-center gap-2">
             <Save size={15} />
-            <strong>Draft restored.</strong> Your previous progress has been recovered automatically.
+            <strong>Concept hersteld.</strong> Uw vorige voortgang is automatisch teruggezet.
           </p>
           <button
             onClick={() => { resetear(); setDraftBanner(false); }}
             className="text-xs text-amber-700 hover:text-amber-900 underline font-semibold"
           >
-            Start fresh
+            Opnieuw beginnen
           </button>
         </div>
       )}
@@ -91,10 +91,10 @@ export default function WizardPage() {
             onClick={handleBack}
             className="flex gap-2 items-center text-blue-600 hover:text-blue-700 mb-6 font-semibold"
           >
-            <ChevronLeft size={20} /> Back
+            <ChevronLeft size={20} /> Terug
           </button>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">New Project</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Nieuw project</h1>
 
           {/* Indicador visual de progreso */}
           <div className="flex gap-2 md:gap-4">
@@ -114,7 +114,7 @@ export default function WizardPage() {
                 key={paso.numero}
                 className={paso.numero === pasoActual ? 'font-bold text-blue-600' : ''}
               >
-                Paso {paso.numero}
+                Stap {paso.numero}
               </span>
             ))}
           </div>

@@ -29,7 +29,7 @@ export default function Step3() {
   const handleGuardarProyecto = async () => {
     // Validar que haya al menos un plano
     if (!projectData.planos || projectData.planos.length === 0) {
-      alert('You must add at least one floor plan before finishing');
+      alert('U moet minstens één plattegrond toevoegen voordat u afrondt');
       return;
     }
 
@@ -80,7 +80,7 @@ export default function Step3() {
       setPasoActual(4);
     } catch (error) {
       console.error('❌ Error completo:', error);
-      alert(`Error al guardar el proyecto: ${error.message}`);
+      alert(`Fout bij opslaan van het project: ${error.message}`);
     } finally {
       setCargando(false);
     }
@@ -95,9 +95,9 @@ export default function Step3() {
           className="border-2 border-dashed border-blue-400 rounded-lg p-12 text-center cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition"
         >
           <Upload size={48} className="mx-auto mb-4 text-blue-600" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Upload Location Photos</h3>
-          <p className="text-gray-600 mb-4">Click here to upload photos or drag them here</p>
-          <p className="text-sm text-gray-500">JPG, PNG (multiple files allowed)</p>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Locatiefoto's uploaden</h3>
+          <p className="text-gray-600 mb-4">Klik hier om foto's te uploaden of sleep ze hierheen</p>
+          <p className="text-sm text-gray-500">JPG, PNG (meerdere bestanden toegestaan)</p>
         </div>
         <input
           ref={fileInputRef}
@@ -112,7 +112,7 @@ export default function Step3() {
       {/* Galería de fotos */}
       {projectData.fotosLocalizacion.length > 0 && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Uploaded Photos ({projectData.fotosLocalizacion.length})</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Geüploade foto's ({projectData.fotosLocalizacion.length})</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {projectData.fotosLocalizacion.map((foto, idx) => (
               <div key={idx} className="relative group">
@@ -141,14 +141,14 @@ export default function Step3() {
           onClick={() => setPasoActual(2)}
           className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition"
         >
-          Back
+          Terug
         </button>
         <button
           onClick={handleGuardarProyecto}
           disabled={cargando || projectData.fotosLocalizacion.length === 0}
           className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition"
         >
-          <CheckCircle size={20} /> Finish and Send
+          <CheckCircle size={20} /> Afronden en verzenden
         </button>
       </div>
     </div>

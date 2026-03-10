@@ -88,10 +88,10 @@ export default function SignaturePad({ onSign, width = 500, height = 200 }) {
   return (
     <div className="space-y-3">
       <label className="block text-sm font-semibold text-gray-700">
-        ✍️ Signature
+        ✍️ Handtekening
       </label>
       <p className="text-xs text-gray-500">
-        Draw your signature in the box below using your mouse or touchscreen
+        Teken uw handtekening in het vak hieronder met uw muis of touchscreen
       </p>
       <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden bg-white relative">
         <canvas
@@ -109,7 +109,7 @@ export default function SignaturePad({ onSign, width = 500, height = 200 }) {
         />
         {!hasSignature && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <p className="text-gray-300 text-lg font-semibold">Sign here</p>
+            <p className="text-gray-300 text-lg font-semibold">Teken hier</p>
           </div>
         )}
       </div>
@@ -119,7 +119,7 @@ export default function SignaturePad({ onSign, width = 500, height = 200 }) {
           onClick={clearSignature}
           className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition"
         >
-          <Trash2 size={16} /> Clear
+          <Trash2 size={16} /> Wissen
         </button>
         <button
           type="button"
@@ -127,7 +127,7 @@ export default function SignaturePad({ onSign, width = 500, height = 200 }) {
           disabled={!hasSignature}
           className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Check size={16} /> Confirm Signature
+          <Check size={16} /> Handtekening bevestigen
         </button>
       </div>
     </div>

@@ -50,7 +50,7 @@ export default function OfferPage() {
         setPlanosModificados(data.oferta.planosModificados || []);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('Fout bij laden van gegevens:', error);
     } finally {
       setCargando(false);
     }
@@ -61,7 +61,7 @@ export default function OfferPage() {
     const file = e.target.files[0];
     if (!file) return;
     if (file.type !== 'application/pdf') {
-      alert('Please upload a PDF file');
+      alert('Upload een PDF-bestand');
       return;
     }
     const reader = new FileReader();
@@ -111,10 +111,10 @@ export default function OfferPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `Server error ${res.status}`);
       }
-      alert('Offer saved successfully!');
+      alert('Offerte succesvol opgeslagen!');
       await cargarDatos();
     } catch (error) {
-      alert('Error saving offer: ' + error.message);
+      alert('Fout bij opslaan van offerte: ' + error.message);
     } finally {
       setGuardando(false);
     }
@@ -122,7 +122,7 @@ export default function OfferPage() {
 
   // Send offer to client
   const handleSend = async () => {
-    if (!window.confirm('Are you sure you want to send this offer to the client? They will receive an email notification.')) return;
+    if (!window.confirm('Weet u zeker dat u deze offerte naar de klant wilt verzenden? De klant ontvangt een e-mailmelding.')) return;
 
     // Save first
     await handleSave();
@@ -136,12 +136,12 @@ export default function OfferPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Failed to send offer');
+        throw new Error(data.error || 'Offerte verzenden mislukt');
       }
-      alert('Offer sent to client! They will receive an email notification.');
+      alert('Offerte naar de klant verzonden! De klant ontvangt een e-mailmelding.');
       navigate('/dashboard');
     } catch (error) {
-      alert('Error sending offer: ' + error.message);
+      alert('Fout bij verzenden van offerte: ' + error.message);
     } finally {
       setEnviando(false);
     }
@@ -150,7 +150,7 @@ export default function OfferPage() {
   if (cargando) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600 text-lg">Loading project...</p>
+        <p className="text-gray-600 text-lg">Project laden...</p>
       </div>
     );
   }
@@ -158,7 +158,7 @@ export default function OfferPage() {
   if (!proyecto) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-red-600 text-lg">Project not found</p>
+        <p className="text-red-600 text-lg">Project niet gevonden</p>
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function OfferPage() {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Prepare Offer</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Offerte voorbereiden</h1>
               <p className="text-gray-600">{proyecto.nombreCasa} — {proyecto.direccion}</p>
             </div>
           </div>
@@ -183,14 +183,14 @@ export default function OfferPage() {
               disabled={guardando}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
             >
-              <Save size={18} /> {guardando ? 'Saving...' : 'Save Draft'}
+              <Save size={18} /> {guardando ? 'Opslaan...' : 'Concept opslaan'}
             </button>
             <button
               onClick={handleSend}
               disabled={enviando}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
             >
-              <Send size={18} /> {enviando ? 'Sending...' : 'Send to Client'}
+              <Send size={18} /> {enviando ? 'Verzenden...' : 'Naar klant verzenden'}
             </button>
           </div>
         </div>
@@ -200,23 +200,23 @@ export default function OfferPage() {
         {/* Client Info */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <FileText size={20} /> Project Information
+            <FileText size={20} /> Projectinformatie
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-gray-500">Client</p>
+              <p className="text-gray-500">Klant</p>
               <p className="font-semibold">{proyecto.usuarioId?.nombre || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-gray-500">Email</p>
+              <p className="text-gray-500">E-mail</p>
               <p className="font-semibold">{proyecto.usuarioId?.email || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-gray-500">Address</p>
+              <p className="text-gray-500">Adres</p>
               <p className="font-semibold">{proyecto.direccion}</p>
             </div>
             <div>
-              <p className="text-gray-500">Floor Plans</p>
+              <p className="text-gray-500">Plattegronden</p>
               <p className="font-semibold">{proyecto.planos?.length || 0}</p>
             </div>
           </div>
@@ -225,13 +225,13 @@ export default function OfferPage() {
         {/* Client's Original Floor Plans (read-only) */}
         {proyecto.planos && proyecto.planos.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Client's Floor Plans (Original)</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Plattegronden van de klant (origineel)</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {proyecto.planos.map((plano, idx) => (
                 <div key={idx} className="border rounded-lg overflow-hidden">
                   <img src={plano.imagenBase64} alt={`Plan ${idx+1}`} className="w-full h-48 object-contain bg-gray-100" />
                   <div className="p-2 text-sm text-gray-600">
-                    <p className="font-semibold">{plano.nombre || `Floor Plan ${idx+1}`}</p>
+                    <p className="font-semibold">{plano.nombre || `Plattegrond ${idx+1}`}</p>
                     {plano.comentarios && <p className="text-xs">{plano.comentarios}</p>}
                   </div>
                 </div>
@@ -243,9 +243,9 @@ export default function OfferPage() {
         {/* Modified Floor Plans (company proposals) */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Upload size={20} /> Modified Floor Plans (Your Proposals)
+            <Upload size={20} /> Gewijzigde plattegronden (uw voorstellen)
           </h2>
-          <p className="text-sm text-gray-500 mb-4">Upload your modified floor plans with the proposed installations</p>
+          <p className="text-sm text-gray-500 mb-4">Upload uw aangepaste plattegronden met de voorgestelde installaties</p>
 
           {planosModificados.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -262,7 +262,7 @@ export default function OfferPage() {
                         setPlanosModificados(updated);
                       }}
                       className="w-full px-2 py-1 border rounded text-sm"
-                      placeholder="Plan name"
+                      placeholder="Naam van het plan"
                     />
                   </div>
                   <button
@@ -277,7 +277,7 @@ export default function OfferPage() {
           )}
 
           <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer text-sm font-semibold transition">
-            <Upload size={16} /> Upload Plans
+            <Upload size={16} /> Plannen uploaden
             <input type="file" accept="image/*" multiple onChange={handlePlanUpload} className="hidden" />
           </label>
         </div>
@@ -285,11 +285,11 @@ export default function OfferPage() {
         {/* Estimated Total Price */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
-            <Euro size={20} /> Estimated Total Price
+            <Euro size={20} /> Geschatte totaalprijs
           </h2>
-          <p className="text-sm text-gray-500 mb-4">Indicative total price for the client. The exact amount will be set once the work is complete.</p>
+          <p className="text-sm text-gray-500 mb-4">Indicatieve totaalprijs voor de klant. Het exacte bedrag wordt bepaald zodra het werk is voltooid.</p>
           <div className="max-w-xs">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Total Estimated Price (€)</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Geschatte totaalprijs (€)</label>
             <input
               type="number"
               min="0"
@@ -308,11 +308,11 @@ export default function OfferPage() {
         {/* Installation Details */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar size={20} /> Installation Details
+            <Calendar size={20} /> Installatiegegevens
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Proposed Start Date</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Voorgestelde startdatum</label>
               <input
                 type="date"
                 value={fechaInicioInstalacion}
@@ -321,14 +321,14 @@ export default function OfferPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Estimated Duration (days)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Geschatte duur (dagen)</label>
               <input
                 type="number"
                 min="1"
                 value={duracionEstimadaDias}
                 onChange={(e) => setDuracionEstimadaDias(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="e.g., 14"
+                placeholder="bijv. 14"
               />
             </div>
           </div>
@@ -336,37 +336,37 @@ export default function OfferPage() {
 
         {/* Notes */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Additional Notes</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Aanvullende notities</h2>
           <textarea
             value={notasEmpresa}
             onChange={(e) => setNotasEmpresa(e.target.value)}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-            placeholder="Any additional information for the client..."
+            placeholder="Extra informatie voor de klant..."
           />
         </div>
 
         {/* Contract PDF Upload */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <FileText size={20} /> Contract Document (PDF)
+            <FileText size={20} /> Contractdocument (PDF)
           </h2>
-          <p className="text-sm text-gray-500 mb-4">Upload the contract/terms document that the client will need to read and sign</p>
+          <p className="text-sm text-gray-500 mb-4">Upload het contract- of voorwaardenbestand dat de klant moet lezen en ondertekenen</p>
 
           {documentoPDF && (
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
-              <span className="text-sm text-green-700 font-semibold">✅ PDF document uploaded</span>
+              <span className="text-sm text-green-700 font-semibold">✅ PDF-document geüpload</span>
               <button
                 onClick={() => setDocumentoPDF(null)}
                 className="text-red-500 hover:text-red-700 text-sm"
               >
-                Remove
+                Verwijderen
               </button>
             </div>
           )}
 
           <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer text-sm font-semibold transition">
-            <Upload size={16} /> {documentoPDF ? 'Replace PDF' : 'Upload PDF'}
+            <Upload size={16} /> {documentoPDF ? 'PDF vervangen' : 'PDF uploaden'}
             <input type="file" accept="application/pdf" onChange={handlePDFUpload} className="hidden" />
           </label>
         </div>
@@ -377,21 +377,21 @@ export default function OfferPage() {
             onClick={() => navigate(`/proyecto/${id}`)}
             className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition"
           >
-            Cancel
+            Annuleren
           </button>
           <button
             onClick={handleSave}
             disabled={guardando}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
           >
-            <Save size={18} /> {guardando ? 'Saving...' : 'Save Draft'}
+            <Save size={18} /> {guardando ? 'Opslaan...' : 'Concept opslaan'}
           </button>
           <button
             onClick={handleSend}
             disabled={enviando}
             className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
           >
-            <Send size={18} /> {enviando ? 'Sending...' : 'Send to Client'}
+            <Send size={18} /> {enviando ? 'Verzenden...' : 'Naar klant verzenden'}
           </button>
         </div>
       </main>

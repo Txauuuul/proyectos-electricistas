@@ -19,6 +19,16 @@ const STATUS_META = {
 };
 const getStatusMeta = (estado) => STATUS_META[estado] || { label: estado, color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-400', order: 99 };
 
+const SIGNED_STATES = ['approved', 'working', 'finished', 'pending_payment', 'paid'];
+
+const getPerformanceColor = (percentage) => {
+  if (percentage >= 75) return 'bg-green-100 text-green-700 border-green-200';
+  if (percentage >= 55) return 'bg-lime-100 text-lime-700 border-lime-200';
+  if (percentage >= 40) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+  if (percentage >= 25) return 'bg-orange-100 text-orange-700 border-orange-200';
+  return 'bg-red-100 text-red-700 border-red-200';
+};
+
 export default function AdminClientDetail() {
   const { id } = useParams();
   const { token, usuario } = useAuth();
@@ -86,7 +96,7 @@ export default function AdminClientDetail() {
       setPerfil(data);
       setEditingPerfil(false);
       setPerfilEdit(null);
-      showMsg('success', 'Klantgegevens opgeslagen.');
+      showMsg('success', 'Elektriciengegevens opgeslagen.');
     } catch (err) { showMsg('error', err.message); }
     finally { setGuardandoPerfil(false); }
   };
@@ -130,12 +140,20 @@ export default function AdminClientDetail() {
     return new Date(b.fechaInicio || b.fechaCreacion || 0) - new Date(a.fechaInicio || a.fechaCreacion || 0);
   });
 
+  const totalStartedProjects = proyectos.length;
+  const signedProjects = proyectos.filter(p => SIGNED_STATES.includes(p.estado)).length;
+  const rejectedProjects = proyectos.filter(p => p.estado === 'rejected').length;
+  const notCarriedOutProjects = Math.max(0, totalStartedProjects - signedProjects - rejectedProjects);
+  const successPercentage = totalStartedProjects > 0
+    ? Math.round((signedProjects / totalStartedProjects) * 100)
+    : 0;
+
   const formatDate = (d) => d
     ? new Date(d).toLocaleDateString('nl-BE', { day: '2-digit', month: 'short', year: 'numeric' })
     : '—';
 
   if (cargando) return <p className="text-center py-12 text-gray-500">Laden...</p>;
-  if (!perfil)  return <p className="text-center py-12 text-red-500">Klant niet gevonden</p>;
+  if (!perfil)  return <p className="text-center py-12 text-red-500">Elektricien niet gevonden</p>;
 
   const editData = editingPerfil ? perfilEdit : perfil;
 
@@ -145,7 +163,7 @@ export default function AdminClientDetail() {
       {/* Back */}
       <button onClick={() => navigate('/admin/clientes')}
         className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 text-sm">
-        <ArrowLeft size={16} /> Terug naar klanten
+        <ArrowLeft size={16} /> Terug naar elektriciens
       </button>
 
       {/* Toast */}
@@ -162,22 +180,52 @@ export default function AdminClientDetail() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
 
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-gray-100 border border-dashed border-gray-300 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
-            {perfil.logo
-              ? <img src={perfil.logo} alt="logo" className="w-full h-full object-contain" />
-              : <span className="text-gray-400 text-xs font-semibold">Logo</span>}
+        <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-5 mb-6">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="w-16 h-16 bg-gray-100 border border-dashed border-gray-300 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+              {perfil.logo
+                ? <img src={perfil.logo} alt="bedrijfslogo" className="w-full h-full object-contain" />
+                : <span className="text-gray-400 text-xs font-semibold">Logo</span>}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h1 className="text-xl font-bold text-gray-900 truncate">
+                  {`${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || perfil.email}
+                </h1>
+                <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${perfil.profileCompleted ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
+                  {perfil.profileCompleted ? '✓ Profiel compleet' : '⚠ Profiel onvolledig'}
+                </span>
+              </div>
+              {perfil.empresa && <p className="text-sm text-gray-500">{perfil.empresa}</p>}
+              <p className="text-xs text-gray-400 mt-0.5">{perfil.email}</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold text-gray-900 truncate">
-              {`${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || perfil.email}
-            </h1>
-            {perfil.empresa && <p className="text-sm text-gray-500">{perfil.empresa}</p>}
-            <p className="text-xs text-gray-400 mt-0.5">{perfil.email}</p>
+
+          <div className={`shrink-0 rounded-xl border px-4 py-3 min-w-[280px] ${getPerformanceColor(successPercentage)}`}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide opacity-80">Succesratio</p>
+                <p className="text-3xl font-bold leading-none mt-1">{successPercentage}%</p>
+              </div>
+              <div className="text-right text-xs font-semibold opacity-80">
+                <p>{signedProjects}/{totalStartedProjects} geaccepteerd</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 mt-4 text-center">
+              <div className="bg-white/55 rounded-lg px-2 py-2">
+                <p className="text-[11px] uppercase tracking-wide opacity-70">Deals</p>
+                <p className="text-lg font-bold">{signedProjects}</p>
+              </div>
+              <div className="bg-white/55 rounded-lg px-2 py-2">
+                <p className="text-[11px] uppercase tracking-wide opacity-70">Afgewezen</p>
+                <p className="text-lg font-bold">{rejectedProjects}</p>
+              </div>
+              <div className="bg-white/55 rounded-lg px-2 py-2">
+                <p className="text-[11px] uppercase tracking-wide opacity-70">Niet afgerond</p>
+                <p className="text-lg font-bold">{notCarriedOutProjects}</p>
+              </div>
+            </div>
           </div>
-          <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${perfil.profileCompleted ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-            {perfil.profileCompleted ? '✓ Profiel compleet' : '⚠ Profiel onvolledig'}
-          </span>
         </div>
 
         {/* Fields */}
@@ -186,8 +234,8 @@ export default function AdminClientDetail() {
           <FieldItem label="Achternaam"     value={editData.apellidos || ''} editing={editingPerfil} onChange={v => handleFieldChange('apellidos', v)} />
           <FieldItem label="Bedrijfsnaam"   value={editData.empresa   || ''} editing={editingPerfil} onChange={v => handleFieldChange('empresa', v)} />
           <FieldItem label="BTW / NIF"      value={editData.nif       || ''} editing={editingPerfil} onChange={v => handleFieldChange('nif', v)} />
-          <FieldItem label="E-mail (login)" value={editData.email     || ''} editing={false} />
-          <FieldItem label="E-mail 2"       value={editData.email2    || ''} editing={editingPerfil} onChange={v => handleFieldChange('email2', v)} />
+          <FieldItem label="E-mailadres (account)" value={editData.email     || ''} editing={false} />
+          <FieldItem label="E-mailadres 2"        value={editData.email2    || ''} editing={editingPerfil} onChange={v => handleFieldChange('email2', v)} />
           <FieldItem label="Telefoon"       value={editData.telefono  || ''} editing={editingPerfil} onChange={v => handleFieldChange('telefono', v)} />
           <FieldItem label="Mobiel"         value={editData.mobiel    || ''} editing={editingPerfil} onChange={v => handleFieldChange('mobiel', v)} />
           <FieldItem label="IBAN"           value={editData.iban      || ''} editing={editingPerfil} onChange={v => handleFieldChange('iban', v)} />
@@ -235,7 +283,7 @@ export default function AdminClientDetail() {
             rows={3}
             value={notaAdmin}
             onChange={e => setNotaAdmin(e.target.value)}
-            placeholder="Voeg hier een interne notitie toe over deze klant..."
+            placeholder="Voeg hier een interne notitie toe over deze elektricien..."
             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none transition"
           />
           <div className="flex justify-end mt-2">
@@ -260,7 +308,7 @@ export default function AdminClientDetail() {
             value={perfil.comisionTransporte ?? 0}
             onChange={v => setPerfil(p => ({ ...p, comisionTransporte: v }))}
             note="Van toepassing op het totale inlabelbedrag van het project" />
-          <CommissionRow label="Type 2 — commissie Hardware"
+          <CommissionRow label="Type 2 — commissie hardware"
             value={perfil.comisionHardware ?? 0}
             onChange={v => setPerfil(p => ({ ...p, comisionHardware: v }))}
             note="Van toepassing op hardware- en materiaalkosten" />

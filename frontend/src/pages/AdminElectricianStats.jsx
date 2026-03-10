@@ -7,12 +7,12 @@ import {
 } from 'lucide-react';
 
 const SORT_OPTIONS = [
-  { key: 'nombre', label: 'Name' },
-  { key: 'totalProyectos', label: 'Projects' },
-  { key: 'tasaConversion', label: 'Conversion' },
-  { key: 'ingresosTotales', label: 'Revenue' },
+  { key: 'nombre', label: 'Naam' },
+  { key: 'totalProyectos', label: 'Projecten' },
+  { key: 'tasaConversion', label: 'Conversie' },
+  { key: 'ingresosTotales', label: 'Omzet' },
   { key: 'pipeline', label: 'Pipeline' },
-  { key: 'diasPromedioCierre', label: 'Avg. Days' },
+  { key: 'diasPromedioCierre', label: 'Gem. dagen' },
 ];
 
 function StatCard({ icon: Icon, label, value, color = 'text-blue-600', sub }) {
@@ -58,7 +58,7 @@ export default function AdminElectricianStats() {
           fetch(`${API}/admin/stats-electricistas`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`${API}/admin/stats-globales`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
-        if (!r1.ok || !r2.ok) throw new Error('Failed to fetch stats');
+        if (!r1.ok || !r2.ok) throw new Error('Statistieken konden niet worden opgehaald');
         const [s, g] = await Promise.all([r1.json(), r2.json()]);
         setStats(s);
         setGlobales(g);
@@ -102,8 +102,8 @@ export default function AdminElectricianStats() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-3">
           <BarChart2 size={28} className="text-indigo-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Electrician Performance</h1>
-            <p className="text-xs text-gray-500">Admin dashboard · Team statistics</p>
+            <h1 className="text-2xl font-bold text-gray-900">Prestaties van elektriciens</h1>
+            <p className="text-xs text-gray-500">Admin-dashboard · Teamstatistieken</p>
           </div>
         </div>
       </header>
@@ -122,13 +122,13 @@ export default function AdminElectricianStats() {
           <>
             {/* Global KPIs */}
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard icon={Users} label="Active Electricians" value={stats.length} color="text-indigo-600" />
-              <StatCard icon={Euro} label="Total Revenue" value={`€${(totalGlobalRevenue / 1000).toFixed(1)}k`} color="text-green-600"
-                sub="from paid projects" />
-              <StatCard icon={TrendingUp} label="Avg. Conversion" value={`${avgConversion}%`} color="text-blue-600"
-                sub="offer → approved" />
-              <StatCard icon={Euro} label="Active Pipeline" value={`€${(totalGlobalPipeline / 1000).toFixed(1)}k`} color="text-orange-500"
-                sub="in progress" />
+              <StatCard icon={Users} label="Actieve elektriciens" value={stats.length} color="text-indigo-600" />
+              <StatCard icon={Euro} label="Totale omzet" value={`€${(totalGlobalRevenue / 1000).toFixed(1)}k`} color="text-green-600"
+                sub="uit betaalde projecten" />
+              <StatCard icon={TrendingUp} label="Gem. conversie" value={`${avgConversion}%`} color="text-blue-600"
+                sub="offerte → goedgekeurd" />
+              <StatCard icon={Euro} label="Actieve pipeline" value={`€${(totalGlobalPipeline / 1000).toFixed(1)}k`} color="text-orange-500"
+                sub="in uitvoering" />
             </div>
 
             {/* Monthly trend (from globales) */}
@@ -137,11 +137,11 @@ export default function AdminElectricianStats() {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="font-bold text-gray-800 flex items-center gap-2">
                     <TrendingUp size={16} className="text-green-600" />
-                    Monthly Revenue Trend
+                    Maandelijkse omzettrend
                   </h2>
                   {globales.tasaCrecimiento != null && (
                     <span className={`text-sm font-semibold px-3 py-1 rounded-full ${globales.tasaCrecimiento >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {globales.tasaCrecimiento >= 0 ? '▲' : '▼'} {Math.abs(globales.tasaCrecimiento)}% vs last month
+                      {globales.tasaCrecimiento >= 0 ? '▲' : '▼'} {Math.abs(globales.tasaCrecimiento)}% t.o.v. vorige maand
                     </span>
                   )}
                 </div>
@@ -198,9 +198,9 @@ export default function AdminElectricianStats() {
               <div className="px-5 py-4 border-b flex items-center justify-between">
                 <h2 className="font-bold text-gray-800 flex items-center gap-2">
                   <Users size={16} className="text-indigo-600" />
-                  Electrician Rankings
+                  Ranglijst elektriciens
                 </h2>
-                <span className="text-xs text-gray-400">{stats.length} members</span>
+                <span className="text-xs text-gray-400">{stats.length} leden</span>
               </div>
 
               {/* Desktop table */}
@@ -224,7 +224,11 @@ export default function AdminElectricianStats() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {sorted.map((e, rank) => (
-                      <tr key={e.id} className="hover:bg-indigo-50 transition">
+                      <tr
+                        key={e.id}
+                        className="hover:bg-indigo-50 transition cursor-pointer"
+                        onClick={() => navigate(`/admin/clientes/${e.id}`)}
+                      >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <span className={`text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center
@@ -256,7 +260,7 @@ export default function AdminElectricianStats() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1">
                             <Clock size={12} className="text-gray-400" />
-                            <span className="text-gray-700">{e.diasPromedioCierre ?? '—'} days</span>
+                            <span className="text-gray-700">{e.diasPromedioCierre ?? '—'} dagen</span>
                           </div>
                         </td>
                       </tr>
@@ -268,7 +272,11 @@ export default function AdminElectricianStats() {
               {/* Mobile cards */}
               <div className="md:hidden space-y-3 p-4">
                 {sorted.map((e, rank) => (
-                  <div key={e.id} className="border border-gray-200 rounded-xl p-4">
+                  <div
+                    key={e.id}
+                    className="border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/60 transition"
+                    onClick={() => navigate(`/admin/clientes/${e.id}`)}
+                  >
                     <div className="flex items-center gap-2 mb-3">
                       <span className={`text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0
                         ${rank === 0 ? 'bg-yellow-400 text-white' : rank === 1 ? 'bg-gray-300 text-white' : rank === 2 ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
@@ -281,17 +289,17 @@ export default function AdminElectricianStats() {
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                       <div>
-                        <p className="text-xs text-gray-400">Projects</p>
+                        <p className="text-xs text-gray-400">Projecten</p>
                         <p className="font-bold">{e.totalProyectos}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400">Conversion</p>
+                        <p className="text-xs text-gray-400">Conversie</p>
                         <p className={`font-bold ${e.tasaConversion >= 70 ? 'text-green-600' : e.tasaConversion >= 40 ? 'text-yellow-600' : 'text-red-500'}`}>
                           {e.tasaConversion}%
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-400">Revenue</p>
+                        <p className="text-xs text-gray-400">Omzet</p>
                         <p className="font-bold text-green-700">€{(e.ingresosTotales || 0).toFixed(0)}</p>
                       </div>
                       <div>
@@ -299,8 +307,8 @@ export default function AdminElectricianStats() {
                         <p className="font-bold text-orange-600">€{(e.pipeline || 0).toFixed(0)}</p>
                       </div>
                       <div className="col-span-2">
-                        <p className="text-xs text-gray-400">Avg. days to close</p>
-                        <p className="font-bold">{e.diasPromedioCierre ?? '—'} days</p>
+                        <p className="text-xs text-gray-400">Gem. dagen tot afsluiting</p>
+                        <p className="font-bold">{e.diasPromedioCierre ?? '—'} dagen</p>
                       </div>
                     </div>
                   </div>

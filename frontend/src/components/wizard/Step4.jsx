@@ -22,11 +22,11 @@ export default function Step4() {
         <CheckCircle size={80} className="mx-auto text-green-600 mb-6" />
         
         <h2 className="text-4xl font-bold text-gray-900 mb-4">
-          Project Created Successfully!
+          Project succesvol aangemaakt!
         </h2>
 
         <p className="text-xl text-gray-600 mb-12">
-          Your project has been saved correctly. You can view it in your dashboard or create a new one.
+          Uw project is correct opgeslagen. U kunt het bekijken in uw dashboard of een nieuw project aanmaken.
         </p>
 
         <div className="space-y-4">
@@ -34,14 +34,14 @@ export default function Step4() {
             onClick={handleIrDashboard}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition text-lg"
           >
-            Go to Dashboard
+            Ga naar dashboard
           </button>
 
           <button
             onClick={handleNuevoProyecto}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition text-lg"
           >
-            Create New Project
+            Nieuw project aanmaken
           </button>
         </div>
       </div>

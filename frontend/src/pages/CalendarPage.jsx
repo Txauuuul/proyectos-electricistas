@@ -16,14 +16,14 @@ const ESTADO_COLORS = {
 };
 
 const ESTADO_LABELS = {
-  created: 'Created', offer_ready: 'Offer Ready', offer_sent: 'Offer Sent',
-  approved: 'Approved', working: 'Working', finished: 'Finished',
-  pending_payment: 'Pending Payment', paid: 'Paid', rejected: 'Rejected',
+  created: 'Aangemaakt', offer_ready: 'Offerte klaar', offer_sent: 'Offerte verzonden',
+  approved: 'Goedgekeurd', working: 'In uitvoering', finished: 'Afgerond',
+  pending_payment: 'Wacht op betaling', paid: 'Betaald', rejected: 'Afgewezen',
 };
 
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'];
+const WEEKDAYS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
+const MONTHS = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni',
+  'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'];
 
 export default function CalendarPage() {
   const { token, usuario } = useAuth();
@@ -126,8 +126,8 @@ export default function CalendarPage() {
           <div className="flex items-center gap-3">
             <Calendar size={28} className="text-blue-600" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Installation Calendar</h1>
-              <p className="text-xs text-gray-500">Scheduled project dates</p>
+              <h1 className="text-2xl font-bold text-gray-900">Installatiekalender</h1>
+              <p className="text-xs text-gray-500">Geplande projectdata</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -135,13 +135,13 @@ export default function CalendarPage() {
               onClick={() => setViewMode(viewMode === 'calendar' ? 'list' : 'calendar')}
               className="px-3 py-1.5 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-50 transition"
             >
-              {viewMode === 'calendar' ? 'List View' : 'Calendar View'}
+              {viewMode === 'calendar' ? 'Lijstweergave' : 'Kalenderweergave'}
             </button>
             <button
               onClick={goToday}
               className="px-3 py-1.5 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
-              Today
+              Vandaag
             </button>
           </div>
         </div>
@@ -149,13 +149,13 @@ export default function CalendarPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {cargando ? (
-          <p className="text-center text-gray-500 py-12">Loading calendar...</p>
+          <p className="text-center text-gray-500 py-12">Kalender laden...</p>
         ) : viewMode === 'list' ? (
           /* ── LIST VIEW ── */
           <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Upcoming (next 30 days) — {upcoming.length} project{upcoming.length !== 1 ? 's' : ''}</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Binnenkort (volgende 30 dagen) — {upcoming.length} project{upcoming.length !== 1 ? 'en' : ''}</h2>
             {upcoming.length === 0 ? (
-              <p className="text-gray-400 text-center py-12">No projects scheduled in the next 30 days</p>
+              <p className="text-gray-400 text-center py-12">Geen projecten gepland in de komende 30 dagen</p>
             ) : (
               <div className="space-y-3">
                 {upcoming.map(p => {
@@ -181,7 +181,7 @@ export default function CalendarPage() {
                           {ESTADO_LABELS[p.estado] || p.estado}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `in ${daysUntil} days`}
+                          {daysUntil === 0 ? 'Vandaag' : daysUntil === 1 ? 'Morgen' : `over ${daysUntil} dagen`}
                         </span>
                       </div>
                     </div>
@@ -248,7 +248,7 @@ export default function CalendarPage() {
                                 </div>
                               ))}
                               {projs.length > 3 && (
-                                <p className="text-[10px] text-gray-400 font-semibold">+{projs.length - 3} more</p>
+                                <p className="text-[10px] text-gray-400 font-semibold">+{projs.length - 3} meer</p>
                               )}
                             </div>
                           </>
@@ -275,11 +275,11 @@ export default function CalendarPage() {
               {selectedDay ? (
                 <div className="bg-white rounded-xl shadow-md p-5">
                   <h3 className="font-bold text-gray-900 text-lg mb-4">
-                    {MONTHS[mes]} {selectedDay}, {anio}
-                    <span className="ml-2 text-sm text-gray-400">({selectedProjects.length} project{selectedProjects.length !== 1 ? 's' : ''})</span>
+                    {selectedDay} {MONTHS[mes]} {anio}
+                    <span className="ml-2 text-sm text-gray-400">({selectedProjects.length} project{selectedProjects.length !== 1 ? 'en' : ''})</span>
                   </h3>
                   {selectedProjects.length === 0 ? (
-                    <p className="text-gray-400 text-sm text-center py-6">No projects on this day</p>
+                    <p className="text-gray-400 text-sm text-center py-6">Geen projecten op deze dag</p>
                   ) : (
                     <div className="space-y-3">
                       {selectedProjects.map(p => (
@@ -308,26 +308,26 @@ export default function CalendarPage() {
                 </div>
               ) : (
                 <div className="bg-white rounded-xl shadow-md p-5">
-                  <h3 className="font-bold text-gray-900 text-lg mb-3">This month</h3>
+                  <h3 className="font-bold text-gray-900 text-lg mb-3">Deze maand</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Total scheduled</span>
+                      <span className="text-gray-500">Totaal gepland</span>
                       <span className="font-bold">{Object.values(projectsByDay).flat().length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">In progress</span>
+                      <span className="text-gray-500">In uitvoering</span>
                       <span className="font-bold text-yellow-600">
                         {Object.values(projectsByDay).flat().filter(p => p.estado === 'working').length}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Pending approval</span>
+                      <span className="text-gray-500">Wacht op goedkeuring</span>
                       <span className="font-bold text-indigo-600">
                         {Object.values(projectsByDay).flat().filter(p => p.estado === 'offer_sent').length}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Revenue this month</span>
+                      <span className="text-gray-500">Omzet deze maand</span>
                       <span className="font-bold text-green-700">
                         €{Object.values(projectsByDay).flat()
                           .filter(p => p.estado === 'paid')
@@ -336,7 +336,7 @@ export default function CalendarPage() {
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-4 text-center">Click on a day to see its projects</p>
+                  <p className="text-xs text-gray-400 mt-4 text-center">Klik op een dag om de projecten te zien</p>
                 </div>
               )}
             </div>

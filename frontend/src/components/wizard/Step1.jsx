@@ -89,9 +89,9 @@ export default function Step1() {
             </div>
           </div>
 
-          {/* Custom naam */}
+          {/* Aangepaste naam */}
           <div>
-            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Custom naam</label>
+            <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Aangepaste naam</label>
             <input type="text" {...register("tituloPersonalizado")} className={inp(false)} placeholder="Bijv. Keukenrenovatie Van Damme" />
           </div>
 
@@ -158,10 +158,10 @@ export default function Step1() {
             {errors.fechaInicio && <p className="text-red-600 text-xs mt-1">{errors.fechaInicio.message}</p>}
           </div>
 
-          {/* Offer directly to client */}
+          {/* Offerte rechtstreeks naar klant */}
           <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <input type="checkbox" id="ofertaDirecta" {...register("ofertaDirectaCliente")} defaultChecked className="w-4 h-4 accent-blue-600 cursor-pointer" />
-            <label htmlFor="ofertaDirecta" className="text-sm font-medium text-blue-800 cursor-pointer select-none">Offer directly to the client</label>
+            <label htmlFor="ofertaDirecta" className="text-sm font-medium text-blue-800 cursor-pointer select-none">Offerte rechtstreeks naar de klant sturen</label>
           </div>
 
           {/* Extra informatie */}
