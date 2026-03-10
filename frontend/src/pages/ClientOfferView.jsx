@@ -5,7 +5,7 @@ import SignaturePad from '../components/SignaturePad';
 import {
   ArrowLeft,
   FileText,
-  DollarSign,
+  Euro,
   Calendar,
   MapPin,
   CheckCircle2,
@@ -273,46 +273,16 @@ export default function ClientOfferView() {
           </div>
         )}
 
-        {/* Budget Breakdown */}
-        {oferta?.presupuestoItems && oferta.presupuestoItems.length > 0 && (
+        {/* Estimated Total Price */}
+        {(oferta?.precioTotalEstimado != null || oferta?.precioTotal > 0) && (
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign size={20} /> Budget Breakdown
+            <h2 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+              <Euro size={20} /> Estimated Total Price
             </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-700">Description</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-700">Qty</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-700">Unit Price</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-700">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {oferta.presupuestoItems.map((item, idx) => (
-                    <tr key={idx} className={`border-b ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                      <td className="px-4 py-3">{item.descripcion}</td>
-                      <td className="px-4 py-3 text-center">{item.cantidad}</td>
-                      <td className="px-4 py-3 text-right">€{(item.precioUnitario || 0).toFixed(2)}</td>
-                      <td className="px-4 py-3 text-right font-semibold">€{(item.total || 0).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Totals */}
-            <div className="mt-6 border-t pt-4 space-y-2 max-w-sm ml-auto">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="font-semibold">€{(oferta.presupuestoEstimado || 0).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-xl font-bold border-t pt-3">
-                <span>Total Price:</span>
-                <span className="text-green-700">€{(oferta.precioTotal || 0).toFixed(2)}</span>
-              </div>
-            </div>
+            <p className="text-sm text-gray-500 mb-3">Indicative price. The exact amount will be confirmed once the work is complete.</p>
+            <p className="text-3xl font-bold text-green-700">
+              €{((oferta.precioTotalEstimado ?? oferta.precioTotal) || 0).toLocaleString('nl-BE', { minimumFractionDigits: 2 })}
+            </p>
           </div>
         )}
 
@@ -421,7 +391,7 @@ export default function ClientOfferView() {
                 />
                 <span className="text-sm text-gray-700 group-hover:text-gray-900">
                   <strong>I have read and understood all documentation provided.</strong> I have reviewed the proposed
-                  floor plans, budget breakdown, and any additional documents attached to this offer.
+                  floor plans, estimated price, and any additional documents attached to this offer.
                 </span>
               </label>
             </div>

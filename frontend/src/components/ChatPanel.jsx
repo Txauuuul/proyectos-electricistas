@@ -52,10 +52,11 @@ export default function ChatPanel({ proyectoId }) {
     cargarMensajes();
   }, [cargarMensajes]);
 
-  // Auto-scroll on new messages
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [mensajes]);
+  // Do NOT auto-scroll on new messages — user can manually scroll if needed
+  // Commenting out the auto-scroll that was causing annoying behavior
+  // useEffect(() => {
+  //   bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // }, [mensajes]);
 
   // Poll for new messages every 15s
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function ChatPanel({ proyectoId }) {
         inputRef.current?.focus();
       } else {
         const d = await res.json();
-        setError(d.mensaje || 'Could not send');
+        setError(d.error || d.mensaje || 'Could not send');
       }
     } catch {
       setError('Connection error');

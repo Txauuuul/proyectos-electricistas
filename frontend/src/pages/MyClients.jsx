@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Plus, Trash2, Edit2, X, Search, User, Phone, Mail, MapPin, FileText, ChevronRight,
+  Plus, Trash2, Edit2, X, Search, User, Phone, Mail, MapPin, FileText,
 } from 'lucide-react';
 
 export default function MyClients() {
@@ -117,138 +117,169 @@ export default function MyClients() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Clients</h1>
+          <h1 className="text-3xl font-bold text-gray-900">My Clients</h1>
           <p className="text-gray-600">Manage the end-customers for your projects.</p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
-        >
-          <Plus size={18} /> New Client
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 lg:items-center">
+          <div className="relative min-w-[280px]">
+            <Search size={18} className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name, company or email..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+            />
+          </div>
+          <button
+            onClick={openCreate}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold"
+          >
+            <Plus size={18} /> New Client
+          </button>
+        </div>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <Search size={18} className="absolute left-3 top-3 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search by name, company or email..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-        />
+      <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-5 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-gray-700">Client overview</p>
+          <p className="text-sm text-gray-500">
+            {filtrados.length} client{filtrados.length !== 1 ? 's' : ''} shown
+            {busqueda ? ` for “${busqueda}”` : ''}
+          </p>
+        </div>
+        {clienteDetalle && (
+          <button
+            onClick={() => setClienteDetalle(null)}
+            className="px-4 py-2 text-sm font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl self-start md:self-auto"
+          >
+            Clear selected client
+          </button>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Client list */}
-        <div className="lg:col-span-2 space-y-3">
-          {cargando ? (
-            <p className="text-gray-500 py-12 text-center">Loading...</p>
-          ) : filtrados.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-              <User size={48} className="text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">
-                {busqueda ? 'No clients match your search' : 'No clients yet. Create your first one!'}
+      {clienteDetalle && (
+        <div className="bg-white rounded-2xl shadow-sm border p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-6">
+            <div>
+              <h2 className="font-bold text-gray-900 text-2xl mb-2">
+                {clienteDetalle.cliente?.nombre || clienteDetalle.nombre} {clienteDetalle.cliente?.apellidos || clienteDetalle.apellidos || ''}
+              </h2>
+              <p className="text-sm text-gray-500">
+                {(clienteDetalle.cliente?.empresa || clienteDetalle.empresa) || 'Private client'}
               </p>
             </div>
-          ) : (
-            filtrados.map(c => (
+            <div className="flex gap-3">
+              <button
+                onClick={() => openEdit(clienteDetalle.cliente || clienteDetalle)}
+                className="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl font-semibold text-sm"
+              >
+                Edit client
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 text-sm mb-6">
+            {(clienteDetalle.cliente?.telefono || clienteDetalle.telefono) && (
+              <InfoRow icon={Phone} label="Phone" value={clienteDetalle.cliente?.telefono || clienteDetalle.telefono} />
+            )}
+            {(clienteDetalle.cliente?.email || clienteDetalle.email) && (
+              <InfoRow icon={Mail} label="Email" value={clienteDetalle.cliente?.email || clienteDetalle.email} />
+            )}
+            {(clienteDetalle.cliente?.direccion || clienteDetalle.direccion) && (
+              <InfoRow icon={MapPin} label="Address" value={clienteDetalle.cliente?.direccion || clienteDetalle.direccion} />
+            )}
+            {(clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad) && (
+              <InfoRow icon={MapPin} label="City" value={clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad} />
+            )}
+          </div>
+
+          {clienteDetalle.proyectos && clienteDetalle.proyectos.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <FileText size={16} /> Projects ({clienteDetalle.proyectos.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                {clienteDetalle.proyectos.map(p => (
+                  <button
+                    key={p._id}
+                    onClick={() => navigate(`/proyecto/${p._id}`)}
+                    className="text-left p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition text-sm border border-transparent hover:border-blue-200"
+                  >
+                    <p className="font-semibold text-gray-900 mb-1">{p.tituloAutomatico || p.nombreCasa}</p>
+                    <p className="text-gray-500 text-xs">{p.estado} • {new Date(p.fechaInicio).toLocaleDateString()}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div>
+        {cargando ? (
+          <p className="text-gray-500 py-12 text-center">Loading...</p>
+        ) : filtrados.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border p-12 text-center">
+            <User size={48} className="text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500">
+              {busqueda ? 'No clients match your search' : 'No clients yet. Create your first one!'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {filtrados.map(c => (
               <div
                 key={c._id}
-                className={`bg-white rounded-lg shadow-md p-4 flex items-center justify-between hover:shadow-lg transition cursor-pointer ${
-                  clienteDetalle?._id === c._id ? 'ring-2 ring-blue-500' : ''
+                className={`bg-white rounded-2xl shadow-sm border p-5 hover:shadow-md transition cursor-pointer ${
+                  clienteDetalle?._id === c._id ? 'ring-2 ring-blue-500 border-blue-200' : 'border-gray-200'
                 }`}
                 onClick={() => verDetalle(c._id)}
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                    {(c.nombre || '?')[0].toUpperCase()}
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold shrink-0">
+                      {(c.nombre || '?')[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900 text-lg truncate">{c.nombre} {c.apellidos || ''}</p>
+                      <p className="text-sm text-gray-500 truncate">{c.empresa || 'Private client'}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{c.nombre} {c.apellidos || ''}</p>
-                    <p className="text-sm text-gray-500">
-                      {c.empresa && <span>{c.empresa} • </span>}
-                      {c.projectCount || 0} project{(c.projectCount || 0) !== 1 ? 's' : ''}
-                    </p>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEdit(c); }}
+                      className="p-2 text-gray-400 hover:text-blue-600"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(c._id); }}
+                      className="p-2 text-gray-400 hover:text-red-600"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); openEdit(c); }}
-                    className="p-2 text-gray-400 hover:text-blue-600"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(c._id); }}
-                    className="p-2 text-gray-400 hover:text-red-600"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                  <ChevronRight size={16} className="text-gray-400" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mb-4">
+                  <InfoRow icon={Phone} label="Phone" value={c.telefono || '—'} />
+                  <InfoRow icon={Mail} label="Email" value={c.email || '—'} />
+                  <InfoRow icon={MapPin} label="City" value={c.ciudad || '—'} />
+                  <InfoRow icon={FileText} label="Projects" value={`${c.projectCount || 0} project${(c.projectCount || 0) !== 1 ? 's' : ''}`} />
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <p className="text-xs text-gray-400">Click to view full client details</p>
+                  <span className="text-sm font-semibold text-blue-600">Open</span>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-
-        {/* Detail panel */}
-        <div className="lg:col-span-1">
-          {clienteDetalle ? (
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
-              <h2 className="font-bold text-gray-900 text-lg mb-4">
-                {clienteDetalle.cliente?.nombre || clienteDetalle.nombre} {clienteDetalle.cliente?.apellidos || clienteDetalle.apellidos || ''}
-              </h2>
-              <div className="space-y-3 text-sm">
-                {(clienteDetalle.cliente?.empresa || clienteDetalle.empresa) && (
-                  <InfoRow icon={User} label="Company" value={clienteDetalle.cliente?.empresa || clienteDetalle.empresa} />
-                )}
-                {(clienteDetalle.cliente?.telefono || clienteDetalle.telefono) && (
-                  <InfoRow icon={Phone} label="Phone" value={clienteDetalle.cliente?.telefono || clienteDetalle.telefono} />
-                )}
-                {(clienteDetalle.cliente?.email || clienteDetalle.email) && (
-                  <InfoRow icon={Mail} label="Email" value={clienteDetalle.cliente?.email || clienteDetalle.email} />
-                )}
-                {(clienteDetalle.cliente?.direccion || clienteDetalle.direccion) && (
-                  <InfoRow icon={MapPin} label="Address" value={clienteDetalle.cliente?.direccion || clienteDetalle.direccion} />
-                )}
-                {(clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad) && (
-                  <InfoRow icon={MapPin} label="City" value={clienteDetalle.cliente?.ciudad || clienteDetalle.ciudad} />
-                )}
-              </div>
-
-              {/* Projects list */}
-              {clienteDetalle.proyectos && clienteDetalle.proyectos.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <FileText size={16} /> Projects ({clienteDetalle.proyectos.length})
-                  </h3>
-                  <div className="space-y-2">
-                    {clienteDetalle.proyectos.map(p => (
-                      <button
-                        key={p._id}
-                        onClick={() => navigate(`/proyecto/${p._id}`)}
-                        className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition text-sm"
-                      >
-                        <p className="font-semibold text-gray-900">{p.tituloAutomatico || p.nombreCasa}</p>
-                        <p className="text-gray-500 text-xs">{p.estado} • {new Date(p.fechaInicio).toLocaleDateString()}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center text-gray-400">
-              <User size={36} className="mx-auto mb-3" />
-              <p className="text-sm">Select a client to see details</p>
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Create / Edit Modal */}

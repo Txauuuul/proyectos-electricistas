@@ -52,6 +52,9 @@ const UserSchema = new mongoose.Schema({
   comisionTransporte: { type: Number, default: 0, min: 0, max: 100 },
   comisionEspecial: { type: Number, default: 0, min: 0, max: 100 },
 
+  // === Admin notes about this electrician ===
+  notaAdmin: { type: String, default: '' },
+
   // === Project counter (for auto-title) ===
   contadorObras: { type: Number, default: 0 },
 

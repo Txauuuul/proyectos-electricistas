@@ -1,9 +1,16 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [usuario, setUsuario] = useState(null);
+  const [usuario, setUsuario] = useState(() => {
+    try {
+      const stored = localStorage.getItem('usuario');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
@@ -73,14 +80,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
   };
-
-  // Restaurar sesión al cargar la app
-  useEffect(() => {
-    const usuarioGuardado = localStorage.getItem('usuario');
-    if (usuarioGuardado && token) {
-      setUsuario(JSON.parse(usuarioGuardado));
-    }
-  }, []);
 
   return (
     <AuthContext.Provider value={{ usuario, token, cargando, error, login, registrar, logout }}>

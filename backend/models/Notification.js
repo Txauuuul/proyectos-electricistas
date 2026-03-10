@@ -26,6 +26,7 @@ const NotificationSchema = new mongoose.Schema({
       'offer_rejected',     // Offer was rejected
       'oferta_rechazada',   // Offer rejected (Spanish variant)
       'cambios_propuestos', // Client submitted a change proposal
+      'chat_message',       // New chat message
     ],
     required: true,
   },

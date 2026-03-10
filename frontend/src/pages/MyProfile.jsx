@@ -325,16 +325,10 @@ export default function MyProfile() {
           ) : (
             <>
               {/* Summary KPIs */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div className="bg-green-50 rounded-xl p-4 text-center">
                   <p className="text-xs text-gray-500 mb-1">Projects Paid</p>
                   <p className="text-2xl font-bold text-green-700">{proyectosPagados.length}</p>
-                </div>
-                <div className="bg-blue-50 rounded-xl p-4 text-center">
-                  <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
-                  <p className="text-2xl font-bold text-blue-700">
-                    €{proyectosPagados.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0).toFixed(0)}
-                  </p>
                 </div>
                 <div className="bg-purple-50 rounded-xl p-4 text-center">
                   <p className="text-xs text-gray-500 mb-1">Total Commission</p>
@@ -351,7 +345,6 @@ export default function MyProfile() {
                     <tr>
                       <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase">Project</th>
                       <th className="text-left px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden sm:table-cell">Address</th>
-                      <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase">Offer Total</th>
                       <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase">Commission</th>
                       <th className="text-right px-3 py-2 text-xs font-bold text-gray-500 uppercase hidden md:table-cell">Date Paid</th>
                     </tr>
@@ -363,9 +356,6 @@ export default function MyProfile() {
                         <tr key={p._id} className="hover:bg-gray-50">
                           <td className="px-3 py-2.5 font-semibold text-gray-900">{p.nombreCasa}</td>
                           <td className="px-3 py-2.5 text-gray-500 hidden sm:table-cell">{p.direccion}</td>
-                          <td className="px-3 py-2.5 text-right font-semibold text-gray-700">
-                            €{(p.oferta?.precioTotal || 0).toFixed(2)}
-                          </td>
                           <td className="px-3 py-2.5 text-right font-bold text-green-700">
                             €{(p.commissieResultaat?.totaleCommissie || 0).toFixed(2)}
                           </td>

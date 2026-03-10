@@ -134,28 +134,62 @@ export default function AdminElectricianStats() {
             {/* Monthly trend (from globales) */}
             {globales?.mensual?.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <TrendingUp size={16} className="text-green-600" />
-                  Monthly Revenue Trend
-                  {globales.tasaCrecimiento !== undefined && (
-                    <span className={`ml-auto text-sm font-semibold px-2 py-0.5 rounded-full ${globales.tasaCrecimiento >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                      {globales.tasaCrecimiento >= 0 ? '+' : ''}{globales.tasaCrecimiento}% vs last month
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-bold text-gray-800 flex items-center gap-2">
+                    <TrendingUp size={16} className="text-green-600" />
+                    Monthly Revenue Trend
+                  </h2>
+                  {globales.tasaCrecimiento != null && (
+                    <span className={`text-sm font-semibold px-3 py-1 rounded-full ${globales.tasaCrecimiento >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {globales.tasaCrecimiento >= 0 ? '▲' : '▼'} {Math.abs(globales.tasaCrecimiento)}% vs last month
                     </span>
                   )}
-                </h2>
-                <div className="flex items-end gap-2 h-24 overflow-x-auto pb-1">
-                  {globales.mensual.map((m, i) => {
-                    const maxM = Math.max(...globales.mensual.map(x => x.ingresos), 1);
-                    const h = Math.max(8, (m.ingresos / maxM) * 80);
-                    return (
-                      <div key={i} className="flex flex-col items-center gap-1 flex-shrink-0 min-w-[32px]">
-                        <span className="text-[9px] text-gray-500 font-semibold">€{(m.ingresos / 1000).toFixed(0)}k</span>
-                        <div className="bg-indigo-500 rounded-t w-6 transition-all" style={{ height: `${h}px` }} title={`€${m.ingresos}`} />
-                        <span className="text-[9px] text-gray-400 rotate-45 origin-left">{m.periodo}</span>
-                      </div>
-                    );
-                  })}
                 </div>
+
+                {(() => {
+                  const maxM = Math.max(...globales.mensual.map(x => x.ingresos), 1);
+                  const BAR_H = 160; // px, chart area height
+                  return (
+                    <div className="flex items-end justify-between gap-2" style={{ height: `${BAR_H + 56}px` }}>
+                      {globales.mensual.map((m, i) => {
+                        const barPct = m.ingresos / maxM;
+                        const barH = Math.max(4, Math.round(barPct * BAR_H));
+                        const isMax = m.ingresos === maxM;
+                        const isCurrent = i === globales.mensual.length - 1;
+                        return (
+                          <div key={i} className="flex flex-col items-center flex-1 gap-0">
+                            {/* Value label — always visible above bar */}
+                            <span className={`text-xs font-bold mb-1 whitespace-nowrap ${isCurrent ? 'text-indigo-600' : 'text-gray-500'}`}>
+                              {m.ingresos > 0
+                                ? m.ingresos >= 1000
+                                  ? `€${(m.ingresos / 1000).toFixed(1)}k`
+                                  : `€${m.ingresos.toFixed(0)}`
+                                : '—'}
+                            </span>
+                            {/* Spacer so all bars align to the same baseline */}
+                            <div style={{ flex: 1 }} className="flex items-end w-full">
+                              <div
+                                className={`w-full rounded-t-lg transition-all duration-500
+                                  ${isCurrent
+                                    ? 'bg-gradient-to-t from-indigo-600 to-indigo-400'
+                                    : isMax
+                                      ? 'bg-gradient-to-t from-green-600 to-green-400'
+                                      : 'bg-gradient-to-t from-indigo-300 to-indigo-200'
+                                  }`}
+                                style={{ height: `${barH}px` }}
+                                title={`€${m.ingresos.toLocaleString('nl-BE')}`}
+                              />
+                            </div>
+                            {/* Month label */}
+                            <span className={`text-xs mt-2 font-semibold ${isCurrent ? 'text-indigo-600' : 'text-gray-400'}`}>
+                              {m.periodo}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
             )}
 

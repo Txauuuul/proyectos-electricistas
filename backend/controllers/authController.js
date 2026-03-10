@@ -38,7 +38,7 @@ const registrar = async (req, res) => {
 
     // Generar token JWT
     const token = jwt.sign(
-      { id: usuario._id, email: usuario.email, rol: usuario.rol },
+      { id: usuario._id, email: usuario.email, rol: usuario.rol, nombre: usuario.nombre },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
@@ -75,7 +75,7 @@ const login = async (req, res) => {
 
     // Generar token JWT
     const token = jwt.sign(
-      { id: usuario._id, email: usuario.email, rol: usuario.rol },
+      { id: usuario._id, email: usuario.email, rol: usuario.rol, nombre: usuario.nombre },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );

@@ -48,11 +48,19 @@ const enviarMensaje = async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
+    // Fallback: si el JWT antiguo no tiene nombre, lo buscamos en BD
+    let nombreAutor = req.usuario.nombre;
+    if (!nombreAutor) {
+      const User = require('../models/User');
+      const userDoc = await User.findById(req.usuario.id).select('nombre');
+      nombreAutor = userDoc?.nombre || 'Unknown';
+    }
+
     const nuevoMensaje = new ChatMessage({
       proyectoId,
       autorId: req.usuario.id,
       rolAutor: req.usuario.rol,
-      nombreAutor: req.usuario.nombre,
+      nombreAutor,
       mensaje: mensaje.trim().slice(0, 2000),
     });
 

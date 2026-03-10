@@ -45,11 +45,11 @@ export default function Navbar() {
       } catch (e) { /* ignore */ }
     };
     fetchCount();
-    const interval = setInterval(fetchCount, 30000); // poll every 30s
+    const interval = setInterval(fetchCount, 10000); // poll every 10s
     return () => clearInterval(interval);
   }, [token]);
 
-  // Fetch full notifications when dropdown opens
+  // Fetch full notifications when dropdown opens or when count changes while open
   useEffect(() => {
     if (!notifOpen || !token) return;
     (async () => {
@@ -63,7 +63,7 @@ export default function Navbar() {
         }
       } catch (e) { /* ignore */ }
     })();
-  }, [notifOpen, token]);
+  }, [notifOpen, notifCount, token]);
 
   // Close dropdown on outside click
   useEffect(() => {

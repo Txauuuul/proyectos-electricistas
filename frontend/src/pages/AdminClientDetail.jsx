@@ -2,19 +2,38 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  ArrowLeft, Save, CheckCircle, AlertCircle, Users, FolderOpen,
+  ArrowLeft, CheckCircle, AlertCircle, Users, FolderOpen,
+  Pencil, X, Save, StickyNote, ChevronRight,
 } from 'lucide-react';
+
+// Status metadata
+const STATUS_META = {
+  working:         { label: 'In uitvoering',      color: 'bg-yellow-100 text-yellow-800', dot: 'bg-yellow-400',  order: 0 },
+  pending_payment: { label: 'Betaling verwacht',  color: 'bg-orange-100 text-orange-800', dot: 'bg-orange-400',  order: 1 },
+  offer_sent:      { label: 'Offerte verzonden',  color: 'bg-indigo-100 text-indigo-800', dot: 'bg-indigo-400',  order: 2 },
+  offer_ready:     { label: 'Offerte klaar',      color: 'bg-purple-100 text-purple-800', dot: 'bg-purple-400',  order: 3 },
+  created:         { label: 'Nieuwe aanvraag',    color: 'bg-blue-100 text-blue-800',     dot: 'bg-blue-400',    order: 4 },
+  paid:            { label: 'Betaald',            color: 'bg-green-100 text-green-800',   dot: 'bg-green-500',   order: 5 },
+  finished:        { label: 'Afgerond',           color: 'bg-teal-100 text-teal-800',     dot: 'bg-teal-400',    order: 6 },
+  rejected:        { label: 'Afgewezen',          color: 'bg-red-100 text-red-800',       dot: 'bg-red-400',     order: 7 },
+};
+const getStatusMeta = (estado) => STATUS_META[estado] || { label: estado, color: 'bg-gray-100 text-gray-700', dot: 'bg-gray-400', order: 99 };
 
 export default function AdminClientDetail() {
   const { id } = useParams();
   const { token, usuario } = useAuth();
   const navigate = useNavigate();
-  const [perfil, setPerfil] = useState(null);
-  const [proyectos, setProyectos] = useState([]);
-  const [clientes, setClientes] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [guardando, setGuardando] = useState(false);
-  const [mensaje, setMensaje] = useState(null);
+
+  const [perfil, setPerfil]               = useState(null);
+  const [perfilEdit, setPerfilEdit]       = useState(null);
+  const [proyectos, setProyectos]         = useState([]);
+  const [clientes, setClientes]           = useState([]);
+  const [cargando, setCargando]           = useState(true);
+  const [editingPerfil, setEditingPerfil] = useState(false);
+  const [guardandoPerfil, setGuardandoPerfil] = useState(false);
+  const [notaAdmin, setNotaAdmin]         = useState('');
+  const [guardandoNota, setGuardandoNota] = useState(false);
+  const [mensaje, setMensaje]             = useState(null);
 
   const API = import.meta.env.VITE_API_URL;
 
@@ -23,14 +42,23 @@ export default function AdminClientDetail() {
     cargarDatos();
   }, [id, token]);
 
+  const showMsg = (type, text) => {
+    setMensaje({ type, text });
+    setTimeout(() => setMensaje(null), 3500);
+  };
+
   const cargarDatos = async () => {
     try {
       const [perfilRes, proyRes, clientesRes] = await Promise.all([
         fetch(`${API}/profile/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API}/proyectos`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/proyectos`,     { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API}/clientes?usuarioId=${id}`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      if (perfilRes.ok) setPerfil(await perfilRes.json());
+      if (perfilRes.ok) {
+        const data = await perfilRes.json();
+        setPerfil(data);
+        setNotaAdmin(data.notaAdmin || '');
+      }
       if (proyRes.ok) {
         const all = await proyRes.json();
         setProyectos(all.filter(p => (p.usuarioId?._id || p.usuarioId) === id));
@@ -40,53 +68,87 @@ export default function AdminClientDetail() {
     finally { setCargando(false); }
   };
 
-  const handleChange = (field, value) => {
-    setPerfil(prev => ({ ...prev, [field]: value }));
+  // Profile edit
+  const handleBewerken = () => { setPerfilEdit({ ...perfil }); setEditingPerfil(true); };
+  const handleAnnuleren = () => { setPerfilEdit(null); setEditingPerfil(false); };
+  const handleFieldChange = (field, value) => setPerfilEdit(prev => ({ ...prev, [field]: value }));
+
+  const handleOpslaanPerfil = async () => {
+    setGuardandoPerfil(true);
+    try {
+      const res = await fetch(`${API}/profile/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(perfilEdit),
+      });
+      if (!res.ok) throw new Error('Opslaan mislukt');
+      const data = await res.json();
+      setPerfil(data);
+      setEditingPerfil(false);
+      setPerfilEdit(null);
+      showMsg('success', 'Klantgegevens opgeslagen.');
+    } catch (err) { showMsg('error', err.message); }
+    finally { setGuardandoPerfil(false); }
   };
 
-  const handleGuardar = async () => {
-    setGuardando(true);
-    setMensaje(null);
+  const handleSaveCommission = async () => {
     try {
       const res = await fetch(`${API}/profile/${id}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(perfil),
       });
-      if (!res.ok) throw new Error('Error saving');
+      if (!res.ok) throw new Error('Opslaan mislukt');
       const data = await res.json();
       setPerfil(data);
-      setMensaje({ type: 'success', text: 'Client data saved!' });
-      setTimeout(() => setMensaje(null), 3000);
-    } catch (err) {
-      setMensaje({ type: 'error', text: err.message });
-    } finally {
-      setGuardando(false);
-    }
+      showMsg('success', 'Commissies opgeslagen.');
+    } catch (err) { showMsg('error', err.message); }
   };
 
-  if (cargando) return <p className="text-center py-12 text-gray-500">Loading...</p>;
-  if (!perfil) return <p className="text-center py-12 text-red-500">Client not found</p>;
-
-  const getStatusBadge = (estado) => {
-    const colors = {
-      created: 'bg-blue-100 text-blue-700', offer_ready: 'bg-purple-100 text-purple-700',
-      offer_sent: 'bg-indigo-100 text-indigo-700', working: 'bg-yellow-100 text-yellow-700',
-      pending_payment: 'bg-orange-100 text-orange-700', paid: 'bg-green-100 text-green-700',
-      rejected: 'bg-red-100 text-red-700',
-    };
-    return <span className={`px-2 py-0.5 rounded text-xs font-semibold ${colors[estado] || 'bg-gray-100 text-gray-700'}`}>{estado}</span>;
+  const handleOpslaanNota = async () => {
+    setGuardandoNota(true);
+    try {
+      const res = await fetch(`${API}/profile/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...perfil, notaAdmin }),
+      });
+      if (!res.ok) throw new Error('Opslaan mislukt');
+      const data = await res.json();
+      setPerfil(data);
+      showMsg('success', 'Notitie opgeslagen.');
+    } catch (err) { showMsg('error', err.message); }
+    finally { setGuardandoNota(false); }
   };
+
+  const getProjectPrice = (p) => (p.oferta?.precioTotalEstimado ?? p.oferta?.precioTotal) || null;
+
+  const sortedProyectos = [...proyectos].sort((a, b) => {
+    const oA = getStatusMeta(a.estado).order;
+    const oB = getStatusMeta(b.estado).order;
+    if (oA !== oB) return oA - oB;
+    return new Date(b.fechaInicio || b.fechaCreacion || 0) - new Date(a.fechaInicio || a.fechaCreacion || 0);
+  });
+
+  const formatDate = (d) => d
+    ? new Date(d).toLocaleDateString('nl-BE', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '—';
+
+  if (cargando) return <p className="text-center py-12 text-gray-500">Laden...</p>;
+  if (!perfil)  return <p className="text-center py-12 text-red-500">Klant niet gevonden</p>;
+
+  const editData = editingPerfil ? perfilEdit : perfil;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
 
       {/* Back */}
-      <button onClick={() => navigate('/admin/clientes')} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 text-sm">
-        <ArrowLeft size={16} /> Back to Clients
+      <button onClick={() => navigate('/admin/clientes')}
+        className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 text-sm">
+        <ArrowLeft size={16} /> Terug naar klanten
       </button>
 
-      {/* Message */}
+      {/* Toast */}
       {mensaje && (
         <div className={`mb-4 p-3 rounded-lg flex items-center gap-2 text-sm ${
           mensaje.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
@@ -96,178 +158,192 @@ export default function AdminClientDetail() {
         </div>
       )}
 
-      {/* Profile card */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      {/* ── Profile card ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
 
-        {/* Foto + Logo header */}
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
-              {perfil.logo ? (
-                <img src={perfil.logo} alt="logo" className="w-full h-full object-contain" />
-              ) : (
-                <span className="text-gray-400 text-xs font-semibold">No logo</span>
-              )}
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                My administration panel
-                <span className="ml-2 inline-block w-3 h-3 rounded-full bg-purple-500 align-middle" />
-              </h1>
-              <p className="text-sm text-gray-500 mt-0.5">{perfil.email}</p>
-              <p className={`text-xs mt-1 font-semibold ${perfil.profileCompleted ? 'text-green-600' : 'text-orange-500'}`}>
-                {perfil.profileCompleted ? '✓ Profile complete' : '⚠ Profile incomplete'}
-              </p>
-            </div>
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 bg-gray-100 border border-dashed border-gray-300 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+            {perfil.logo
+              ? <img src={perfil.logo} alt="logo" className="w-full h-full object-contain" />
+              : <span className="text-gray-400 text-xs font-semibold">Logo</span>}
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-16 h-10 bg-gray-100 border border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 text-xs font-semibold">
-              Logo
-            </div>
-            <button onClick={handleGuardar} disabled={guardando}
-              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm disabled:opacity-50">
-              <Save size={15} /> {guardando ? 'Saving...' : 'Save Changes'}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-bold text-gray-900 truncate">
+              {`${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || perfil.email}
+            </h1>
+            {perfil.empresa && <p className="text-sm text-gray-500">{perfil.empresa}</p>}
+            <p className="text-xs text-gray-400 mt-0.5">{perfil.email}</p>
+          </div>
+          <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${perfil.profileCompleted ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
+            {perfil.profileCompleted ? '✓ Profiel compleet' : '⚠ Profiel onvolledig'}
+          </span>
+        </div>
+
+        {/* Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-4">
+          <FieldItem label="Voornaam"       value={editData.nombre    || ''} editing={editingPerfil} onChange={v => handleFieldChange('nombre', v)} />
+          <FieldItem label="Achternaam"     value={editData.apellidos || ''} editing={editingPerfil} onChange={v => handleFieldChange('apellidos', v)} />
+          <FieldItem label="Bedrijfsnaam"   value={editData.empresa   || ''} editing={editingPerfil} onChange={v => handleFieldChange('empresa', v)} />
+          <FieldItem label="BTW / NIF"      value={editData.nif       || ''} editing={editingPerfil} onChange={v => handleFieldChange('nif', v)} />
+          <FieldItem label="E-mail (login)" value={editData.email     || ''} editing={false} />
+          <FieldItem label="E-mail 2"       value={editData.email2    || ''} editing={editingPerfil} onChange={v => handleFieldChange('email2', v)} />
+          <FieldItem label="Telefoon"       value={editData.telefono  || ''} editing={editingPerfil} onChange={v => handleFieldChange('telefono', v)} />
+          <FieldItem label="Mobiel"         value={editData.mobiel    || ''} editing={editingPerfil} onChange={v => handleFieldChange('mobiel', v)} />
+          <FieldItem label="IBAN"           value={editData.iban      || ''} editing={editingPerfil} onChange={v => handleFieldChange('iban', v)} />
+        </div>
+
+        {/* Address */}
+        <div className="grid grid-cols-3 gap-3 mb-3">
+          <div className="col-span-2">
+            <FieldItem label="Straat" value={editData.direccion   || ''} editing={editingPerfil} onChange={v => handleFieldChange('direccion', v)} />
+          </div>
+          <FieldItem label="Nr." value={editData.huisnummer || ''} editing={editingPerfil} onChange={v => handleFieldChange('huisnummer', v)} />
+        </div>
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <FieldItem label="Postcode" value={editData.codigoPostal || ''} editing={editingPerfil} onChange={v => handleFieldChange('codigoPostal', v)} />
+          <FieldItem label="Stad"     value={editData.ciudad       || ''} editing={editingPerfil} onChange={v => handleFieldChange('ciudad', v)} />
+        </div>
+
+        {/* Bewerken / Opslaan / Annuleren */}
+        <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+          {!editingPerfil ? (
+            <button onClick={handleBewerken}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition">
+              <Pencil size={14} /> Bewerken
+            </button>
+          ) : (
+            <>
+              <button onClick={handleOpslaanPerfil} disabled={guardandoPerfil}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50">
+                <Save size={14} /> {guardandoPerfil ? 'Opslaan...' : 'Opslaan'}
+              </button>
+              <button onClick={handleAnnuleren}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition">
+                <X size={14} /> Annuleren
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Admin note */}
+        <div className="mt-5 pt-5 border-t border-gray-100">
+          <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+            <StickyNote size={15} className="text-yellow-500" /> Interne notitie
+          </label>
+          <textarea
+            rows={3}
+            value={notaAdmin}
+            onChange={e => setNotaAdmin(e.target.value)}
+            placeholder="Voeg hier een interne notitie toe over deze klant..."
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none transition"
+          />
+          <div className="flex justify-end mt-2">
+            <button onClick={handleOpslaanNota} disabled={guardandoNota}
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50">
+              <Save size={14} /> {guardandoNota ? 'Opslaan...' : 'Notitie opslaan'}
             </button>
           </div>
         </div>
-
-        {/* Two-column field grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6">
-          {/* Left */}
-          <div className="space-y-4">
-            <Field label="Voornaam (First name)" value={perfil.nombre || ''} onChange={v => handleChange('nombre', v)} />
-            <Field label="Achternaam (Last name)" value={perfil.apellidos || ''} onChange={v => handleChange('apellidos', v)} />
-            <Field label="Bedrijfsnaam (Company)" value={perfil.empresa || ''} onChange={v => handleChange('empresa', v)} />
-            <Field label="BTW nummer (VAT / NIF)" value={perfil.nif || ''} onChange={v => handleChange('nif', v)} />
-          </div>
-          {/* Right */}
-          <div className="space-y-4">
-            <Field label="Email 1 (login)" value={perfil.email || ''} disabled />
-            <Field label="Email 2" value={perfil.email2 || ''} onChange={v => handleChange('email2', v)} />
-            <Field label="Telefoon" value={perfil.telefono || ''} onChange={v => handleChange('telefono', v)} />
-            <Field label="Mobiel" value={perfil.mobiel || ''} onChange={v => handleChange('mobiel', v)} />
-            <Field label="IBAN nummer" value={perfil.iban || ''} onChange={v => handleChange('iban', v)} />
-          </div>
-        </div>
-
-        {/* Address row */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="col-span-2">
-            <Field label="Straat (Street)" value={perfil.direccion || ''} onChange={v => handleChange('direccion', v)} />
-          </div>
-          <Field label="Nr." value={perfil.huisnummer || ''} onChange={v => handleChange('huisnummer', v)} />
-        </div>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Field label="Postcode" value={perfil.codigoPostal || ''} onChange={v => handleChange('codigoPostal', v)} />
-          <Field label="Stad (City)" value={perfil.ciudad || ''} onChange={v => handleChange('ciudad', v)} />
-        </div>
-
-        {/* Login */}
-        <div className="border-t pt-4">
-          <p className="text-sm text-gray-600">
-            <span className="font-semibold">Login: </span>
-            <a href={`mailto:${perfil.email}`} className="text-blue-600 hover:underline">{perfil.email}</a>
-          </p>
-        </div>
       </div>
 
-      {/* Commission settings — admin editable */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      {/* ── Commission settings ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
         <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide mb-1">
-          Commission settings (ONLY admin can fill this in, fixed)
+          Commissie-instellingen
         </h2>
-        <p className="text-xs text-gray-400 mb-5">Set the commission percentage for each cost category. Electrician sees these as read-only.</p>
-        <div className="space-y-4">
-          <CommissionRow
-            label="Type 1 — commissie op Inlabelbedrag"
+        <p className="text-xs text-gray-400 mb-5">
+          Stel het commissiepercentage in per kostencategorie. Alleen zichtbaar voor de beheerder.
+        </p>
+        <div className="space-y-1">
+          <CommissionRow label="Type 1 — commissie op Inlabelbedrag"
             value={perfil.comisionTransporte ?? 0}
-            onChange={v => handleChange('comisionTransporte', v)}
-            note="Applies to the total labeled amount of the project"
-          />
-          <CommissionRow
-            label="Type 2 — commissie Hardware"
+            onChange={v => setPerfil(p => ({ ...p, comisionTransporte: v }))}
+            note="Van toepassing op het totale inlabelbedrag van het project" />
+          <CommissionRow label="Type 2 — commissie Hardware"
             value={perfil.comisionHardware ?? 0}
-            onChange={v => handleChange('comisionHardware', v)}
-            note="Applies to hardware and material costs"
-          />
-          <CommissionRow
-            label="Type 3 — commissie werkuren"
+            onChange={v => setPerfil(p => ({ ...p, comisionHardware: v }))}
+            note="Van toepassing op hardware- en materiaalkosten" />
+          <CommissionRow label="Type 3 — commissie werkuren"
             value={perfil.comisionHorasTrabajo ?? 0}
-            onChange={v => handleChange('comisionHorasTrabajo', v)}
-            note="Applies to labor / work hour costs"
-          />
-          <CommissionRow
-            label="Type 4 — commission 0% (services, verzekeringen, ...)"
-            value={0}
-            readOnly
-            note="Fixed at 0% — services and insurance are always excluded"
-          />
-          <CommissionRow
-            label="Type 5 — speciale commissie"
+            onChange={v => setPerfil(p => ({ ...p, comisionHorasTrabajo: v }))}
+            note="Van toepassing op de arbeidskosten" />
+          <CommissionRow label="Type 4 — 0% commissie (diensten, verzekeringen, ...)"
+            value={0} readOnly
+            note="Vastgesteld op 0% — diensten en verzekeringen altijd uitgesloten" />
+          <CommissionRow label="Type 5 — speciale commissie"
             value={perfil.comisionEspecial ?? 0}
-            onChange={v => handleChange('comisionEspecial', v)}
-            note="Special commission agreed individually"
-          />
+            onChange={v => setPerfil(p => ({ ...p, comisionEspecial: v }))}
+            note="Speciale commissie individueel overeengekomen" />
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button onClick={handleSaveCommission}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition">
+            <Save size={14} /> Commissies opslaan
+          </button>
         </div>
       </div>
 
-      {/* List clients */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      {/* ── End clients ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
         <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Users size={18} /> List clients ({clientes.length})
+          <Users size={18} className="text-indigo-500" /> Eindklanten ({clientes.length})
         </h2>
         {clientes.length === 0 ? (
-          <p className="text-gray-400 text-sm">No end-clients registered yet.</p>
+          <p className="text-gray-400 text-sm">Nog geen eindklanten geregistreerd.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-xs text-gray-500 uppercase">
-                  <th className="pb-2 pr-4">Name</th>
-                  <th className="pb-2 pr-4">Email</th>
-                  <th className="pb-2 pr-4">Phone</th>
-                  <th className="pb-2">City</th>
-                </tr>
-              </thead>
-              <tbody>
-                {clientes.map(c => (
-                  <tr key={c._id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="py-2 pr-4 font-semibold text-gray-900">{c.nombre} {c.apellidos}</td>
-                    <td className="py-2 pr-4 text-gray-500">{c.email || '—'}</td>
-                    <td className="py-2 pr-4 text-gray-500">{c.telefono || '—'}</td>
-                    <td className="py-2 text-gray-500">{c.ciudad || '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="divide-y divide-gray-100">
+            {clientes.map(c => (
+              <div key={c._id} className="py-2.5 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{c.nombre} {c.apellidos}</p>
+                  <p className="text-xs text-gray-400">
+                    {[c.email, c.telefono].filter(Boolean).join(' · ')}
+                  </p>
+                </div>
+                {c.ciudad && <span className="text-xs text-gray-400">{c.ciudad}</span>}
+              </div>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Projects */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      {/* ── Projects ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <FolderOpen size={18} /> Projects ({proyectos.length})
+          <FolderOpen size={18} className="text-blue-500" /> Projecten ({proyectos.length})
         </h2>
-        {proyectos.length === 0 ? (
-          <p className="text-gray-400 text-sm">No projects yet.</p>
+        {sortedProyectos.length === 0 ? (
+          <p className="text-gray-400 text-sm">Nog geen projecten.</p>
         ) : (
-          <div className="space-y-2 max-h-80 overflow-y-auto">
-            {proyectos.map(p => (
-              <button key={p._id} onClick={() => navigate(`/proyecto/${p._id}`)}
-                className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition text-sm flex justify-between items-center">
-                <div>
-                  <p className="font-semibold text-gray-900">{p.tituloAutomatico || p.nombreCasa}</p>
-                  <p className="text-xs text-gray-500">{new Date(p.fechaInicio).toLocaleDateString()}</p>
-                </div>
-                <div className="text-right">
-                  {getStatusBadge(p.estado)}
-                  {p.estado === 'paid' && p.oferta?.precioTotal && (
-                    <p className="text-xs text-green-600 font-bold mt-1">€{p.oferta.precioTotal.toFixed(2)}</p>
-                  )}
-                </div>
-              </button>
-            ))}
+          <div className="space-y-2">
+            {sortedProyectos.map(p => {
+              const meta  = getStatusMeta(p.estado);
+              const price = getProjectPrice(p);
+              const title = p.tituloAutomatico || p.nombreCasa || 'Project';
+              const date  = formatDate(p.fechaInicio || p.fechaCreacion);
+              return (
+                <button key={p._id} onClick={() => navigate(`/proyecto/${p._id}`)}
+                  className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition group">
+                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${meta.dot}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{title}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{date}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${meta.color}`}>
+                      {meta.label}
+                    </span>
+                    {price !== null && (
+                      <p className={`text-xs font-bold mt-1 ${p.estado === 'paid' ? 'text-green-600' : 'text-gray-500'}`}>
+                        €{price.toLocaleString('nl-BE', { minimumFractionDigits: 2 })}
+                      </p>
+                    )}
+                  </div>
+                  <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-400 shrink-0" />
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -276,19 +352,24 @@ export default function AdminClientDetail() {
   );
 }
 
-function Field({ label, value, onChange, disabled }) {
+// ── Sub-components ──────────────────────────────────────────
+
+function FieldItem({ label, value, editing, onChange }) {
   return (
     <div>
-      <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
-      <input
-        type="text"
-        value={value}
-        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-        disabled={disabled || !onChange}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition text-sm ${
-          (disabled || !onChange) ? 'bg-gray-100 text-gray-500' : ''
-        }`}
-      />
+      <p className="text-xs font-semibold text-gray-500 mb-1">{label}</p>
+      {editing && onChange ? (
+        <input
+          type="text"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm transition"
+        />
+      ) : (
+        <p className={`text-sm py-1 px-1 ${value ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+          {value || '—'}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Edit2, X, ZoomIn, ZoomOut, FileText, DollarSign, Flag, Send, CheckCircle, ExternalLink, Upload, MessageSquare, RotateCcw, PenTool, Receipt, StickyNote } from 'lucide-react';
+import { ArrowLeft, Edit2, X, ZoomIn, ZoomOut, FileText, DollarSign, Send, CheckCircle, ExternalLink, Upload, MessageSquare, RotateCcw, PenTool, Receipt, StickyNote } from 'lucide-react';
 import { fabric } from 'fabric';
 import PlanoEditor from '../components/canvas/PlanoEditor';
 import ChatPanel from '../components/ChatPanel';
@@ -607,61 +607,6 @@ export default function ProjectPage() {
           </div>
         </div>
 
-        {/* Workflow Action Buttons */}
-        {usuario?.rol === 'administrador' && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Flag size={22} /> Workflow Actions
-            </h2>
-            <div className="flex flex-wrap gap-3">
-              {/* Prepare Offer */}
-              {['created', 'offer_ready'].includes(proyecto.estado) && (
-                <button
-                  onClick={() => navigate(`/proyecto/${id}/preparar-oferta`)}
-                  className="flex items-center gap-2 px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition"
-                >
-                  <FileText size={18} /> {proyecto.estado === 'offer_ready' ? 'Edit Offer' : 'Prepare Offer'}
-                </button>
-              )}
-              {/* Mark Finished */}
-              {proyecto.estado === 'working' && (
-                <button
-                  onClick={abrirPopupFinalizar}
-                  className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition"
-                >
-                  <CheckCircle size={18} /> Mark Finished
-                </button>
-              )}
-              {/* Mark Paid */}
-              {proyecto.estado === 'pending_payment' && (
-                <button
-                  onClick={async () => {
-                    if (!window.confirm('Mark this project as paid?')) return;
-                    try {
-                      const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}/marcar-pagado`, {
-                        method: 'POST',
-                        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-                      });
-                      if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
-                      await recargarProyecto();
-                    } catch (err) { alert('Error: ' + err.message); }
-                  }}
-                  className="flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition"
-                >
-                  <DollarSign size={18} /> Mark as Paid
-                </button>
-              )}
-              {/* Delete Project */}
-              <button
-                onClick={handleEliminarProyecto}
-                className="ml-auto flex items-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
-              >
-                <X size={18} /> Delete Project
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Client: View/Sign Offer */}
         {usuario?.rol !== 'administrador' && proyecto.estado === 'offer_sent' && (
           proyecto.reaperturas?.some(r => !r.aceptado) ? (
@@ -687,15 +632,15 @@ export default function ProjectPage() {
         )}
 
         {/* Offer Summary (when offer exists) */}
-        {proyecto.oferta && proyecto.oferta.precioTotal > 0 && (
+        {proyecto.oferta && (proyecto.oferta.precioTotalEstimado > 0 || proyecto.oferta.precioTotal > 0) && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <DollarSign size={22} /> Offer Summary
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-gray-500">Total Price</p>
-                <p className="text-2xl font-bold text-green-700">€{(proyecto.oferta.precioTotal || 0).toFixed(2)}</p>
+                <p className="text-gray-500">Estimated Total Price</p>
+                <p className="text-2xl font-bold text-green-700">€{((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0).toFixed(2)}</p>
               </div>
               {proyecto.oferta.fechaInicioInstalacion && (
                 <div>
@@ -727,6 +672,72 @@ export default function ProjectPage() {
               >
                 <ExternalLink size={16} /> View Full Offer Details
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Admin: Financial Summary (pending_payment & paid) */}
+        {usuario?.rol === 'administrador' &&
+         ['pending_payment', 'paid'].includes(proyecto.estado) &&
+         proyecto.oferta && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 border-l-4 border-blue-500">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <DollarSign size={20} className="text-blue-600" /> Financial Summary
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Offer Price</p>
+                <p className="text-2xl font-bold text-blue-700">€{((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0).toFixed(2)}</p>
+              </div>
+              {proyecto.commissieResultaat && (
+                <div className="bg-orange-50 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Commission to Electrician</p>
+                  <p className="text-2xl font-bold text-orange-700">€{(proyecto.commissieResultaat.totaleCommissie || 0).toFixed(2)}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {[
+                      proyecto.commissieResultaat.type1Commissie > 0 && `Type1: ${proyecto.commissieResultaat.type1Pct}%`,
+                      proyecto.commissieResultaat.type2Commissie > 0 && `Type2: ${proyecto.commissieResultaat.type2Pct}%`,
+                      proyecto.commissieResultaat.type3Commissie > 0 && `Type3: ${proyecto.commissieResultaat.type3Pct}%`,
+                      proyecto.commissieResultaat.type5Commissie > 0 && `Type5: ${proyecto.commissieResultaat.type5Pct}%`,
+                    ].filter(Boolean).join(' · ')}
+                  </p>
+                </div>
+              )}
+              {proyecto.commissieResultaat && (
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Net Gain for Company</p>
+                  <p className="text-2xl font-bold text-green-700">
+                    €{(((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0) - (proyecto.commissieResultaat.totaleCommissie || 0)).toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {(((((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0) - (proyecto.commissieResultaat.totaleCommissie || 0)) / ((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 1) * 100).toFixed(1))}% margin
+                  </p>
+                </div>
+              )}
+            </div>
+            {proyecto.commissieResultaat && (
+              <div className="border-t pt-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Commission Breakdown</p>
+                <div className="flex flex-wrap gap-2 text-sm">
+                  {[
+                    { key: 'type1', label: 'Type 1', pct: proyecto.commissieResultaat.type1Pct, amt: proyecto.commissieResultaat.type1Commissie },
+                    { key: 'type2', label: 'Type 2', pct: proyecto.commissieResultaat.type2Pct, amt: proyecto.commissieResultaat.type2Commissie },
+                    { key: 'type3', label: 'Type 3', pct: proyecto.commissieResultaat.type3Pct, amt: proyecto.commissieResultaat.type3Commissie },
+                    { key: 'type5', label: 'Type 5', pct: proyecto.commissieResultaat.type5Pct, amt: proyecto.commissieResultaat.type5Commissie },
+                  ].filter(x => x.amt > 0 || x.pct > 0).map(item => (
+                    <div key={item.key} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-center min-w-[80px]">
+                      <p className="text-xs text-gray-400">{item.label}</p>
+                      <p className="font-bold text-gray-800">{item.pct}%</p>
+                      <p className="text-xs text-gray-500">€{item.amt.toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="mt-4 pt-3 border-t">
+              {proyecto.estado === 'paid'
+                ? <p className="text-sm font-semibold text-green-700">✓ Payment received</p>
+                : <p className="text-sm font-semibold text-orange-600">⏳ Awaiting payment</p>}
             </div>
           </div>
         )}
@@ -838,18 +849,8 @@ export default function ProjectPage() {
                     </div>
                   )}
 
-                  {/* Marcadores */}
                   {plano.marcadores && plano.marcadores.length > 0 && (
-                    <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm font-semibold text-gray-700 mb-2">Markers ({plano.marcadores.length}):</p>
-                      <ul className="space-y-1">
-                        {plano.marcadores.map((marcador, midx) => (
-                          <li key={midx} className="text-sm text-gray-700">
-                            • {marcador.tipo}: ({marcador.x.toFixed(0)}, {marcador.y.toFixed(0)})
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <p className="text-xs text-gray-400 mt-1">{plano.marcadores.length} marker{plano.marcadores.length !== 1 ? 's' : ''} placed</p>
                   )}
                 </div>
               ))}
@@ -1689,6 +1690,52 @@ export default function ProjectPage() {
                 {guardandoNotas ? 'Saving...' : 'Save Notes'}
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Final action buttons */}
+        {usuario?.rol === 'administrador' && (
+          <div className="flex flex-wrap gap-3 pt-2 pb-8">
+            {['created', 'offer_ready'].includes(proyecto.estado) && (
+              <button
+                onClick={() => navigate(`/proyecto/${id}/preparar-oferta`)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold text-sm transition"
+              >
+                <FileText size={16} /> {proyecto.estado === 'offer_ready' ? 'Edit Offer' : 'Prepare Offer'}
+              </button>
+            )}
+            {proyecto.estado === 'working' && (
+              <button
+                onClick={abrirPopupFinalizar}
+                className="flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold text-sm transition"
+              >
+                <CheckCircle size={16} /> Mark Finished
+              </button>
+            )}
+            {proyecto.estado === 'pending_payment' && (
+              <button
+                onClick={async () => {
+                  if (!window.confirm('Mark this project as paid?')) return;
+                  try {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${id}/marcar-pagado`, {
+                      method: 'POST',
+                      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    });
+                    if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+                    await recargarProyecto();
+                  } catch (err) { alert('Error: ' + err.message); }
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-sm transition"
+              >
+                <DollarSign size={16} /> Mark as Paid
+              </button>
+            )}
+            <button
+              onClick={handleEliminarProyecto}
+              className="ml-auto flex items-center gap-2 px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold text-sm transition"
+            >
+              <X size={16} /> Delete Project
+            </button>
           </div>
         )}
 

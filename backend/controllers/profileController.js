@@ -76,7 +76,7 @@ const updateProfileById = async (req, res) => {
       'ciudad', 'provincia', 'pais', 'telefono', 'mobiel', 'email2',
       'huisnummer', 'iban', 'nif', 'web',
       'comisionHardware', 'comisionHorasTrabajo', 'comisionTransporte',
-      'comisionEspecial', 'activo', 'logo',
+      'comisionEspecial', 'activo', 'logo', 'notaAdmin',
     ];
 
     allowedFields.forEach(field => {

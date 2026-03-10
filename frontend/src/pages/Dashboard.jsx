@@ -67,10 +67,22 @@ export default function Dashboard() {
     return map[estado] || { bg: 'bg-gray-500', label: estado, col: 'bg-gray-50 border-gray-200' };
   };
 
+  const getPlanCount = (proyecto) => {
+    const topLevelPlans = proyecto.planos?.length || 0;
+    const roomPlans = proyecto.ruimtes?.filter(r => r.platteGrond).length || 0;
+    return topLevelPlans + roomPlans;
+  };
+
+  const getPhotoCount = (proyecto) => {
+    const topLevelPhotos = proyecto.fotosLocalizacion?.length || 0;
+    const roomPhotos = proyecto.ruimtes?.reduce((sum, room) => sum + (room.fotos?.length || 0), 0) || 0;
+    return topLevelPhotos + roomPhotos;
+  };
+
   // =======================
   // Admin workflow actions
   // =======================
-  const handleAction = async (url, confirmMsg, successMsg) => {
+  const handleAction = async (url, confirmMsg, successMsg, proyectoId) => {
     if (confirmMsg && !window.confirm(confirmMsg)) return;
     try {
       const res = await fetch(url, {
@@ -79,8 +91,17 @@ export default function Dashboard() {
         body: JSON.stringify({}),
       });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+      // Reload just the affected project from the API instead of full page refresh
+      if (proyectoId) {
+        const reloadRes = await fetch(`${import.meta.env.VITE_API_URL}/proyectos/${proyectoId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (reloadRes.ok) {
+          const updated = await reloadRes.json();
+          setProyectos(prev => prev.map(p => p._id === proyectoId ? updated : p));
+        }
+      }
       alert(successMsg || 'Done!');
-      window.location.reload();
     } catch (err) { alert('Error: ' + err.message); }
   };
 
@@ -133,7 +154,7 @@ export default function Dashboard() {
 
                   <div className="text-xs text-gray-500 space-y-1 mb-4">
                     <p><strong>Start:</strong> {new Date(p.fechaInicio).toLocaleDateString()}</p>
-                    <p><strong>Plans:</strong> {p.planos?.length || 0} &nbsp; <strong>Photos:</strong> {p.fotosLocalizacion?.length || 0}</p>
+                    <p><strong>Plans:</strong> {getPlanCount(p)} &nbsp; <strong>Photos:</strong> {getPhotoCount(p)}</p>
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -224,14 +245,21 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
+    <div className="flex flex-col bg-gray-50" style={{ height: 'calc(100vh - 64px)' }}>
 
       {/* ── Top bar: stats + search + filters ── */}
-      <div className="flex-shrink-0 bg-white border-b px-6 py-3 space-y-2">
+      <div className="flex-shrink-0 bg-white border-b px-6 py-6 space-y-5 shadow-sm">
+
+        <div className="flex flex-col items-center text-center gap-2 pb-2">
+          <h1 className="text-3xl font-bold text-gray-900">Project Dashboard</h1>
+          <p className="text-sm text-gray-500 max-w-2xl">
+            Manage all active projects, review the pipeline, and move work forward from one place.
+          </p>
+        </div>
 
         {/* Stats row */}
         {!cargando && proyectos.length > 0 && (
-          <div className="flex flex-wrap gap-3 mb-2 justify-center">
+          <div className="flex flex-wrap gap-4 mb-10 justify-center">
             <MiniStat label="Total" value={proyectos.length} color="text-gray-800" />
             <MiniStat label="Working" value={proyectos.filter(p => p.estado === 'working').length} color="text-yellow-600" />
             <MiniStat label="Pending Payment" value={proyectos.filter(p => p.estado === 'pending_payment').length} color="text-orange-600" />
@@ -267,7 +295,7 @@ export default function Dashboard() {
         )}
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 justify-center">
+        <div className="flex flex-wrap items-center gap-4 justify-center mt-2 mb-4">
           <div className="relative">
             <Search size={15} className="absolute left-2.5 top-2.5 text-gray-400" />
             <input
@@ -275,16 +303,16 @@ export default function Dashboard() {
               placeholder="Search projects..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-8 pr-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-52"
+              className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-72"
             />
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <label className="text-xs font-semibold text-gray-600">Sort:</label>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-gray-600">Sort:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="fecha-desc">Newest First</option>
               <option value="fecha-asc">Oldest First</option>
@@ -293,12 +321,12 @@ export default function Dashboard() {
           </div>
 
           {clientesUnicos.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <label className="text-xs font-semibold text-gray-600">Client:</label>
+          <div className="flex items-center gap-2">
+              <label className="text-sm font-semibold text-gray-600">Client:</label>
               <select
                 value={filtroCliente}
                 onChange={(e) => setFiltroCliente(e.target.value)}
-                className="px-2 py-1.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="">All</option>
                 {clientesUnicos.map(c => (
@@ -309,15 +337,6 @@ export default function Dashboard() {
           )}
 
           <span className="text-xs text-gray-400">{filtered.length} project{filtered.length !== 1 ? 's' : ''}</span>
-
-          {/* Export CSV */}
-          <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-800 text-white rounded-lg text-xs font-semibold transition"
-            title="Export all projects to CSV"
-          >
-            <Download size={14} /> Export CSV
-          </button>
         </div>
       </div>
 
@@ -327,8 +346,8 @@ export default function Dashboard() {
           <p className="text-gray-500">Loading projects...</p>
         </div>
       ) : (
-        <div className="flex-1 overflow-x-auto overflow-y-hidden flex justify-center items-center">
-          <div className="flex gap-3 h-full py-4" style={{ minWidth: 'max-content' }}>
+        <div className="flex-1 overflow-x-auto overflow-y-hidden flex justify-center items-start px-4 py-6">
+          <div className="flex gap-5 h-full" style={{ minWidth: 'max-content' }}>
             {kanbanStates.map(state => {
               const si = getStatusInfo(state);
               const cards = grouped[state] || [];
@@ -349,24 +368,24 @@ export default function Dashboard() {
                   </div>
 
                   {/* Card list — this column scrolls independently */}
-                  <div className="flex-1 overflow-y-auto min-h-0 p-2 space-y-2">
+                  <div className="flex-1 overflow-y-auto min-h-0 p-3 space-y-3">
                     {cards.length === 0 && (
                       <p className="text-gray-400 text-xs text-center py-6 select-none">No projects</p>
                     )}
                     {cards.map(p => (
                       <div
                         key={p._id}
-                        className="bg-white rounded-lg shadow-sm border p-3 hover:shadow-md transition cursor-pointer"
+                        className="bg-white rounded-xl shadow-sm border p-4 hover:shadow-md transition cursor-pointer"
                         onClick={() => navigate(`/proyecto/${p._id}`)}
                       >
-                        <p className="font-semibold text-gray-900 text-sm mb-1 truncate">
+                        <p className="font-semibold text-gray-900 text-sm mb-2 truncate">
                           {p.tituloAutomatico || p.nombreCasa}
                         </p>
                         {p.tituloPersonalizado && (
-                          <p className="text-xs text-gray-400 italic truncate mb-1">{p.tituloPersonalizado}</p>
+                          <p className="text-xs text-gray-400 italic truncate mb-2">{p.tituloPersonalizado}</p>
                         )}
-                        <p className="text-xs text-gray-500 truncate mb-2">{p.direccion}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                        <p className="text-xs text-gray-500 truncate mb-3">{p.direccion}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
                           <span>{p.usuarioId?.nombre || '—'}</span>
                           <span>•</span>
                           <span>{new Date(p.fechaInicio).toLocaleDateString()}</span>
@@ -384,7 +403,7 @@ export default function Dashboard() {
                           )}
                           {state === 'offer_ready' && (
                             <button
-                              onClick={() => handleAction(`${API}/proyectos/${p._id}/enviar-oferta`, 'Send offer to client?', 'Offer sent!')}
+                              onClick={() => handleAction(`${API}/proyectos/${p._id}/enviar-oferta`, 'Send offer to client?', 'Offer sent!', p._id)}
                               className="text-[10px] px-2 py-1 bg-indigo-100 text-indigo-700 rounded font-semibold hover:bg-indigo-200 flex items-center gap-1"
                             >
                               <Send size={10} /> Send
@@ -392,7 +411,7 @@ export default function Dashboard() {
                           )}
                           {state === 'pending_payment' && (
                             <button
-                              onClick={() => handleAction(`${API}/proyectos/${p._id}/marcar-pagado`, 'Mark as paid?', 'Marked paid!')}
+                              onClick={() => handleAction(`${API}/proyectos/${p._id}/marcar-pagado`, 'Mark as paid?', 'Marked paid!', p._id)}
                               className="text-[10px] px-2 py-1 bg-emerald-100 text-emerald-700 rounded font-semibold hover:bg-emerald-200 flex items-center gap-1"
                             >
                               <DollarSign size={10} /> Paid
@@ -429,7 +448,7 @@ export default function Dashboard() {
 
 function MiniStat({ label, value, color }) {
   return (
-    <div className="flex items-center gap-1.5 bg-gray-100 rounded-lg px-3 py-1.5">
+    <div className="flex items-center gap-1.5 bg-gray-100 rounded-xl px-4 py-2">
       <span className="text-xs text-gray-500">{label}:</span>
       <span className={`text-sm font-bold ${color}`}>{value}</span>
     </div>

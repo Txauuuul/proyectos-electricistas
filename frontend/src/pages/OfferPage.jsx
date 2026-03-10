@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Plus, Trash2, Save, Send, Upload, DollarSign, Calendar, FileText } from 'lucide-react';
+import { ArrowLeft, Save, Send, Upload, Euro, Calendar, FileText, Trash2 } from 'lucide-react';
 
 export default function OfferPage() {
   const { id } = useParams();
@@ -14,12 +14,9 @@ export default function OfferPage() {
   const [enviando, setEnviando] = useState(false);
 
   // Form state
-  const [presupuestoItems, setPresupuestoItems] = useState([]);
+  const [precioTotalEstimado, setPrecioTotalEstimado] = useState('');
   const [fechaInicioInstalacion, setFechaInicioInstalacion] = useState('');
   const [duracionEstimadaDias, setDuracionEstimadaDias] = useState('');
-  const [costeHardware, setCosteHardware] = useState(0);
-  const [costeHorasTrabajo, setCosteHorasTrabajo] = useState(0);
-  const [costeTransporte, setCosteTransporte] = useState(0);
   const [notasEmpresa, setNotasEmpresa] = useState('');
   const [documentoPDF, setDocumentoPDF] = useState(null);
   const [planosModificados, setPlanosModificados] = useState([]);
@@ -45,12 +42,9 @@ export default function OfferPage() {
 
       // Load existing offer if any
       if (data.oferta) {
-        setPresupuestoItems(data.oferta.presupuestoItems || []);
+        setPrecioTotalEstimado(data.oferta.precioTotalEstimado ?? data.oferta.precioTotal ?? '');
         setFechaInicioInstalacion(data.oferta.fechaInicioInstalacion ? data.oferta.fechaInicioInstalacion.split('T')[0] : '');
         setDuracionEstimadaDias(data.oferta.duracionEstimadaDias || '');
-        setCosteHardware(data.oferta.costeHardware || 0);
-        setCosteHorasTrabajo(data.oferta.costeHorasTrabajo || 0);
-        setCosteTransporte(data.oferta.costeTransporte || 0);
         setNotasEmpresa(data.oferta.notasEmpresa || '');
         setDocumentoPDF(data.oferta.documentoPDF || null);
         setPlanosModificados(data.oferta.planosModificados || []);
@@ -60,28 +54,6 @@ export default function OfferPage() {
     } finally {
       setCargando(false);
     }
-  };
-
-  // Budget calculations
-  const subtotal = presupuestoItems.reduce((sum, item) => sum + (item.total || 0), 0);
-  const precioTotal = subtotal;
-
-  // Add budget item
-  const addItem = () => {
-    setPresupuestoItems([...presupuestoItems, { descripcion: '', cantidad: 1, precioUnitario: 0, total: 0 }]);
-  };
-
-  const updateItem = (index, field, value) => {
-    const updated = [...presupuestoItems];
-    updated[index][field] = value;
-    if (field === 'cantidad' || field === 'precioUnitario') {
-      updated[index].total = updated[index].cantidad * updated[index].precioUnitario;
-    }
-    setPresupuestoItems(updated);
-  };
-
-  const removeItem = (index) => {
-    setPresupuestoItems(presupuestoItems.filter((_, i) => i !== index));
   };
 
   // Handle PDF upload
@@ -120,12 +92,9 @@ export default function OfferPage() {
     try {
       const body = {
         planosModificados,
-        presupuestoItems,
-        presupuestoEstimado: subtotal,
-        precioTotal,
-        costeHardware,
-        costeHorasTrabajo,
-        costeTransporte,
+        presupuestoItems: [],
+        precioTotalEstimado: precioTotalEstimado !== '' ? parseFloat(precioTotalEstimado) : null,
+        precioTotal: precioTotalEstimado !== '' ? parseFloat(precioTotalEstimado) : null,
         fechaInicioInstalacion: fechaInicioInstalacion || null,
         duracionEstimadaDias: duracionEstimadaDias ? parseInt(duracionEstimadaDias) : null,
         notasEmpresa,
@@ -155,10 +124,8 @@ export default function OfferPage() {
   const handleSend = async () => {
     if (!window.confirm('Are you sure you want to send this offer to the client? They will receive an email notification.')) return;
 
-    // Save first if needed
-    if (proyecto.estado === 'created' || presupuestoItems.length > 0) {
-      await handleSave();
-    }
+    // Save first
+    await handleSave();
 
     setEnviando(true);
     try {
@@ -220,7 +187,7 @@ export default function OfferPage() {
             </button>
             <button
               onClick={handleSend}
-              disabled={enviando || presupuestoItems.length === 0}
+              disabled={enviando}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
             >
               <Send size={18} /> {enviando ? 'Sending...' : 'Send to Client'}
@@ -315,136 +282,27 @@ export default function OfferPage() {
           </label>
         </div>
 
-        {/* Budget Items */}
+        {/* Estimated Total Price */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <DollarSign size={20} /> Budget Breakdown
+          <h2 className="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+            <Euro size={20} /> Estimated Total Price
           </h2>
-
-          {presupuestoItems.length > 0 && (
-            <div className="overflow-x-auto mb-4">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-2 text-left font-semibold text-gray-700">Description</th>
-                    <th className="px-4 py-2 text-center font-semibold text-gray-700 w-24">Qty</th>
-                    <th className="px-4 py-2 text-right font-semibold text-gray-700 w-32">Unit Price (€)</th>
-                    <th className="px-4 py-2 text-right font-semibold text-gray-700 w-32">Total (€)</th>
-                    <th className="px-4 py-2 w-12"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {presupuestoItems.map((item, idx) => (
-                    <tr key={idx} className="border-b">
-                      <td className="px-4 py-2">
-                        <input
-                          type="text"
-                          value={item.descripcion}
-                          onChange={(e) => updateItem(idx, 'descripcion', e.target.value)}
-                          className="w-full px-2 py-1 border rounded"
-                          placeholder="e.g., Electrical wiring"
-                        />
-                      </td>
-                      <td className="px-4 py-2">
-                        <input
-                          type="number"
-                          min="1"
-                          value={item.cantidad}
-                          onChange={(e) => updateItem(idx, 'cantidad', parseInt(e.target.value) || 1)}
-                          className="w-full px-2 py-1 border rounded text-center"
-                        />
-                      </td>
-                      <td className="px-4 py-2">
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={item.precioUnitario}
-                          onChange={(e) => updateItem(idx, 'precioUnitario', parseFloat(e.target.value) || 0)}
-                          className="w-full px-2 py-1 border rounded text-right"
-                        />
-                      </td>
-                      <td className="px-4 py-2 text-right font-semibold">
-                        €{item.total.toFixed(2)}
-                      </td>
-                      <td className="px-4 py-2">
-                        <button onClick={() => removeItem(idx)} className="text-red-500 hover:text-red-700">
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <button
-            onClick={addItem}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold transition"
-          >
-            <Plus size={16} /> Add Item
-          </button>
-
-          {/* Totals */}
-          {presupuestoItems.length > 0 && (
-            <div className="mt-6 border-t pt-4 space-y-2 max-w-sm ml-auto">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="font-semibold">€{subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold border-t pt-2">
-                <span>Total:</span>
-                <span className="text-green-700">€{precioTotal.toFixed(2)}</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Cost Breakdown */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <DollarSign size={20} /> Cost Breakdown
-          </h2>
-          <p className="text-sm text-gray-500 mb-4">Breakdown of costs for commission calculation</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Hardware Cost (€)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={costeHardware}
-                onChange={(e) => setCosteHardware(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="0.00"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Work Hours Cost (€)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={costeHorasTrabajo}
-                onChange={(e) => setCosteHorasTrabajo(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="0.00"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Transport Cost (€)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={costeTransporte}
-                onChange={(e) => setCosteTransporte(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder="0.00"
-              />
-            </div>
+          <p className="text-sm text-gray-500 mb-4">Indicative total price for the client. The exact amount will be set once the work is complete.</p>
+          <div className="max-w-xs">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Total Estimated Price (€)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={precioTotalEstimado}
+              onChange={(e) => setPrecioTotalEstimado(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-lg font-semibold"
+              placeholder="0.00"
+            />
           </div>
+          {precioTotalEstimado !== '' && parseFloat(precioTotalEstimado) > 0 && (
+            <p className="mt-3 text-green-700 font-bold text-xl">€ {parseFloat(precioTotalEstimado).toLocaleString('nl-BE', { minimumFractionDigits: 2 })}</p>
+          )}
         </div>
 
         {/* Installation Details */}
@@ -530,7 +388,7 @@ export default function OfferPage() {
           </button>
           <button
             onClick={handleSend}
-            disabled={enviando || presupuestoItems.length === 0}
+            disabled={enviando}
             className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
           >
             <Send size={18} /> {enviando ? 'Sending...' : 'Send to Client'}
