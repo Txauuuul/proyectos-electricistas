@@ -32,7 +32,7 @@ export default function Step4() {
         <div className="space-y-4">
           <button
             onClick={handleIrDashboard}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition text-lg"
+            className="w-full bg-[#29ace3] hover:bg-[#1d96cb] text-white font-bold py-3 rounded-lg transition text-lg"
           >
             Ga naar dashboard
           </button>

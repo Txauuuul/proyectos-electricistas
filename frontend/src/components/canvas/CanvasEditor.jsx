@@ -175,7 +175,7 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
               disabled={herramientaActiva !== null}
               className={`px-3 py-2 rounded text-sm font-semibold flex gap-1 items-center transition ${
                 herramientaActiva === tipo.id
-                  ? 'bg-blue-600'
+                  ? 'bg-[#29ace3]'
                   : herramientaActiva !== null
                   ? 'opacity-50 cursor-not-allowed'
                   : 'bg-gray-700 hover:bg-gray-600'
@@ -197,7 +197,7 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
           ) : (
             <button
               onClick={desactivarLapiz}
-              className="px-3 py-2 rounded text-sm font-semibold bg-blue-600 hover:bg-blue-700 transition"
+              className="px-3 py-2 rounded text-sm font-semibold bg-[#29ace3] hover:bg-[#1d96cb] transition"
             >
               ✓ Listo
             </button>

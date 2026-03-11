@@ -15,7 +15,7 @@ const SORT_OPTIONS = [
   { key: 'diasPromedioCierre', label: 'Gem. dagen' },
 ];
 
-function StatCard({ icon: Icon, label, value, color = 'text-blue-600', sub }) {
+function StatCard({ icon: Icon, label, value, color = 'text-[#29ace3]', sub }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
       <div className={`p-3 rounded-xl bg-gray-50 ${color}`}>
@@ -30,7 +30,7 @@ function StatCard({ icon: Icon, label, value, color = 'text-blue-600', sub }) {
   );
 }
 
-function ProgressBar({ value, max, color = 'bg-blue-500' }) {
+function ProgressBar({ value, max, color = 'bg-[#29ace3]' }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
     <div className="w-full bg-gray-100 rounded-full h-1.5 mt-1">
@@ -92,18 +92,20 @@ export default function AdminElectricianStats() {
 
   const SortIcon = ({ col }) => {
     if (sortKey !== col) return <ArrowUpDown size={12} className="text-gray-300" />;
-    return sortDir === 'asc' ? <ChevronUp size={14} className="text-blue-600" /> : <ChevronDown size={14} className="text-blue-600" />;
+    return sortDir === 'asc' ? <ChevronUp size={14} className="text-[#29ace3]" /> : <ChevronDown size={14} className="text-[#29ace3]" />;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Header */}
-      <header className="bg-white shadow sticky top-0 z-10">
+      <header className="shadow sticky top-0 z-10" style={{ background: '#1a1a1a' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-3">
-          <BarChart2 size={28} className="text-indigo-600" />
+          <BarChart2 size={26} style={{ color: '#29ace3' }} />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Prestaties van elektriciens</h1>
-            <p className="text-xs text-gray-500">Admin-dashboard · Teamstatistieken</p>
+            <h1 className="text-xl font-extrabold text-white uppercase tracking-wide">
+              Prestaties<span style={{ color: '#29ace3' }}>statistieken</span>
+            </h1>
+            <p className="text-xs text-gray-400">Admin-dashboard · Teamstatistieken</p>
           </div>
         </div>
       </header>
@@ -125,7 +127,7 @@ export default function AdminElectricianStats() {
               <StatCard icon={Users} label="Actieve elektriciens" value={stats.length} color="text-indigo-600" />
               <StatCard icon={Euro} label="Totale omzet" value={`€${(totalGlobalRevenue / 1000).toFixed(1)}k`} color="text-green-600"
                 sub="uit betaalde projecten" />
-              <StatCard icon={TrendingUp} label="Gem. conversie" value={`${avgConversion}%`} color="text-blue-600"
+              <StatCard icon={TrendingUp} label="Gem. conversie" value={`${avgConversion}%`} color="text-[#29ace3]"
                 sub="offerte → goedgekeurd" />
               <StatCard icon={Euro} label="Actieve pipeline" value={`€${(totalGlobalPipeline / 1000).toFixed(1)}k`} color="text-orange-500"
                 sub="in uitvoering" />

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Send, MessageCircle, Loader2, RefreshCw } from 'lucide-react';
 
 const ROL_COLORS = {
-  administrador: 'bg-blue-100 text-blue-900',
+  administrador: 'bg-[#d0eef9] text-[#0a3d52]',
   electricista: 'bg-green-100 text-green-900',
 };
 const ROL_LABELS = { administrador: 'Admin', electricista: 'Elektricien' };
@@ -101,13 +101,13 @@ export default function ChatPanel({ proyectoId }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50 rounded-t-xl">
         <div className="flex items-center gap-2">
-          <MessageCircle size={18} className="text-blue-600" />
+          <MessageCircle size={18} className="text-[#29ace3]" />
           <span className="font-bold text-gray-900 text-sm">Projectchat</span>
           <span className="text-xs text-gray-400 hidden sm:inline">— Admin ↔ Elektricien</span>
         </div>
         <button
           onClick={() => cargarMensajes(false)}
-          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+          className="p-1.5 text-gray-400 hover:text-[#29ace3] hover:bg-[#eaf7fd] rounded-lg transition"
           title="Vernieuwen"
         >
           <RefreshCw size={14} />
@@ -146,7 +146,7 @@ export default function ChatPanel({ proyectoId }) {
                   )}
                   <div className={`px-3 py-2 rounded-2xl text-sm break-words
                     ${isOwn
-                      ? 'bg-blue-600 text-white rounded-br-sm'
+                      ? 'bg-[#29ace3] text-white rounded-br-sm'
                       : 'bg-gray-100 text-gray-900 rounded-bl-sm'
                     }`}
                   >
@@ -154,7 +154,7 @@ export default function ChatPanel({ proyectoId }) {
                   </div>
                   <div className={`text-[10px] text-gray-400 mt-0.5 ${isOwn ? 'text-right' : 'text-left'}`}>
                     {formatTime(m.fechaCreacion)}
-                    {isOwn && !m.leido && <span className="ml-1 text-blue-400">• ongelezen</span>}
+                    {isOwn && !m.leido && <span className="ml-1 text-[#29ace3]">• ongelezen</span>}
                   </div>
                 </div>
               </div>
@@ -175,13 +175,13 @@ export default function ChatPanel({ proyectoId }) {
           maxLength={2000}
           placeholder="Typ een bericht... (Enter om te verzenden)"
           disabled={enviando}
-          className="flex-1 resize-none border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition disabled:opacity-50"
+          className="flex-1 resize-none border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#29ace3] focus:ring-2 focus:ring-blue-100 transition disabled:opacity-50"
           style={{ maxHeight: '80px' }}
         />
         <button
           onClick={enviar}
           disabled={!texto.trim() || enviando}
-          className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition flex-shrink-0"
+          className="p-2.5 bg-[#29ace3] text-white rounded-xl hover:bg-[#1d96cb] disabled:opacity-40 disabled:cursor-not-allowed transition flex-shrink-0"
         >
           {enviando ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
         </button>

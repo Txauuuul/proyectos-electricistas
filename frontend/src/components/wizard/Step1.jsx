@@ -73,7 +73,7 @@ export default function Step1() {
   };
 
   const inp = (err) =>
-    `w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm ${err ? "border-red-500" : "border-gray-300"}`;
+    `w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#29ace3] focus:border-transparent outline-none transition text-sm ${err ? "border-red-500" : "border-gray-300"}`;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -101,7 +101,7 @@ export default function Step1() {
               <Users size={13} /> Eindklant (optioneel)
             </label>
             <div className="flex gap-2">
-              <select {...register("clienteId")} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+              <select {...register("clienteId")} className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm">
                 <option value="">&mdash; Geen klant geselecteerd &mdash;</option>
                 {clientes.map(c => (
                   <option key={c._id} value={c._id}>{c.nombre} {c.apellidos || ""} {c.empresa ? `(${c.empresa})` : ""}</option>
@@ -115,10 +115,10 @@ export default function Step1() {
               <div className="mt-3 p-4 bg-gray-50 rounded-lg border space-y-3">
                 <p className="text-sm font-semibold text-gray-700">Snelle klant aanmaken</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="text" placeholder="Voornaam *" value={newClientName} onChange={e => setNewClientName(e.target.value)} className="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
-                  <input type="text" placeholder="Achternaam" value={newClientApellidos} onChange={e => setNewClientApellidos(e.target.value)} className="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="text" placeholder="Voornaam *" value={newClientName} onChange={e => setNewClientName(e.target.value)} className="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#29ace3]" />
+                  <input type="text" placeholder="Achternaam" value={newClientApellidos} onChange={e => setNewClientApellidos(e.target.value)} className="px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#29ace3]" />
                 </div>
-                <button type="button" onClick={handleCreateQuickClient} disabled={!newClientName.trim()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50">Aanmaken &amp; selecteren</button>
+                <button type="button" onClick={handleCreateQuickClient} disabled={!newClientName.trim()} className="px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg text-sm font-semibold disabled:opacity-50">Aanmaken &amp; selecteren</button>
               </div>
             )}
           </div>
@@ -159,19 +159,19 @@ export default function Step1() {
           </div>
 
           {/* Offerte rechtstreeks naar klant */}
-          <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-[#eaf7fd] border border-[#a8dcf0] rounded-lg">
             <input type="checkbox" id="ofertaDirecta" {...register("ofertaDirectaCliente")} defaultChecked className="w-4 h-4 accent-blue-600 cursor-pointer" />
-            <label htmlFor="ofertaDirecta" className="text-sm font-medium text-blue-800 cursor-pointer select-none">Offerte rechtstreeks naar de klant sturen</label>
+            <label htmlFor="ofertaDirecta" className="text-sm font-medium text-[#1a6a8a] cursor-pointer select-none">Offerte rechtstreeks naar de klant sturen</label>
           </div>
 
           {/* Extra informatie */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">(Extra) informatie over klant/ prospect en/ of opdracht</label>
-            <textarea {...register("extraInfo")} rows={4} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm resize-none" placeholder="Notities over de klant, de opdracht of de locatie\u2026" />
+            <textarea {...register("extraInfo")} rows={4} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] focus:border-transparent outline-none transition text-sm resize-none" placeholder="Notities over de klant, de opdracht of de locatie\u2026" />
           </div>
 
           {/* Volgende stap */}
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition mt-6">
+          <button type="submit" className="w-full bg-[#29ace3] hover:bg-[#1d96cb] text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition mt-6">
             Volgende stap <ChevronRight size={20} />
           </button>
         </form>

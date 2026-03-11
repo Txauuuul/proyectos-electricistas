@@ -93,7 +93,7 @@ export default function Dashboard() {
 
   const getStatusInfo = (estado) => {
     const map = {
-      created:         { bg: 'bg-blue-500',    label: 'Aangemaakt',        col: 'bg-white border-gray-200' },
+      created:         { bg: 'bg-[#29ace3]',    label: 'Aangemaakt',        col: 'bg-white border-gray-200' },
       offer_ready:     { bg: 'bg-purple-500',  label: 'Offerte klaar',     col: 'bg-white border-gray-200' },
       offer_sent:      { bg: 'bg-indigo-500',  label: 'Offerte verzonden', col: 'bg-white border-gray-200' },
       approved:        { bg: 'bg-green-500',   label: 'Goedgekeurd',       col: 'bg-white border-gray-200' },
@@ -169,7 +169,7 @@ export default function Dashboard() {
           </div>
           <button
             onClick={() => navigate('/nuevo-proyecto')}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold"
           >
             <Plus size={18} /> Nieuw project
           </button>
@@ -180,7 +180,7 @@ export default function Dashboard() {
         ) : proyectos.length === 0 ? (
           <div className="text-center py-16">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Nog geen projecten</h3>
-            <button onClick={() => navigate('/nuevo-proyecto')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold inline-flex gap-2">
+            <button onClick={() => navigate('/nuevo-proyecto')} className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-6 py-3 rounded-lg font-semibold inline-flex gap-2">
               <Plus size={18} /> Eerste project aanmaken
             </button>
           </div>
@@ -209,7 +209,7 @@ export default function Dashboard() {
                   <div className="flex flex-col gap-2">
                     <button
                       onClick={() => navigate(`/proyecto/${p._id}`)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold text-sm flex gap-2 items-center justify-center"
+                      className="w-full bg-[#29ace3] hover:bg-[#1d96cb] text-white px-3 py-2 rounded-lg font-semibold text-sm flex gap-2 items-center justify-center"
                     >
                       <Eye size={16} /> Project bekijken
                     </button>
@@ -294,14 +294,16 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="flex flex-col bg-gray-50" style={{ height: 'calc(100vh - 64px)' }}>
+    <div className="flex flex-col" style={{ background: '#f4f6f8', height: 'calc(100vh - 64px)' }}>
 
       {/* ── Top bar: stats + search + filters ── */}
-      <div className="flex-shrink-0 bg-white border-b px-6 py-6 space-y-5 shadow-sm">
+      <div className="flex-shrink-0 border-b px-6 py-6 space-y-5 shadow-sm" style={{ background: '#1a1a1a' }}>
 
         <div className="flex flex-col items-center text-center gap-2 pb-2">
-          <h1 className="text-3xl font-bold text-gray-900">Projectdashboard</h1>
-          <p className="text-sm text-gray-500 max-w-2xl">
+          <h1 className="text-2xl font-extrabold text-white tracking-wide uppercase">
+            Project<span style={{ color: '#29ace3' }}>dashboard</span>
+          </h1>
+          <p className="text-sm text-gray-400 max-w-2xl">
             Beheer alle actieve projecten, bekijk de pipeline en stuur het werk vooruit vanuit één plek.
           </p>
         </div>
@@ -332,7 +334,7 @@ export default function Dashboard() {
               const pagados = proyectos.filter(p => p.estado === 'paid' && p.oferta?.precioTotal);
               if (pagados.length === 0) return null;
               const avg = pagados.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0) / pagados.length;
-              return <MiniStat label="Gem. waarde" value={`€${avg.toFixed(0)}`} color="text-blue-700" />;
+              return <MiniStat label="Gem. waarde" value={`€${avg.toFixed(0)}`} color="text-[#1d8ab5]" />;
             })()}
             {/* Pipeline value (offer_sent + approved + working) */}
             {(() => {
@@ -352,7 +354,7 @@ export default function Dashboard() {
               placeholder="Zoek projecten..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-72"
+              className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none w-72"
             />
           </div>
 
@@ -361,7 +363,7 @@ export default function Dashboard() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
             >
               <option value="fecha-desc">Nieuwste eerst</option>
               <option value="fecha-asc">Oudste eerst</option>
@@ -375,7 +377,7 @@ export default function Dashboard() {
               <select
                 value={filtroCliente}
                 onChange={(e) => setFiltroCliente(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
               >
                 <option value="">Alle</option>
                 {clientesUnicos.map(c => (
@@ -507,8 +509,8 @@ export default function Dashboard() {
 
 function MiniStat({ label, value, color }) {
   return (
-    <div className="flex items-center gap-1.5 bg-gray-100 rounded-xl px-4 py-2">
-      <span className="text-xs text-gray-500">{label}:</span>
+    <div className="flex items-center gap-1.5 rounded px-4 py-2" style={{ background: '#2b2b2b' }}>
+      <span className="text-xs text-gray-400">{label}:</span>
       <span className={`text-sm font-bold ${color}`}>{value}</span>
     </div>
   );

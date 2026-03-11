@@ -366,7 +366,7 @@ export default function ProjectPage() {
 
   const getColorEstado = (estado) => {
     const colorMap = {
-      created: 'bg-blue-600',
+      created: 'bg-[#29ace3]',
       offer_ready: 'bg-purple-600',
       offer_sent: 'bg-indigo-600',
       approved: 'bg-green-500',
@@ -468,7 +468,7 @@ export default function ProjectPage() {
 
   if (cargando) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f4f6f8] flex items-center justify-center">
         <p className="text-gray-600 text-lg">Project laden...</p>
       </div>
     );
@@ -476,11 +476,11 @@ export default function ProjectPage() {
 
   if (error || !proyecto) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-[#f4f6f8] flex flex-col items-center justify-center">
         <p className="text-red-600 text-lg mb-4">{error || 'Project niet gevonden'}</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex gap-2 items-center font-semibold"
+          className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-6 py-2 rounded-lg flex gap-2 items-center font-semibold"
         >
           <ArrowLeft size={20} /> Terug naar dashboard
         </button>
@@ -489,19 +489,22 @@ export default function ProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center gap-4">
+      <header className="shadow" style={{ background: '#1a1a1a' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center gap-4">
           <button
             onClick={() => navigate('/dashboard')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition"
+            className="p-2 rounded transition"
+            style={{ background: '#2b2b2b' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#3a3a3a')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#2b2b2b')}
           >
-            <ArrowLeft size={24} className="text-gray-600" />
+            <ArrowLeft size={22} style={{ color: '#29ace3' }} />
           </button>
           <div>
-            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 truncate">{proyecto.nombreCasa}</h1>
-            <p className="text-gray-600 mt-1 text-sm sm:text-base">{proyecto.direccion}</p>
+            <h1 className="text-lg sm:text-2xl font-extrabold text-white truncate">{proyecto.nombreCasa}</h1>
+            <p className="text-gray-400 mt-0.5 text-xs sm:text-sm">{proyecto.direccion}</p>
           </div>
         </div>
       </header>
@@ -509,7 +512,7 @@ export default function ProjectPage() {
       {/* ── STATUS BANNER (electricista only) ── */}
       {usuario?.rol !== 'administrador' && (() => {
         const bannerMap = {
-          created: { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800', icon: '📋', title: 'Project ingediend', sub: 'Uw project wacht op beoordeling door de admin en op de voorbereiding van een offerte.' },
+          created: { bg: 'bg-[#eaf7fd] border-[#a8dcf0]', text: 'text-[#1a6a8a]', icon: '📋', title: 'Project ingediend', sub: 'Uw project wacht op beoordeling door de admin en op de voorbereiding van een offerte.' },
           offer_ready: { bg: 'bg-purple-50 border-purple-200', text: 'text-purple-800', icon: '📄', title: 'Offerte wordt voorbereid', sub: 'De admin bereidt uw projectofferte voor.' },
           offer_sent: { bg: 'bg-indigo-50 border-indigo-300', text: 'text-indigo-900', icon: '✍️', title: 'Offerte wacht op uw handtekening!', sub: 'Scroll naar beneden om de offerte te bekijken en te ondertekenen.' },
           approved: { bg: 'bg-green-50 border-green-200', text: 'text-green-800', icon: '✅', title: 'Offerte goedgekeurd!', sub: 'De klant heeft de offerte ondertekend. De installatie kan beginnen.' },
@@ -668,7 +671,7 @@ export default function ProjectPage() {
             <div className="mt-4 pt-4 border-t">
               <button
                 onClick={() => navigate(`/proyecto/${id}/${usuario?.rol === 'administrador' ? 'preparar-oferta' : 'ver-oferta'}`)}
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold text-sm transition"
+                className="flex items-center gap-2 text-[#29ace3] hover:text-[#1a6a8a] font-semibold text-sm transition"
               >
                 <ExternalLink size={16} /> Volledige offerte bekijken
               </button>
@@ -680,14 +683,14 @@ export default function ProjectPage() {
         {usuario?.rol === 'administrador' &&
          ['pending_payment', 'paid'].includes(proyecto.estado) &&
          proyecto.oferta && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 border-l-4 border-blue-500">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 border-l-4 border-[#29ace3]">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign size={20} className="text-blue-600" /> Financieel overzicht
+              <DollarSign size={20} className="text-[#29ace3]" /> Financieel overzicht
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-[#eaf7fd] rounded-lg p-4">
                   <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-semibold">Offerteprijs</p>
-                <p className="text-2xl font-bold text-blue-700">€{((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0).toFixed(2)}</p>
+                <p className="text-2xl font-bold text-[#1d8ab5]">€{((proyecto.oferta.precioTotalEstimado ?? proyecto.oferta.precioTotal) || 0).toFixed(2)}</p>
               </div>
               {proyecto.commissieResultaat && (
                 <div className="bg-orange-50 rounded-lg p-4">
@@ -753,7 +756,7 @@ export default function ProjectPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Plattegrond {idx + 1}</h3>
                     <button
                       onClick={() => setPlanoEditorAbierto(idx)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg flex gap-2 items-center text-sm font-semibold transition"
+                      className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-3 py-2 rounded-lg flex gap-2 items-center text-sm font-semibold transition"
                     >
                       <Edit2 size={16} /> Bewerken
                     </button>
@@ -843,7 +846,7 @@ export default function ProjectPage() {
 
                   {/* Comentarios */}
                   {plano.comentarios && (
-                    <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+                    <div className="mb-4 p-4 bg-[#eaf7fd] rounded-lg">
                       <p className="text-sm font-semibold text-gray-700 mb-1">Notities:</p>
                       <p className="text-gray-700">{plano.comentarios}</p>
                     </div>
@@ -905,7 +908,7 @@ export default function ProjectPage() {
                         {usuario?.rol === 'administrador' && (
                           <button
                             onClick={() => setRuimteEditorAbierto(idx)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg flex gap-1 items-center text-xs font-semibold transition"
+                            className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-3 py-1 rounded-lg flex gap-1 items-center text-xs font-semibold transition"
                           >
                             <Edit2 size={13} /> Bewerken
                           </button>
@@ -1043,18 +1046,18 @@ export default function ProjectPage() {
             {!mostrarFormInfo ? (
               <button
                 onClick={() => setMostrarFormInfo(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold transition"
+                className="flex items-center gap-2 px-4 py-2 bg-[#eaf7fd] hover:bg-[#d0eef9] text-[#1d8ab5] rounded-lg text-sm font-semibold transition"
               >
                 <Upload size={16} /> Informatie toevoegen
               </button>
             ) : (
-              <div className="border border-blue-200 rounded-lg p-4 bg-blue-50 space-y-4">
+              <div className="border border-[#a8dcf0] rounded-lg p-4 bg-[#eaf7fd] space-y-4">
                 <textarea
                   value={infoTexto}
                   onChange={(e) => setInfoTexto(e.target.value)}
                   rows={3}
                   placeholder="Beschrijf de aanvullende informatie..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none resize-none"
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -1121,7 +1124,7 @@ export default function ProjectPage() {
                       finally { setEnviandoInfo(false); }
                     }}
                     disabled={enviandoInfo}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg text-sm font-semibold disabled:opacity-50 transition"
                   >
                     <Send size={16} /> {enviandoInfo ? 'Verzenden...' : 'Verzenden'}
                   </button>
@@ -1255,7 +1258,7 @@ export default function ProjectPage() {
             </h2>
             <div className="space-y-3">
               {proyecto.propuestasCliente.map((prop, idx) => (
-                <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div key={idx} className="bg-[#eaf7fd] border border-[#a8dcf0] rounded-lg p-4">
                   <p className="text-xs text-gray-400 mb-2">{new Date(prop.fechaCreacion).toLocaleString()}</p>
                   <p className="text-sm text-gray-700">{prop.demandas}</p>
                 </div>
@@ -1301,7 +1304,7 @@ export default function ProjectPage() {
                       </div>
                     )}
                     {rea.documentoPDF && (
-                      <a href={rea.documentoPDF} download className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1 mb-2">
+                      <a href={rea.documentoPDF} download className="text-[#29ace3] hover:text-[#1a6a8a] text-sm flex items-center gap-1 mb-2">
                         <FileText size={14} /> PDF van wijziging downloaden
                       </a>
                     )}
@@ -1610,7 +1613,7 @@ export default function ProjectPage() {
               <div className="space-y-4">
                 {[...proyecto.historialEstados].reverse().map((entry, idx) => {
                   const estadoColors = {
-                    created: 'bg-blue-500', offer_ready: 'bg-purple-500', offer_sent: 'bg-indigo-500',
+                    created: 'bg-[#29ace3]', offer_ready: 'bg-purple-500', offer_sent: 'bg-indigo-500',
                     approved: 'bg-green-500', working: 'bg-yellow-500', finished: 'bg-teal-500',
                     pending_payment: 'bg-orange-500', paid: 'bg-green-700', rejected: 'bg-red-500',
                   };
@@ -1656,7 +1659,7 @@ export default function ProjectPage() {
         {/* ── PROJECT CHAT ── */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <MessageSquare size={20} className="text-blue-600" /> Projectchat
+            <MessageSquare size={20} className="text-[#29ace3]" /> Projectchat
           </h2>
           <ChatPanel proyectoId={id} />
         </div>
@@ -1919,7 +1922,7 @@ export default function ProjectPage() {
             <div className="bg-gray-900 p-4 flex justify-center gap-4 border-t border-gray-700">
               <button
                 onClick={() => manejarZoomFoto(-1)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition"
+                className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-4 py-2 rounded flex items-center gap-2 transition"
               >
                 <ZoomOut size={20} /> Zoom Out
               </button>
@@ -1931,7 +1934,7 @@ export default function ProjectPage() {
               </button>
               <button
                 onClick={() => manejarZoomFoto(1)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition"
+                className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-4 py-2 rounded flex items-center gap-2 transition"
               >
                 <ZoomIn size={20} /> Zoom In
               </button>
@@ -1998,7 +2001,7 @@ export default function ProjectPage() {
             <div className="bg-gray-900 p-4 flex justify-center gap-4 border-t border-gray-700">
               <button
                 onClick={() => setZoomLightbox(z => Math.max(0.5, z - 0.5))}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition"
+                className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-4 py-2 rounded flex items-center gap-2 transition"
               >
                 <ZoomOut size={20} /> Uitzoomen
               </button>
@@ -2010,7 +2013,7 @@ export default function ProjectPage() {
               </button>
               <button
                 onClick={() => setZoomLightbox(z => Math.min(5, z + 0.5))}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 transition"
+                className="bg-[#29ace3] hover:bg-[#1d96cb] text-white px-4 py-2 rounded flex items-center gap-2 transition"
               >
                 <ZoomIn size={20} /> Inzoomen
               </button>
@@ -2053,7 +2056,7 @@ export default function ProjectPage() {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-6">
               {/* Header */}
               <div className="px-8 pt-8 pb-4 border-b">
-                <h2 className="text-3xl font-light text-blue-600 mb-4">Commissie</h2>
+                <h2 className="text-3xl font-light text-[#29ace3] mb-4">Commissie</h2>
                 <div className="space-y-0.5 text-sm text-gray-700">
                   <p><span className="font-semibold">Project naam:</span> {proyecto.tituloPersonalizado || proyecto.tituloAutomatico || proyecto.nombreCasa}</p>
                   <p><span className="font-semibold">Project nummer:</span> {proyecto.tituloAutomatico}</p>
@@ -2072,7 +2075,7 @@ export default function ProjectPage() {
                       type="number" step="0.01" min="0"
                       value={commissie.offerteTotaalbedrag}
                       onChange={e => setCommissie(prev => ({ ...prev, offerteTotaalbedrag: e.target.value }))}
-                      className="w-40 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-40 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
                       placeholder="0.00"
                     />
                   </div>
@@ -2108,7 +2111,7 @@ export default function ProjectPage() {
                                 type="number" step="0.1" min="0" max="100"
                                 value={commissie[`${key}Pct`]}
                                 onChange={e => setCommissie(prev => ({ ...prev, [`${key}Pct`]: e.target.value }))}
-                                className="w-12 px-1.5 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-12 px-1.5 py-1 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-[#29ace3] outline-none"
                               />
                               <span className="ml-0.5 text-sm text-gray-500">%</span>
                             </div>
@@ -2120,7 +2123,7 @@ export default function ProjectPage() {
                             type="number" step="0.01" min="0"
                             value={commissie[`${key}Bedrag`]}
                             onChange={e => setCommissie(prev => ({ ...prev, [`${key}Bedrag`]: e.target.value }))}
-                            className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
                             placeholder="0.00"
                           />
                         </div>
@@ -2172,7 +2175,7 @@ export default function ProjectPage() {
                 <button
                   onClick={() => handleSubmitFinalizar(true)}
                   disabled={enviandoFinalizar}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-semibold text-sm transition"
+                  className="px-5 py-2.5 bg-[#29ace3] hover:bg-[#1d96cb] disabled:bg-gray-400 text-white rounded-lg font-semibold text-sm transition"
                 >
                   {enviandoFinalizar ? 'Opslaan…' : 'Afronden + e-mail naar klant'}
                 </button>

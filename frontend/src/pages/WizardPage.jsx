@@ -67,7 +67,7 @@ export default function WizardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Draft restored banner */}
       {draftBanner && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between">
@@ -84,17 +84,20 @@ export default function WizardPage() {
         </div>
       )}
 
-      {/* Header con progreso */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header met progress */}
+      <header className="shadow" style={{ background: '#1a1a1a' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <button
             onClick={handleBack}
-            className="flex gap-2 items-center text-blue-600 hover:text-blue-700 mb-6 font-semibold"
+            className="flex gap-2 items-center mb-4 font-semibold text-xs uppercase tracking-widest"
+            style={{ color: '#29ace3' }}
           >
-            <ChevronLeft size={20} /> Terug
+            <ChevronLeft size={18} /> Terug
           </button>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Nieuw project</h1>
+          <h1 className="text-xl font-extrabold text-white uppercase tracking-wide mb-5">
+            Nieuw<span style={{ color: '#29ace3' }}> project</span>
+          </h1>
 
           {/* Indicador visual de progreso */}
           <div className="flex gap-2 md:gap-4">
@@ -102,7 +105,7 @@ export default function WizardPage() {
               <div
                 key={paso.numero}
                 className={`flex-1 h-2 rounded-full transition ${
-                  paso.numero <= pasoActual ? 'bg-blue-600' : 'bg-gray-300'
+                  paso.numero <= pasoActual ? 'bg-[#29ace3]' : 'bg-gray-300'
                 }`}
               />
             ))}
@@ -112,7 +115,7 @@ export default function WizardPage() {
             {pasos.map(paso => (
               <span
                 key={paso.numero}
-                className={paso.numero === pasoActual ? 'font-bold text-blue-600' : ''}
+                className={paso.numero === pasoActual ? 'font-bold text-[#29ace3]' : ''}
               >
                 Stap {paso.numero}
               </span>

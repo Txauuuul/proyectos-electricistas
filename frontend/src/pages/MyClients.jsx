@@ -125,31 +125,42 @@ export default function MyClients() {
   const selectedClienteData = clienteDetalle?.cliente || clienteDetalle || selectedClienteResumen || null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Mijn klanten</h1>
-          <p className="text-gray-600">Beheer de eindklanten van uw projecten.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 lg:items-center">
-          <div className="relative min-w-[280px]">
-            <Search size={18} className="absolute left-3 top-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Zoek op naam, bedrijf of e-mail..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-            />
+    <div className="min-h-screen" style={{ background: '#f4f6f8' }}>
+      <header className="shadow mb-0" style={{ background: '#1a1a1a' }}>
+        <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
+              Mijn <span style={{ color: '#29ace3' }}>klanten</span>
+            </h1>
+            <p className="text-xs text-gray-400">Beheer de eindklanten van uw projecten.</p>
           </div>
-          <button
-            onClick={openCreate}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold"
-          >
-            <Plus size={18} /> Nieuwe klant
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <div className="relative min-w-[260px]">
+              <Search size={16} className="absolute left-3 top-2.5 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Zoek op naam, bedrijf of e-mail..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-sm rounded text-white placeholder-gray-500 focus:outline-none"
+                style={{ background: '#2b2b2b', border: '1px solid #3a3a3a' }}
+                onFocus={e => (e.target.style.borderColor = '#29ace3')}
+                onBlur={e => (e.target.style.borderColor = '#3a3a3a')}
+              />
+            </div>
+            <button
+              onClick={openCreate}
+              className="flex items-center justify-center gap-2 px-4 py-2 text-white text-xs font-bold uppercase tracking-widest rounded transition"
+              style={{ background: '#29ace3' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#1d96cb')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#29ace3')}
+            >
+              <Plus size={16} /> Nieuwe klant
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
+      <div className="max-w-7xl mx-auto px-4 py-8">
 
       <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-5 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div>
@@ -183,7 +194,7 @@ export default function MyClients() {
             <div className="flex gap-3">
               <button
                 onClick={() => openEdit(selectedClienteData)}
-                className="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl font-semibold text-sm"
+                className="px-4 py-2 bg-[#eaf7fd] text-[#1d8ab5] hover:bg-[#d0eef9] rounded-xl font-semibold text-sm"
               >
                 Klant bewerken
               </button>
@@ -215,7 +226,7 @@ export default function MyClients() {
                   <button
                     key={p._id}
                     onClick={() => navigate(`/proyecto/${p._id}`)}
-                    className="text-left p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition text-sm border border-transparent hover:border-blue-200"
+                    className="text-left p-4 bg-gray-50 rounded-xl hover:bg-[#eaf7fd] transition text-sm border border-transparent hover:border-[#a8dcf0]"
                   >
                     <p className="font-semibold text-gray-900 mb-1">{p.tituloAutomatico || p.nombreCasa}</p>
                     <p className="text-gray-500 text-xs">{p.estado} • {new Date(p.fechaInicio).toLocaleDateString()}</p>
@@ -243,13 +254,13 @@ export default function MyClients() {
               <div
                 key={c._id}
                 className={`bg-white rounded-2xl shadow-sm border p-5 hover:shadow-md transition cursor-pointer ${
-                  selectedClienteId === c._id ? 'ring-2 ring-blue-500 border-blue-200' : 'border-gray-200'
+                  selectedClienteId === c._id ? 'ring-2 ring-[#29ace3] border-[#a8dcf0]' : 'border-gray-200'
                 }`}
                 onClick={() => verDetalle(c._id)}
               >
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold shrink-0">
+                    <div className="w-12 h-12 bg-[#d0eef9] rounded-full flex items-center justify-center text-[#29ace3] font-bold shrink-0">
                       {(c.nombre || '?')[0].toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -260,7 +271,7 @@ export default function MyClients() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(c); }}
-                      className="p-2 text-gray-400 hover:text-blue-600"
+                      className="p-2 text-gray-400 hover:text-[#29ace3]"
                     >
                       <Edit2 size={16} />
                     </button>
@@ -282,7 +293,7 @@ export default function MyClients() {
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <p className="text-xs text-gray-400">Klik om alle klantgegevens te bekijken</p>
-                  <span className="text-sm font-semibold text-blue-600">Openen</span>
+                  <span className="text-sm font-semibold text-[#29ace3]">Openen</span>
                 </div>
               </div>
             ))}
@@ -309,7 +320,7 @@ export default function MyClients() {
                   <input
                     type="text" value={form.nombre}
                     onChange={(e) => setForm(prev => ({ ...prev, nombre: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                   />
                 </div>
                 <div>
@@ -317,7 +328,7 @@ export default function MyClients() {
                   <input
                     type="text" value={form.apellidos}
                     onChange={(e) => setForm(prev => ({ ...prev, apellidos: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                   />
                 </div>
               </div>
@@ -326,7 +337,7 @@ export default function MyClients() {
                 <input
                   type="text" value={form.empresa}
                   onChange={(e) => setForm(prev => ({ ...prev, empresa: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                 />
               </div>
               <div>
@@ -334,7 +345,7 @@ export default function MyClients() {
                 <input
                   type="text" value={form.direccion}
                   onChange={(e) => setForm(prev => ({ ...prev, direccion: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -343,7 +354,7 @@ export default function MyClients() {
                   <input
                     type="text" value={form.codigoPostal}
                     onChange={(e) => setForm(prev => ({ ...prev, codigoPostal: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                   />
                 </div>
                 <div>
@@ -351,7 +362,7 @@ export default function MyClients() {
                   <input
                     type="text" value={form.ciudad}
                     onChange={(e) => setForm(prev => ({ ...prev, ciudad: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                   />
                 </div>
               </div>
@@ -361,7 +372,7 @@ export default function MyClients() {
                   <input
                     type="text" value={form.telefono}
                     onChange={(e) => setForm(prev => ({ ...prev, telefono: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                   />
                 </div>
                 <div>
@@ -369,7 +380,7 @@ export default function MyClients() {
                   <input
                     type="email" value={form.email}
                     onChange={(e) => setForm(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3]"
                   />
                 </div>
               </div>
@@ -379,7 +390,7 @@ export default function MyClients() {
                   value={form.notas}
                   onChange={(e) => setForm(prev => ({ ...prev, notas: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-[#29ace3] resize-none"
                 />
               </div>
             </div>
@@ -393,7 +404,7 @@ export default function MyClients() {
               <button
                 onClick={handleSave}
                 disabled={guardando}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50"
+                className="px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold disabled:opacity-50"
               >
                 {guardando ? 'Opslaan...' : 'Opslaan'}
               </button>
@@ -401,6 +412,7 @@ export default function MyClients() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

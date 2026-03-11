@@ -142,9 +142,9 @@ export default function ClientOfferView() {
 
   if (cargando) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f4f6f8] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#29ace3] mx-auto mb-4"></div>
           <p className="text-gray-600">Offerte laden...</p>
         </div>
       </div>
@@ -153,14 +153,14 @@ export default function ClientOfferView() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f4f6f8] flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-md text-center">
           <XCircle size={48} className="text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Error</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+            className="px-6 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold"
           >
             Terug naar dashboard
           </button>
@@ -170,17 +170,19 @@ export default function ClientOfferView() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex justify-between items-center">
+      <header className="shadow" style={{ background: '#1a1a1a' }}>
+        <div className="max-w-4xl mx-auto px-4 py-5 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/dashboard')} className="text-gray-600 hover:text-gray-900">
-              <ArrowLeft size={24} />
+            <button onClick={() => navigate('/dashboard')} className="text-gray-400 hover:text-white transition">
+              <ArrowLeft size={22} />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Projectofferte</h1>
-              <p className="text-gray-600">{proyecto?.nombreCasa} — {proyecto?.direccion}</p>
+              <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
+                Project<span style={{ color: '#29ace3' }}>offerte</span>
+              </h1>
+              <p className="text-xs text-gray-400">{proyecto?.nombreCasa} — {proyecto?.direccion}</p>
             </div>
           </div>
 
@@ -296,7 +298,7 @@ export default function ClientOfferView() {
               {oferta.fechaInicioInstalacion && (
                 <div>
                   <p className="text-gray-500">Voorgestelde startdatum</p>
-                  <p className="text-lg font-bold text-blue-600">
+                  <p className="text-lg font-bold text-[#29ace3]">
                     {new Date(oferta.fechaInicioInstalacion).toLocaleDateString('nl-BE', {
                       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                     })}
@@ -306,7 +308,7 @@ export default function ClientOfferView() {
               {oferta.duracionEstimadaDias && (
                 <div>
                   <p className="text-gray-500">Geschatte duur</p>
-                  <p className="text-lg font-bold text-blue-600">{oferta.duracionEstimadaDias} dagen</p>
+                  <p className="text-lg font-bold text-[#29ace3]">{oferta.duracionEstimadaDias} dagen</p>
                 </div>
               )}
             </div>
@@ -315,7 +317,7 @@ export default function ClientOfferView() {
 
         {/* Company Notes */}
         {oferta?.notasEmpresa && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="bg-[#eaf7fd] border border-[#a8dcf0] rounded-lg p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
               <FileText size={20} /> Aanvullende notities
             </h2>
@@ -335,7 +337,7 @@ export default function ClientOfferView() {
             <div className="flex gap-3">
               <button
                 onClick={() => setMostrarPDF(!mostrarPDF)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition"
+                className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold text-sm transition"
               >
                 <Eye size={16} /> {mostrarPDF ? 'Document verbergen' : 'Document bekijken'}
               </button>
@@ -362,7 +364,7 @@ export default function ClientOfferView() {
 
         {/* ===== APPROVAL SECTION (only when offer_sent) ===== */}
         {isPendingApproval && (
-          <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-blue-200">
+          <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-[#a8dcf0]">
             <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">
               Contractgoedkeuring
             </h2>
@@ -374,7 +376,7 @@ export default function ClientOfferView() {
                   type="checkbox"
                   checked={aceptaContrato}
                   onChange={(e) => setAceptaContrato(e.target.checked)}
-                  className="mt-1 h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                  className="mt-1 h-5 w-5 text-[#29ace3] rounded border-gray-300 focus:ring-[#29ace3]"
                 />
                 <span className="text-sm text-gray-700 group-hover:text-gray-900">
                   <strong>Ik aanvaard de voorwaarden van dit contract.</strong> Ik ga akkoord met het voorgestelde budget,
@@ -387,7 +389,7 @@ export default function ClientOfferView() {
                   type="checkbox"
                   checked={haLeidoDocumentacion}
                   onChange={(e) => setHaLeidoDocumentacion(e.target.checked)}
-                  className="mt-1 h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                  className="mt-1 h-5 w-5 text-[#29ace3] rounded border-gray-300 focus:ring-[#29ace3]"
                 />
                 <span className="text-sm text-gray-700 group-hover:text-gray-900">
                   <strong>Ik heb alle verstrekte documentatie gelezen en begrepen.</strong> Ik heb de voorgestelde

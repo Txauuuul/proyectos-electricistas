@@ -10,7 +10,6 @@ import {
   LogOut,
   Menu,
   X,
-  Zap,
   Calendar,
   BarChart2,
 } from 'lucide-react';
@@ -120,69 +119,79 @@ export default function Navbar() {
 
   const links = esAdmin ? adminLinks : clientLinks;
 
-  const NavLink = ({ path, label, icon: Icon }) => (
+  const NavLink = ({ path, label }) => (
     <button
       onClick={() => { navigate(path); setMobileOpen(false); }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition ${
-        isActive(path)
-          ? 'bg-blue-600 text-white shadow'
-          : 'text-gray-700 hover:bg-gray-100'
-      }`}
+      className={`
+        relative px-3 py-1.5 text-xs font-bold tracking-widest uppercase transition-colors duration-200
+        ${isActive(path)
+          ? 'text-[#29ace3]'
+          : 'text-white hover:text-[#29ace3]'
+        }
+      `}
     >
-      <Icon size={18} />
       {label}
+      {isActive(path) && (
+        <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#29ace3] rounded-full" />
+      )}
     </button>
   );
 
   if (!usuario || !token) return null;
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-40">
+    <nav className="sticky top-0 z-40" style={{ background: '#1a1a1a' }}>
+      {/* Main bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo / Brand */}
+        <div className="flex items-center justify-between h-[64px]">
+
+          {/* Logo */}
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2 text-blue-600 font-bold text-lg"
+            className="flex items-center gap-3 flex-shrink-0"
           >
-            <Zap size={24} />
-            <span className="hidden sm:inline">ElectriProject</span>
+            <img
+              src="/logo-2beit.png"
+              alt="2beIT"
+              className="h-10 w-10 object-contain rounded"
+            />
           </button>
 
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop nav links */}
+          <div className="hidden md:flex items-center gap-1">
             {links.map(link => (
-              <NavLink key={link.path} {...link} />
+              <NavLink key={link.path} path={link.path} label={link.label} />
             ))}
           </div>
 
-          {/* Right side: notifications + user + logout */}
-          <div className="flex items-center gap-3">
+          {/* Right: bell + user + logout */}
+          <div className="flex items-center gap-2">
+
             {/* Notification bell */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+                className="relative p-2 rounded text-gray-300 hover:text-[#29ace3] transition-colors"
               >
-                <Bell size={22} />
+                <Bell size={20} />
                 {notifCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#29ace3] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                     {notifCount > 9 ? '9+' : notifCount}
                   </span>
                 )}
               </button>
 
-              {/* Dropdown */}
+              {/* Notifications dropdown */}
               {notifOpen && (
-                <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-xl border z-50 max-h-96 overflow-hidden flex flex-col">
-                  <div className="p-3 border-b flex justify-between items-center">
-                    <span className="font-bold text-gray-900 text-sm">Meldingen</span>
+                <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden flex flex-col">
+                  <div className="p-3 border-b flex justify-between items-center bg-[#1a1a1a]">
+                    <span className="font-bold text-white text-sm tracking-wide">MELDINGEN</span>
                     {notifCount > 0 && (
                       <button
                         onClick={markAllRead}
-                        className="text-xs text-blue-600 hover:underline"
+                        className="text-xs text-[#29ace3] hover:underline font-semibold"
                       >
-                        Alles markeren als gelezen
+                        Alles gelezen
                       </button>
                     )}
                   </div>
@@ -194,7 +203,7 @@ export default function Navbar() {
                         <div
                           key={n._id}
                           className={`px-4 py-3 border-b text-sm cursor-pointer hover:bg-gray-50 transition ${
-                            !n.leida ? 'bg-blue-50' : ''
+                            !n.leida ? 'bg-blue-50 border-l-2 border-l-[#29ace3]' : ''
                           }`}
                           onClick={() => {
                             if (!n.leida) markOneRead(n._id);
@@ -218,23 +227,23 @@ export default function Navbar() {
             </div>
 
             {/* User name */}
-            <span className="hidden sm:inline text-sm text-gray-600 font-medium">
+            <span className="hidden sm:inline text-xs text-gray-400 font-semibold tracking-wide uppercase">
               {usuario?.nombre}
             </span>
 
             {/* Logout */}
             <button
               onClick={handleLogout}
-              className="p-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition"
+              className="p-2 rounded text-gray-300 hover:text-red-400 transition-colors"
               title="Uitloggen"
             >
-              <LogOut size={20} />
+              <LogOut size={18} />
             </button>
 
-            {/* Mobile menu button */}
+            {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+              className="md:hidden p-2 rounded text-gray-300 hover:text-[#29ace3] transition-colors"
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -244,9 +253,23 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t bg-white px-4 py-3 space-y-1">
+        <div
+          className="md:hidden border-t px-4 py-3 space-y-1"
+          style={{ background: '#2b2b2b', borderColor: '#333' }}
+        >
           {links.map(link => (
-            <NavLink key={link.path} {...link} />
+            <button
+              key={link.path}
+              onClick={() => { navigate(link.path); setMobileOpen(false); }}
+              className={`flex items-center gap-3 w-full px-4 py-3 rounded text-xs font-bold tracking-widest uppercase transition-colors ${
+                isActive(link.path)
+                  ? 'text-[#29ace3] bg-white/5'
+                  : 'text-gray-300 hover:text-[#29ace3] hover:bg-white/5'
+              }`}
+            >
+              <link.icon size={16} />
+              {link.label}
+            </button>
           ))}
         </div>
       )}

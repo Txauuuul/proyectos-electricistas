@@ -192,7 +192,7 @@ export default function Step2() {
             type="text"
             value={current.naam}
             onChange={e => setCurrent(prev => ({ ...prev, naam: e.target.value }))}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm"
             placeholder="Bijv. Woonkamer, Keuken, Slaapkamer..."
           />
         </div>
@@ -204,7 +204,7 @@ export default function Step2() {
             value={current.omschrijving}
             onChange={e => setCurrent(prev => ({ ...prev, omschrijving: e.target.value }))}
             rows={3}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm resize-none"
             placeholder="Beschrijf de ruimte..."
           />
         </div>
@@ -234,7 +234,7 @@ export default function Step2() {
           ) : (
             <div
               onClick={() => platteGrondRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
             >
               <Upload size={32} className="mx-auto mb-2 text-gray-400" />
               <p className="text-sm text-gray-500">upload pdf.</p>
@@ -261,7 +261,7 @@ export default function Step2() {
             {/* Upload box + Camera box */}
             <div
               onClick={() => fotosRef.current?.click()}
-              className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition"
+              className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
               title="Upload foto"
             >
               <span className="text-gray-400 text-2xl leading-none">+</span>
@@ -286,7 +286,7 @@ export default function Step2() {
         {/* VOEG RUIMTE TOE */}
         <button
           onClick={handleVoegRuimteToe}
-          className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition text-sm"
+          className="w-full bg-[#1d96cb] hover:bg-blue-800 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition text-sm"
         >
           <Plus size={18} /> VOEG RUIMTE TOE (MET PLAN) &nbsp;<span className="font-normal opacity-80">(nog een ruimte toevoegen)</span>
         </button>
@@ -303,7 +303,7 @@ export default function Step2() {
         {/* vorige stap */}
         <button
           onClick={() => setPasoActual(1)}
-          className="w-fit bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition"
+          className="w-fit bg-[#29ace3] hover:bg-[#1d96cb] text-white font-semibold px-6 py-2 rounded-lg text-sm transition"
         >
           vorige stap
         </button>

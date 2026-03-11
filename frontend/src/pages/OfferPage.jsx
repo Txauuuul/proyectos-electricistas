@@ -149,7 +149,7 @@ export default function OfferPage() {
 
   if (cargando) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f4f6f8] flex items-center justify-center">
         <p className="text-gray-600 text-lg">Project laden...</p>
       </div>
     );
@@ -157,31 +157,33 @@ export default function OfferPage() {
 
   if (!proyecto) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f4f6f8] flex items-center justify-center">
         <p className="text-red-600 text-lg">Project niet gevonden</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
+      <header className="shadow" style={{ background: '#1a1a1a' }}>
+        <div className="max-w-5xl mx-auto px-4 py-5 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate(`/proyecto/${id}`)} className="text-gray-600 hover:text-gray-900">
-              <ArrowLeft size={24} />
+            <button onClick={() => navigate(`/proyecto/${id}`)} style={{ color: '#29ace3' }}>
+              <ArrowLeft size={22} />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Offerte voorbereiden</h1>
-              <p className="text-gray-600">{proyecto.nombreCasa} — {proyecto.direccion}</p>
+              <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
+                Offerte<span style={{ color: '#29ace3' }}> voorbereiden</span>
+              </h1>
+              <p className="text-xs text-gray-400">{proyecto.nombreCasa} — {proyecto.direccion}</p>
             </div>
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleSave}
               disabled={guardando}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold disabled:opacity-50 transition"
             >
               <Save size={18} /> {guardando ? 'Opslaan...' : 'Concept opslaan'}
             </button>
@@ -296,7 +298,7 @@ export default function OfferPage() {
               step="0.01"
               value={precioTotalEstimado}
               onChange={(e) => setPrecioTotalEstimado(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-lg font-semibold"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-lg font-semibold"
               placeholder="0.00"
             />
           </div>
@@ -317,7 +319,7 @@ export default function OfferPage() {
                 type="date"
                 value={fechaInicioInstalacion}
                 onChange={(e) => setFechaInicioInstalacion(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none"
               />
             </div>
             <div>
@@ -327,7 +329,7 @@ export default function OfferPage() {
                 min="1"
                 value={duracionEstimadaDias}
                 onChange={(e) => setDuracionEstimadaDias(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none"
                 placeholder="bijv. 14"
               />
             </div>
@@ -341,7 +343,7 @@ export default function OfferPage() {
             value={notasEmpresa}
             onChange={(e) => setNotasEmpresa(e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none resize-none"
             placeholder="Extra informatie voor de klant..."
           />
         </div>
@@ -382,7 +384,7 @@ export default function OfferPage() {
           <button
             onClick={handleSave}
             disabled={guardando}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
+            className="flex items-center gap-2 px-6 py-3 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold disabled:opacity-50 transition"
           >
             <Save size={18} /> {guardando ? 'Opslaan...' : 'Concept opslaan'}
           </button>

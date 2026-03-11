@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 
 const ESTADO_COLORS = {
-  created: 'bg-blue-500',
+  created: 'bg-[#29ace3]',
   offer_ready: 'bg-purple-500',
   offer_sent: 'bg-indigo-500',
   approved: 'bg-green-500',
@@ -119,27 +119,30 @@ export default function CalendarPage() {
   const isToday = (day) => day === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Header */}
-      <header className="bg-white shadow sticky top-0 z-10">
+      <header className="shadow sticky top-0 z-10" style={{ background: '#1a1a1a' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Calendar size={28} className="text-blue-600" />
+            <Calendar size={24} style={{ color: '#29ace3' }} />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Installatiekalender</h1>
-              <p className="text-xs text-gray-500">Geplande projectdata</p>
+              <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
+                Installatie<span style={{ color: '#29ace3' }}>kalender</span>
+              </h1>
+              <p className="text-xs text-gray-400">Geplande projectdata</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode(viewMode === 'calendar' ? 'list' : 'calendar')}
-              className="px-3 py-1.5 text-sm font-semibold border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-300 border border-gray-600 rounded hover:border-[#29ace3] hover:text-[#29ace3] transition"
             >
               {viewMode === 'calendar' ? 'Lijstweergave' : 'Kalenderweergave'}
             </button>
             <button
               onClick={goToday}
-              className="px-3 py-1.5 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white rounded hover:bg-[#1d96cb] transition"
+              style={{ background: '#29ace3' }}
             >
               Vandaag
             </button>
@@ -165,11 +168,11 @@ export default function CalendarPage() {
                     <div
                       key={p._id}
                       onClick={() => navigate(`/proyecto/${p._id}`)}
-                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 cursor-pointer transition"
+                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:bg-[#eaf7fd] hover:border-[#a8dcf0] cursor-pointer transition"
                     >
-                      <div className="text-center bg-blue-50 rounded-lg px-3 py-2 min-w-[60px]">
-                        <p className="text-xs font-semibold text-blue-600 uppercase">{MONTHS[fecha.getMonth()].slice(0,3)}</p>
-                        <p className="text-2xl font-bold text-blue-700 leading-none">{fecha.getDate()}</p>
+                      <div className="text-center bg-[#eaf7fd] rounded-lg px-3 py-2 min-w-[60px]">
+                        <p className="text-xs font-semibold text-[#29ace3] uppercase">{MONTHS[fecha.getMonth()].slice(0,3)}</p>
+                        <p className="text-2xl font-bold text-[#1d8ab5] leading-none">{fecha.getDate()}</p>
                       </div>
                       <div className="flex-1">
                         <p className="font-bold text-gray-900">{p.tituloAutomatico || p.nombreCasa}</p>
@@ -228,13 +231,13 @@ export default function CalendarPage() {
                         key={i}
                         onClick={() => day && setSelectedDay(day === selectedDay ? null : day)}
                         className={`min-h-[80px] sm:min-h-[100px] border-b border-r p-1 transition
-                          ${!day ? 'bg-gray-50' : 'cursor-pointer hover:bg-blue-50'}
-                          ${selected ? 'bg-blue-100 ring-2 ring-blue-400 ring-inset' : ''}
+                          ${!day ? 'bg-gray-50' : 'cursor-pointer hover:bg-[#eaf7fd]'}
+                          ${selected ? 'bg-[#d0eef9] ring-2 ring-blue-400 ring-inset' : ''}
                         `}
                       >
                         {day && (
                           <>
-                            <div className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full mb-1 ${today ? 'bg-blue-600 text-white' : 'text-gray-700'}`}>
+                            <div className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full mb-1 ${today ? 'bg-[#29ace3] text-white' : 'text-gray-700'}`}>
                               {day}
                             </div>
                             <div className="space-y-0.5">
@@ -286,7 +289,7 @@ export default function CalendarPage() {
                         <div
                           key={p._id}
                           onClick={() => navigate(`/proyecto/${p._id}`)}
-                          className="border border-gray-200 rounded-lg p-3 hover:bg-blue-50 cursor-pointer transition"
+                          className="border border-gray-200 rounded-lg p-3 hover:bg-[#eaf7fd] cursor-pointer transition"
                         >
                           <div className="flex items-center justify-between mb-1">
                             <p className="font-semibold text-gray-900 text-sm">{p.tituloAutomatico || p.nombreCasa}</p>

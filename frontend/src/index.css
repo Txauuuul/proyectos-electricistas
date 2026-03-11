@@ -1,26 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── 2beIT CSS custom properties ─── */
+:root {
+  --brand-dark:    #1a1a1a;
+  --brand-darker:  #111111;
+  --brand-mid:     #2b2b2b;
+  --brand-blue:    #29ace3;
+  --brand-blue-h:  #1d96cb;
+  --brand-light:   #f4f6f8;
+}
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Raleway', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--brand-light);
+  color: #1a1a1a;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Canvas custom */
+/* ─── Canvas ─── */
 canvas {
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: var(--brand-blue); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-blue-h); }
+
+/* ─── Utility classes ─── */
+.btn-2beit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.4rem;
+  background: var(--brand-blue);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-2beit:hover { background: var(--brand-blue-h); }
+
+.btn-2beit-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.3rem;
+  background: transparent;
+  color: var(--brand-blue);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--brand-blue);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-2beit-outline:hover {
+  background: var(--brand-blue);
+  color: #fff;
+}
+
+/* ─── Card surface ─── */
+.card-2beit {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  border: 1px solid #e8eaed;
+}
+
+/* ─── Page wrapper ─── */
+.page-2beit {
+  min-height: calc(100vh - 64px);
+  background: var(--brand-light);
+  padding: 2rem 1rem;
 }

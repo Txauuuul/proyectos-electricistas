@@ -144,20 +144,19 @@ export default function MyProfile() {
     <div className="max-w-4xl mx-auto px-4 py-8">
 
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="rounded shadow-sm p-5 mb-6" style={{ background: '#1a1a1a' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">
-              Mijn administratiepaneel
-              <span className="ml-2 inline-block w-3 h-3 rounded-full bg-purple-500 align-middle" />
+            <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
+              Mijn<span style={{ color: '#29ace3' }}> administratiepaneel</span>
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Houd uw persoonlijke en bedrijfsgegevens up-to-date.</p>
+            <p className="text-xs text-gray-400 mt-1">Houd uw persoonlijke en bedrijfsgegevens up-to-date.</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500">Profielvolledigheid</p>
-            <p className={`text-lg font-bold ${pct === 100 ? 'text-green-600' : 'text-orange-500'}`}>{pct}%</p>
-            <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
-              <div className={`h-2 rounded-full transition-all ${pct === 100 ? 'bg-green-500' : 'bg-blue-500'}`} style={{ width: `${pct}%` }} />
+            <p className="text-xs text-gray-400">Profielvolledigheid</p>
+            <p className={`text-lg font-bold ${pct === 100 ? 'text-green-400' : 'text-orange-400'}`}>{pct}%</p>
+            <div className="w-32 bg-gray-700 rounded-full h-2 mt-1">
+              <div className={`h-2 rounded-full transition-all ${pct === 100 ? 'bg-green-500' : 'bg-[#29ace3]'}`} style={{ width: `${pct}%` }} />
             </div>
           </div>
         </div>
@@ -181,7 +180,7 @@ export default function MyProfile() {
           <div className="flex items-center gap-4">
             <div
               onClick={() => logoRef.current?.click()}
-              className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition overflow-hidden shrink-0"
+              className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition overflow-hidden shrink-0"
               title="Upload uw logo"
             >
               {perfil.logo ? (
@@ -240,7 +239,7 @@ export default function MyProfile() {
         <div className="border-t pt-4 mb-2">
           <p className="text-sm text-gray-600">
             <span className="font-semibold">Login: </span>
-            <a href={`mailto:${perfil.email}`} className="text-blue-600 hover:underline">{perfil.email}</a>
+            <a href={`mailto:${perfil.email}`} className="text-[#29ace3] hover:underline">{perfil.email}</a>
           </p>
         </div>
 
@@ -249,7 +248,7 @@ export default function MyProfile() {
           <button
             onClick={handleGuardar}
             disabled={guardando}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 transition"
+            className="flex items-center gap-2 px-6 py-3 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold disabled:opacity-50 transition"
           >
             <Save size={18} />
             {guardando ? 'Opslaan...' : 'Profiel opslaan'}
@@ -274,17 +273,17 @@ export default function MyProfile() {
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Huidig wachtwoord</label>
             <input type="password" value={contrasenaActual} onChange={e => setContrasenaActual(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="••••••••" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm" placeholder="••••••••" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Nieuw wachtwoord</label>
             <input type="password" value={nuevaContrasena} onChange={e => setNuevaContrasena(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="••••••••" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm" placeholder="••••••••" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Bevestig nieuw wachtwoord</label>
             <input type="password" value={confirmarContrasena} onChange={e => setConfirmarContrasena(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="••••••••" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm" placeholder="••••••••" />
           </div>
         </div>
         <div className="flex justify-end mt-4">
@@ -303,7 +302,7 @@ export default function MyProfile() {
         </h2>
         <p className="text-sm text-gray-500 mb-4">Beheer de eindklanten die u op het platform hebt geregistreerd.</p>
         <button onClick={() => navigate('/mis-clientes')}
-          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition">
+          className="px-5 py-2.5 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold text-sm transition">
           Ga naar mijn klanten →
         </button>
       </div>
@@ -386,7 +385,7 @@ function Field({ label, value, onChange, disabled, className = '' }) {
         value={value}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         disabled={disabled}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition text-sm ${
+        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none transition text-sm ${
           disabled ? 'bg-gray-100 text-gray-500' : ''
         }`}
       />

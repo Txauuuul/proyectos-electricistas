@@ -92,9 +92,9 @@ export default function Step3() {
       <div className="bg-white rounded-lg shadow-md p-8">
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-blue-400 rounded-lg p-12 text-center cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition"
+          className="border-2 border-dashed border-[#29ace3] rounded-lg p-12 text-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
         >
-          <Upload size={48} className="mx-auto mb-4 text-blue-600" />
+          <Upload size={48} className="mx-auto mb-4 text-[#29ace3]" />
           <h3 className="text-lg font-bold text-gray-900 mb-2">Locatiefoto's uploaden</h3>
           <p className="text-gray-600 mb-4">Klik hier om foto's te uploaden of sleep ze hierheen</p>
           <p className="text-sm text-gray-500">JPG, PNG (meerdere bestanden toegestaan)</p>

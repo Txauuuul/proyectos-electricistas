@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -12,7 +12,7 @@ const STATUS_META = {
   pending_payment: { label: 'Betaling verwacht',  color: 'bg-orange-100 text-orange-800', dot: 'bg-orange-400',  order: 1 },
   offer_sent:      { label: 'Offerte verzonden',  color: 'bg-indigo-100 text-indigo-800', dot: 'bg-indigo-400',  order: 2 },
   offer_ready:     { label: 'Offerte klaar',      color: 'bg-purple-100 text-purple-800', dot: 'bg-purple-400',  order: 3 },
-  created:         { label: 'Nieuwe aanvraag',    color: 'bg-blue-100 text-blue-800',     dot: 'bg-blue-400',    order: 4 },
+  created:         { label: 'Nieuwe aanvraag',    color: 'bg-[#d0eef9] text-[#1a6a8a]',     dot: 'bg-blue-400',    order: 4 },
   paid:            { label: 'Betaald',            color: 'bg-green-100 text-green-800',   dot: 'bg-green-500',   order: 5 },
   finished:        { label: 'Afgerond',           color: 'bg-teal-100 text-teal-800',     dot: 'bg-teal-400',    order: 6 },
   rejected:        { label: 'Afgewezen',          color: 'bg-red-100 text-red-800',       dot: 'bg-red-400',     order: 7 },
@@ -150,7 +150,7 @@ export default function AdminClientDetail() {
 
   const formatDate = (d) => d
     ? new Date(d).toLocaleDateString('nl-BE', { day: '2-digit', month: 'short', year: 'numeric' })
-    : '—';
+    : '�';
 
   if (cargando) return <p className="text-center py-12 text-gray-500">Laden...</p>;
   if (!perfil)  return <p className="text-center py-12 text-red-500">Elektricien niet gevonden</p>;
@@ -162,8 +162,9 @@ export default function AdminClientDetail() {
 
       {/* Back */}
       <button onClick={() => navigate('/admin/clientes')}
-        className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 text-sm">
-        <ArrowLeft size={16} /> Terug naar elektriciens
+        className="flex items-center gap-2 mb-5 text-xs font-bold uppercase tracking-widest transition"
+        style={{ color: '#29ace3' }}>
+        <ArrowLeft size={15} /> Terug naar elektriciens
       </button>
 
       {/* Toast */}
@@ -176,7 +177,7 @@ export default function AdminClientDetail() {
         </div>
       )}
 
-      {/* ── Profile card ── */}
+      {/* -- Profile card -- */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
 
         {/* Header */}
@@ -193,7 +194,7 @@ export default function AdminClientDetail() {
                   {`${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || perfil.email}
                 </h1>
                 <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${perfil.profileCompleted ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-600'}`}>
-                  {perfil.profileCompleted ? '✓ Profiel compleet' : '⚠ Profiel onvolledig'}
+                  {perfil.profileCompleted ? '? Profiel compleet' : '? Profiel onvolledig'}
                 </span>
               </div>
               {perfil.empresa && <p className="text-sm text-gray-500">{perfil.empresa}</p>}
@@ -263,7 +264,7 @@ export default function AdminClientDetail() {
           ) : (
             <>
               <button onClick={handleOpslaanPerfil} disabled={guardandoPerfil}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50">
+                className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg text-sm font-semibold transition disabled:opacity-50">
                 <Save size={14} /> {guardandoPerfil ? 'Opslaan...' : 'Opslaan'}
               </button>
               <button onClick={handleAnnuleren}
@@ -284,7 +285,7 @@ export default function AdminClientDetail() {
             value={notaAdmin}
             onChange={e => setNotaAdmin(e.target.value)}
             placeholder="Voeg hier een interne notitie toe over deze elektricien..."
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none transition"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none resize-none transition"
           />
           <div className="flex justify-end mt-2">
             <button onClick={handleOpslaanNota} disabled={guardandoNota}
@@ -295,44 +296,44 @@ export default function AdminClientDetail() {
         </div>
       </div>
 
-      {/* ── Commission settings ── */}
+      {/* -- Commission settings -- */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
-        <h2 className="text-sm font-bold text-blue-800 uppercase tracking-wide mb-1">
+        <h2 className="text-sm font-bold text-[#1a6a8a] uppercase tracking-wide mb-1">
           Commissie-instellingen
         </h2>
         <p className="text-xs text-gray-400 mb-5">
           Stel het commissiepercentage in per kostencategorie. Alleen zichtbaar voor de beheerder.
         </p>
         <div className="space-y-1">
-          <CommissionRow label="Type 1 — commissie op Inlabelbedrag"
+          <CommissionRow label="Type 1 � commissie op Inlabelbedrag"
             value={perfil.comisionTransporte ?? 0}
             onChange={v => setPerfil(p => ({ ...p, comisionTransporte: v }))}
             note="Van toepassing op het totale inlabelbedrag van het project" />
-          <CommissionRow label="Type 2 — commissie hardware"
+          <CommissionRow label="Type 2 � commissie hardware"
             value={perfil.comisionHardware ?? 0}
             onChange={v => setPerfil(p => ({ ...p, comisionHardware: v }))}
             note="Van toepassing op hardware- en materiaalkosten" />
-          <CommissionRow label="Type 3 — commissie werkuren"
+          <CommissionRow label="Type 3 � commissie werkuren"
             value={perfil.comisionHorasTrabajo ?? 0}
             onChange={v => setPerfil(p => ({ ...p, comisionHorasTrabajo: v }))}
             note="Van toepassing op de arbeidskosten" />
-          <CommissionRow label="Type 4 — 0% commissie (diensten, verzekeringen, ...)"
+          <CommissionRow label="Type 4 � 0% commissie (diensten, verzekeringen, ...)"
             value={0} readOnly
-            note="Vastgesteld op 0% — diensten en verzekeringen altijd uitgesloten" />
-          <CommissionRow label="Type 5 — speciale commissie"
+            note="Vastgesteld op 0% � diensten en verzekeringen altijd uitgesloten" />
+          <CommissionRow label="Type 5 � speciale commissie"
             value={perfil.comisionEspecial ?? 0}
             onChange={v => setPerfil(p => ({ ...p, comisionEspecial: v }))}
             note="Speciale commissie individueel overeengekomen" />
         </div>
         <div className="mt-4 flex justify-end">
           <button onClick={handleSaveCommission}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition">
+            className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg text-sm font-semibold transition">
             <Save size={14} /> Commissies opslaan
           </button>
         </div>
       </div>
 
-      {/* ── End clients ── */}
+      {/* -- End clients -- */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-5">
         <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
           <Users size={18} className="text-indigo-500" /> Eindklanten ({clientes.length})
@@ -346,7 +347,7 @@ export default function AdminClientDetail() {
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{c.nombre} {c.apellidos}</p>
                   <p className="text-xs text-gray-400">
-                    {[c.email, c.telefono].filter(Boolean).join(' · ')}
+                    {[c.email, c.telefono].filter(Boolean).join(' � ')}
                   </p>
                 </div>
                 {c.ciudad && <span className="text-xs text-gray-400">{c.ciudad}</span>}
@@ -356,7 +357,7 @@ export default function AdminClientDetail() {
         )}
       </div>
 
-      {/* ── Projects ── */}
+      {/* -- Projects -- */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
           <FolderOpen size={18} className="text-blue-500" /> Projecten ({proyectos.length})
@@ -372,7 +373,7 @@ export default function AdminClientDetail() {
               const date  = formatDate(p.fechaInicio || p.fechaCreacion);
               return (
                 <button key={p._id} onClick={() => navigate(`/proyecto/${p._id}`)}
-                  className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition group">
+                  className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-100 hover:border-[#a8dcf0] hover:bg-[#eaf7fd] transition group">
                   <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${meta.dot}`} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-900 truncate">{title}</p>
@@ -384,11 +385,11 @@ export default function AdminClientDetail() {
                     </span>
                     {price !== null && (
                       <p className={`text-xs font-bold mt-1 ${p.estado === 'paid' ? 'text-green-600' : 'text-gray-500'}`}>
-                        €{price.toLocaleString('nl-BE', { minimumFractionDigits: 2 })}
+                        �{price.toLocaleString('nl-BE', { minimumFractionDigits: 2 })}
                       </p>
                     )}
                   </div>
-                  <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-400 shrink-0" />
+                  <ChevronRight size={16} className="text-gray-300 group-hover:text-[#29ace3] shrink-0" />
                 </button>
               );
             })}
@@ -400,7 +401,7 @@ export default function AdminClientDetail() {
   );
 }
 
-// ── Sub-components ──────────────────────────────────────────
+// -- Sub-components ------------------------------------------
 
 function FieldItem({ label, value, editing, onChange }) {
   return (
@@ -411,11 +412,11 @@ function FieldItem({ label, value, editing, onChange }) {
           type="text"
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm transition"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm transition"
         />
       ) : (
         <p className={`text-sm py-1 px-1 ${value ? 'text-gray-900' : 'text-gray-400 italic'}`}>
-          {value || '—'}
+          {value || '�'}
         </p>
       )}
     </div>
@@ -438,7 +439,7 @@ function CommissionRow({ label, value, onChange, readOnly, note }) {
               type="number" min="0" max="100" step="0.5"
               value={value}
               onChange={e => onChange && onChange(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))}
-              className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-center font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-center font-bold text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
             />
             <span className="text-gray-600 font-bold text-sm">%</span>
           </>

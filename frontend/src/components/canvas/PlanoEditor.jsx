@@ -366,7 +366,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
             {herramientaActiva !== 'lapiz' ? (
               <button
                 onClick={activarLapiz}
-                className="px-4 py-2 rounded text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition flex gap-2 items-center"
+                className="px-4 py-2 rounded text-sm font-semibold bg-[#29ace3] text-white hover:bg-[#1d96cb] transition flex gap-2 items-center"
                 title="Teken op het canvas"
               >
                 ✏️ Tekenen
@@ -471,7 +471,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
                 value={nombrePlano}
                 onChange={(e) => setNombrePlano(e.target.value)}
                 placeholder="Bijv.: Gelijkvloers, 1e verdieping, enz."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm"
               />
             </div>
 
@@ -483,7 +483,7 @@ export default function PlanoEditor({ plano, idxPlano, onSave, onCancel }) {
               <textarea
                 value={comentarios}
                 onChange={(e) => setComentarios(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#29ace3] outline-none text-sm"
                 rows="4"
                 placeholder="Speciale notities over deze plattegrond..."
               />
