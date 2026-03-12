@@ -151,26 +151,24 @@ export default function Step2() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4">
 
       {/* List of already-added ruimtes */}
       {ruimtes.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md p-5">
+        <div className="bg-white rounded-xl shadow-sm p-4">
           <h3 className="text-sm font-bold text-gray-700 mb-3">Toegevoegde ruimtes ({ruimtes.length})</h3>
           <div className="space-y-2">
             {ruimtes.map((r, i) => (
               <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">{r.naam}</p>
-                  {r.omschrijving && <p className="text-xs text-gray-500 mt-0.5">{r.omschrijving.substring(0, 60)}{r.omschrijving.length > 60 ? "..." : ""}</p>}
+                <div className="flex-1 min-w-0 mr-2">
+                  <p className="text-sm font-semibold text-gray-800 truncate">{r.naam}</p>
                   <p className="text-xs text-gray-400 mt-0.5">
-                    {r.platteGrond ? "Platte grond ✓" : "Geen platte grond"}
-                    {r.marcadores?.length > 0 ? ` · ${r.marcadores.length} marker(s)` : ""}
+                    {r.platteGrond ? "Plan ✓" : "Geen plan"}
                     {r.dataDibujo ? " · tekening ✓" : ""}
                     {" · "}{r.fotos.length} foto{r.fotos.length !== 1 ? "s" : ""}
                   </p>
                 </div>
-                <button onClick={() => setRuimtes(prev => prev.filter((_, idx) => idx !== i))} className="text-red-500 hover:text-red-700 p-1">
+                <button onClick={() => setRuimtes(prev => prev.filter((_, idx) => idx !== i))} className="text-red-500 hover:text-red-700 p-2 flex-shrink-0">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -180,7 +178,7 @@ export default function Step2() {
       )}
 
       {/* Current ruimte form */}
-      <div className="bg-white rounded-lg shadow-md p-6 space-y-5">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 space-y-5">
         <h3 className="text-base font-bold text-gray-900 border-b pb-3">
           {ruimtes.length === 0 ? "Ruimte 1" : `Ruimte ${ruimtes.length + 1}`}
         </h3>
@@ -234,7 +232,7 @@ export default function Step2() {
           ) : (
             <div
               onClick={() => platteGrondRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-5 sm:p-8 text-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
             >
               <Upload size={32} className="mx-auto mb-2 text-gray-400" />
               <p className="text-sm text-gray-500">upload pdf.</p>
@@ -282,30 +280,27 @@ export default function Step2() {
       </div>
 
       {/* Action buttons */}
-      <div className="flex flex-col gap-3">
-        {/* VOEG RUIMTE TOE */}
+      <div className="flex flex-col gap-3 pb-4">
         <button
           onClick={handleVoegRuimteToe}
-          className="w-full bg-[#1d96cb] hover:bg-blue-800 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition text-sm"
+          className="w-full bg-[#1d96cb] hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl flex gap-2 items-center justify-center transition text-sm active:scale-95"
         >
-          <Plus size={18} /> VOEG RUIMTE TOE (MET PLAN) &nbsp;<span className="font-normal opacity-80">(nog een ruimte toevoegen)</span>
+          <Plus size={18} /> <span>RUIMTE TOEVOEGEN</span>
         </button>
 
-        {/* AFRONDEN */}
         <button
           onClick={handleAfronden}
           disabled={saving}
-          className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition text-sm"
+          className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-white font-bold py-3.5 rounded-xl flex gap-2 items-center justify-center transition text-sm active:scale-95"
         >
-          {saving ? "Bezig met opslaan..." : <><CheckCircle size={18} /> AFRONDEN (verzenden)</>}
+          {saving ? "Bezig met opslaan..." : <><CheckCircle size={18} /> AFRONDEN &amp; VERZENDEN</>}
         </button>
 
-        {/* vorige stap */}
         <button
           onClick={() => setPasoActual(1)}
-          className="w-fit bg-[#29ace3] hover:bg-[#1d96cb] text-white font-semibold px-6 py-2 rounded-lg text-sm transition"
+          className="w-full border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-3 rounded-xl text-sm transition"
         >
-          vorige stap
+          ← Vorige stap
         </button>
       </div>
     </div>

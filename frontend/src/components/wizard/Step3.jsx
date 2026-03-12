@@ -87,12 +87,12 @@ export default function Step3() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4">
       {/* Zona de carga */}
-      <div className="bg-white rounded-lg shadow-md p-8">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-8">
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-[#29ace3] rounded-lg p-12 text-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
+          className="border-2 border-dashed border-[#29ace3] rounded-lg p-6 sm:p-12 text-center cursor-pointer hover:border-[#29ace3] hover:bg-[#eaf7fd] transition"
         >
           <Upload size={48} className="mx-auto mb-4 text-[#29ace3]" />
           <h3 className="text-lg font-bold text-gray-900 mb-2">Locatiefoto's uploaden</h3>
@@ -111,7 +111,7 @@ export default function Step3() {
 
       {/* Galería de fotos */}
       {projectData.fotosLocalizacion.length > 0 && (
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Geüploade foto's ({projectData.fotosLocalizacion.length})</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {projectData.fotosLocalizacion.map((foto, idx) => (
@@ -136,19 +136,19 @@ export default function Step3() {
       )}
 
       {/* Botones de acción */}
-      <div className="flex gap-4">
+      <div className="flex gap-3 pb-4">
         <button
           onClick={() => setPasoActual(2)}
-          className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-lg transition"
+          className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3.5 rounded-xl transition active:scale-95"
         >
           Terug
         </button>
         <button
           onClick={handleGuardarProyecto}
           disabled={cargando || projectData.fotosLocalizacion.length === 0}
-          className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition"
+          className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-3.5 rounded-xl flex gap-2 items-center justify-center transition active:scale-95"
         >
-          <CheckCircle size={20} /> Afronden en verzenden
+          <CheckCircle size={20} /> <span className="hidden xs:inline">Afronden en </span>verzenden
         </button>
       </div>
     </div>

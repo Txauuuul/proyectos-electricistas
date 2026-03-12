@@ -183,7 +183,7 @@ export default function Navbar() {
 
               {/* Notifications dropdown */}
               {notifOpen && (
-                <div className="absolute right-0 top-12 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden flex flex-col">
+                <div className="absolute right-0 top-12 w-[calc(100vw-1rem)] max-w-sm sm:w-80 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden flex flex-col">
                   <div className="p-3 border-b flex justify-between items-center bg-[#1a1a1a]">
                     <span className="font-bold text-white text-sm tracking-wide">MELDINGEN</span>
                     {notifCount > 0 && (

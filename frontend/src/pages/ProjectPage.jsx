@@ -6,9 +6,41 @@ import { fabric } from 'fabric';
 import PlanoEditor from '../components/canvas/PlanoEditor';
 import ChatPanel from '../components/ChatPanel';
 
-// Marker coordinates are stored in the 1200x800 canvas coordinate space.
-// The SVG viewBox="0 0 1200 800" with preserveAspectRatio="xMidYMid meet"
-// handles the mapping automatically — no extra offset is needed.
+const DEFAULT_CANVAS_WIDTH = 1200;
+const DEFAULT_CANVAS_HEIGHT = 800;
+
+function getFloorPlanCanvasSize(plan) {
+  return { width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT };
+}
+
+function getCanvasSizeFromImage(imageSrc) {
+  return new Promise((resolve, reject) => {
+    if (!imageSrc) {
+      resolve({ width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT });
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      const ratio = img.naturalWidth / img.naturalHeight || (DEFAULT_CANVAS_WIDTH / DEFAULT_CANVAS_HEIGHT);
+      resolve({
+        width: DEFAULT_CANVAS_WIDTH,
+        height: Math.round(DEFAULT_CANVAS_WIDTH / ratio),
+      });
+    };
+    img.onerror = reject;
+    img.src = imageSrc;
+  });
+}
+
+function getContainedImageLayout(imageWidth, imageHeight) {
+  const scale = Math.min(DEFAULT_CANVAS_WIDTH / imageWidth, DEFAULT_CANVAS_HEIGHT / imageHeight);
+  const width = imageWidth * scale;
+  const height = imageHeight * scale;
+  const left = (DEFAULT_CANVAS_WIDTH - width) / 2;
+  const top = (DEFAULT_CANVAS_HEIGHT - height) / 2;
+  return { left, top, width, height };
+}
 
 export default function ProjectPage() {
   const { id } = useParams();
@@ -39,6 +71,8 @@ export default function ProjectPage() {
   // URLs de imágenes PNG generadas offscreen para mostrar dibujos
   const [drawingUrls, setDrawingUrls] = useState({});
   const [ruimteDrawingUrls, setRuimteDrawingUrls] = useState({});
+  const [planImageLayouts, setPlanImageLayouts] = useState({});
+  const [roomImageLayouts, setRoomImageLayouts] = useState({});
 
   // Additional info form state (post-signature)
   const [mostrarFormInfo, setMostrarFormInfo] = useState(false);
@@ -211,17 +245,67 @@ export default function ProjectPage() {
     }
   }, [id, token]);
 
+  useEffect(() => {
+    if (!proyecto) return;
+
+    let cancelled = false;
+
+    const loadLayouts = async () => {
+      try {
+        const planEntries = await Promise.all(
+          (proyecto.planos || []).map(async (plano, idx) => {
+            try {
+              const size = await getCanvasSizeFromImage(plano.imagenBase64);
+              return [idx, getContainedImageLayout(size.width, size.height)];
+            } catch {
+              return [idx, { left: 0, top: 0, width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT }];
+            }
+          })
+        );
+
+        const roomEntries = await Promise.all(
+          (proyecto.ruimtes || []).map(async (ruimte, idx) => {
+            try {
+              const size = await getCanvasSizeFromImage(ruimte.platteGrond);
+              return [idx, getContainedImageLayout(size.width, size.height)];
+            } catch {
+              return [idx, { left: 0, top: 0, width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT }];
+            }
+          })
+        );
+
+        if (cancelled) return;
+
+        setPlanImageLayouts(Object.fromEntries(planEntries));
+        setRoomImageLayouts(Object.fromEntries(roomEntries));
+      } catch (err) {
+        console.error('Error loading floor plan sizes:', err);
+      }
+    };
+
+    loadLayouts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [proyecto]);
+
   // Renderizar dibujos de ruimtes usando StaticCanvas offscreen
   useEffect(() => {
     if (!proyecto?.ruimtes) return;
     proyecto.ruimtes.forEach((ruimte, idx) => {
       if (!ruimte.dataDibujo) return;
       try {
+        const { width, height } = getFloorPlanCanvasSize(ruimte);
         const tempEl = document.createElement('canvas');
-        tempEl.width = 1200;
-        tempEl.height = 800;
-        const staticCanvas = new fabric.StaticCanvas(tempEl, { width: 1200, height: 800, backgroundColor: 'transparent' });
-        staticCanvas.loadFromJSON(ruimte.dataDibujo, () => {
+        tempEl.width = width;
+        tempEl.height = height;
+        const staticCanvas = new fabric.StaticCanvas(tempEl, { width, height, backgroundColor: 'transparent' });
+        const sanitizedDrawing = {
+          ...ruimte.dataDibujo,
+          objects: (ruimte.dataDibujo.objects || []).filter(obj => obj.type !== 'image'),
+        };
+        staticCanvas.loadFromJSON(sanitizedDrawing, () => {
           staticCanvas.backgroundColor = 'transparent';
           staticCanvas.backgroundImage = null;
           staticCanvas.renderAll();
@@ -245,17 +329,23 @@ export default function ProjectPage() {
 
       try {
         // Crear elemento canvas temporal fuera del DOM
+        const { width, height } = getFloorPlanCanvasSize(plano);
         const tempEl = document.createElement('canvas');
-        tempEl.width = 1200;
-        tempEl.height = 800;
+        tempEl.width = width;
+        tempEl.height = height;
 
         const staticCanvas = new fabric.StaticCanvas(tempEl, {
-          width: 1200,
-          height: 800,
+          width,
+          height,
           backgroundColor: 'transparent',
         });
 
-        staticCanvas.loadFromJSON(plano.dataDibujo, () => {
+        const sanitizedDrawing = {
+          ...plano.dataDibujo,
+          objects: (plano.dataDibujo.objects || []).filter(obj => obj.type !== 'image'),
+        };
+
+        staticCanvas.loadFromJSON(sanitizedDrawing, () => {
           staticCanvas.backgroundColor = 'transparent';
           staticCanvas.backgroundImage = null;
           staticCanvas.renderAll();
@@ -540,8 +630,8 @@ export default function ProjectPage() {
       {/* Contenido */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
         {/* Información General */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Projectinformatie</h2>
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
+          <h2 className="text-lg sm:text-2xl font-bold text-gray-900 mb-4">Projectinformatie</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-gray-600">Startdatum</p>
@@ -752,6 +842,11 @@ export default function ProjectPage() {
             <div className="space-y-8">
               {proyecto.planos.map((plano, idx) => (
                 <div key={idx} className="border-b pb-8 last:border-b-0">
+                  {(() => {
+                    const planoCanvasSize = getFloorPlanCanvasSize(plano);
+                    const planoLayout = planImageLayouts[idx] || { left: 0, top: 0, width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT };
+                    return (
+                      <>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Plattegrond {idx + 1}</h3>
                     <button
@@ -773,7 +868,7 @@ export default function ProjectPage() {
                         position: 'relative', 
                         display: 'inline-block',
                         width: '100%',
-                        paddingBottom: '66.67%'
+                        paddingBottom: `${(planoCanvasSize.height / planoCanvasSize.width) * 100}%`
                       }}
                     >
                       <img 
@@ -781,16 +876,14 @@ export default function ProjectPage() {
                         alt={`Plano ${idx + 1}`}
                         style={{ 
                           position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'contain',
+                          top: `${(planoLayout.top / DEFAULT_CANVAS_HEIGHT) * 100}%`,
+                          left: `${(planoLayout.left / DEFAULT_CANVAS_WIDTH) * 100}%`,
+                          width: `${(planoLayout.width / DEFAULT_CANVAS_WIDTH) * 100}%`,
+                          height: `${(planoLayout.height / DEFAULT_CANVAS_HEIGHT) * 100}%`,
                           pointerEvents: 'none'
                         }}
                       />
                       
-                      {/* Dibujos a mano alzada como imagen PNG (generado offscreen, sin wrapper Fabric) */}
                       {plano.dataDibujo && drawingUrls[idx] && (
                         <img
                           src={drawingUrls[idx]}
@@ -801,12 +894,12 @@ export default function ProjectPage() {
                             left: 0,
                             width: '100%',
                             height: '100%',
+                            objectFit: 'fill',
                             pointerEvents: 'none',
                           }}
                         />
                       )}
                       
-                      {/* Marcadores como iconos SVG - viewBox usa coordenadas del canvas editor (1200x800) */}
                       {plano.marcadores && plano.marcadores.length > 0 && (
                         <svg 
                           style={{
@@ -817,8 +910,8 @@ export default function ProjectPage() {
                             height: '100%',
                             pointerEvents: 'none'
                           }}
-                          viewBox="0 0 1200 800"
-                          preserveAspectRatio="xMidYMid meet"
+                          viewBox={`0 0 ${DEFAULT_CANVAS_WIDTH} ${DEFAULT_CANVAS_HEIGHT}`}
+                          preserveAspectRatio="none"
                         >
                           {plano.marcadores.map((marcador, midx) => {
                             const iconMap = {
@@ -843,6 +936,9 @@ export default function ProjectPage() {
                       )}
                     </div>
                   </div>
+                      </>
+                    );
+                  })()}
 
                   {/* Comentarios */}
                   {plano.comentarios && (
@@ -895,6 +991,11 @@ export default function ProjectPage() {
             <div className="space-y-8">
               {proyecto.ruimtes.map((ruimte, idx) => (
                 <div key={idx} className="border-b pb-8 last:border-b-0">
+                  {(() => {
+                    const ruimteCanvasSize = getFloorPlanCanvasSize(ruimte);
+                    const ruimteLayout = roomImageLayouts[idx] || { left: 0, top: 0, width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT };
+                    return (
+                      <>
                   <h3 className="text-lg font-semibold text-gray-900 mb-1">{ruimte.naam || `Ruimte ${idx + 1}`}</h3>
                   {ruimte.omschrijving && (
                     <p className="text-gray-600 text-sm mb-3">{ruimte.omschrijving}</p>
@@ -917,33 +1018,31 @@ export default function ProjectPage() {
                       <div
                         className="bg-gray-100 rounded-lg overflow-hidden flex justify-center items-center relative cursor-pointer group"
                         style={{ position: 'relative', maxHeight: '400px' }}
-                        onClick={() => { setModalLightbox({ src: ruimte.platteGrond, title: `${ruimte.naam || `Ruimte ${idx + 1}`} – Plattegrond`, marcadores: ruimte.marcadores, drawingSrc: ruimteDrawingUrls[idx] || null }); setZoomLightbox(1); }}
+                        onClick={() => { setModalLightbox({ src: ruimte.platteGrond, title: `${ruimte.naam || `Ruimte ${idx + 1}`} – Plattegrond`, marcadores: ruimte.marcadores, drawingSrc: ruimteDrawingUrls[idx] || null, imageLayout: roomImageLayouts[idx] || { left: 0, top: 0, width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT } }); setZoomLightbox(1); }}
                         title="Klik om te vergroten"
                       >
-                        <div style={{ position: 'relative', display: 'inline-block', width: '100%', paddingBottom: '66.67%' }}>
+                        <div style={{ position: 'relative', display: 'inline-block', width: '100%', paddingBottom: `${(ruimteCanvasSize.height / ruimteCanvasSize.width) * 100}%` }}>
                           <img
                             src={ruimte.platteGrond}
                             alt={`Plattegrond ${ruimte.naam}`}
-                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' }}
+                            style={{ position: 'absolute', top: `${(ruimteLayout.top / DEFAULT_CANVAS_HEIGHT) * 100}%`, left: `${(ruimteLayout.left / DEFAULT_CANVAS_WIDTH) * 100}%`, width: `${(ruimteLayout.width / DEFAULT_CANVAS_WIDTH) * 100}%`, height: `${(ruimteLayout.height / DEFAULT_CANVAS_HEIGHT) * 100}%`, pointerEvents: 'none' }}
                           />
-                          {/* Freehand drawing overlay */}
                           {ruimte.dataDibujo && ruimteDrawingUrls[idx] && (
                             <img
                               src={ruimteDrawingUrls[idx]}
                               alt="drawing"
-                              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+                              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', pointerEvents: 'none' }}
                             />
                           )}
                           {/* Zoom hint overlay */}
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center pointer-events-none">
                             <span className="opacity-0 group-hover:opacity-100 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded transition">🔍 Klik om te vergroten</span>
                           </div>
-                          {/* Markers */}
                           {ruimte.marcadores && ruimte.marcadores.length > 0 && (
                             <svg
                               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-                              viewBox="0 0 1200 800"
-                              preserveAspectRatio="xMidYMid meet"
+                              viewBox={`0 0 ${DEFAULT_CANVAS_WIDTH} ${DEFAULT_CANVAS_HEIGHT}`}
+                              preserveAspectRatio="none"
                             >
                               {ruimte.marcadores.map((marcador, midx) => {
                                 const iconMap = { camara: '/icons/camara.png', wifi: '/icons/wifi.png', arbol: '/icons/arbol.png' };
@@ -971,6 +1070,9 @@ export default function ProjectPage() {
                       )}
                     </div>
                   )}
+                      </>
+                    );
+                  })()}
 
                   {/* Photos */}
                   {ruimte.fotos && ruimte.fotos.length > 0 && (
@@ -1791,20 +1893,23 @@ export default function ProjectPage() {
                 }}
                 onMouseDown={manejarMouseDown}
               >
+                {(() => {
+                  const layout = planImageLayouts[imagenActivaIdx] || { left: 0, top: 0, width: DEFAULT_CANVAS_WIDTH, height: DEFAULT_CANVAS_HEIGHT };
+                  return (
                 <img
                   src={proyecto.planos[imagenActivaIdx].imagenBase64}
                   alt={`Plano ${imagenActivaIdx + 1} Zoom`}
                   style={{
                     position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
+                    top: `${(layout.top / DEFAULT_CANVAS_HEIGHT) * 100}%`,
+                    left: `${(layout.left / DEFAULT_CANVAS_WIDTH) * 100}%`,
+                    width: `${(layout.width / DEFAULT_CANVAS_WIDTH) * 100}%`,
+                    height: `${(layout.height / DEFAULT_CANVAS_HEIGHT) * 100}%`,
                   }}
                 />
+                  );
+                })()}
 
-                {/* Dibujos a mano alzada en modal zoom - misma imagen PNG del preview */}
                 {proyecto.planos[imagenActivaIdx]?.dataDibujo && drawingUrls[imagenActivaIdx] && (
                   <img
                     src={drawingUrls[imagenActivaIdx]}
@@ -1815,25 +1920,24 @@ export default function ProjectPage() {
                       left: 0,
                       width: '100%',
                       height: '100%',
+                      objectFit: 'fill',
                       pointerEvents: 'none',
                     }}
                   />
                 )}
 
-                {/* Marcadores como SVG - DENTRO del div escalado para que se muevan con el zoom */}
                 {proyecto.planos[imagenActivaIdx]?.marcadores && proyecto.planos[imagenActivaIdx].marcadores.length > 0 && (
                   <svg
                     style={{
                       position: 'absolute',
-                      top: 0,
-                      left: 0,
+                      inset: 0,
                       width: '100%',
                       height: '100%',
                       pointerEvents: 'none',
-                      zIndex: 20
+                      zIndex: 20,
                     }}
-                    viewBox="0 0 1200 800"
-                    preserveAspectRatio="xMidYMid meet"
+                    viewBox={`0 0 ${DEFAULT_CANVAS_WIDTH} ${DEFAULT_CANVAS_HEIGHT}`}
+                    preserveAspectRatio="none"
                   >
                     {proyecto.planos[imagenActivaIdx].marcadores.map((marcador, midx) => {
                       const iconMap = {
@@ -1966,6 +2070,8 @@ export default function ProjectPage() {
                 style={{
                   position: 'relative',
                   display: 'inline-block',
+                  width: modalLightbox.imageLayout ? 'min(90vw, calc(75vh * 1.5))' : 'auto',
+                  aspectRatio: modalLightbox.imageLayout ? '3 / 2' : undefined,
                   transformOrigin: 'center',
                   transform: `scale(${zoomLightbox})`,
                   transition: 'transform 0.1s ease-out',
@@ -1974,21 +2080,28 @@ export default function ProjectPage() {
                 <img
                   src={modalLightbox.src}
                   alt={modalLightbox.title}
-                  style={{ display: 'block', maxWidth: '90vw', maxHeight: '75vh', objectFit: 'contain' }}
+                  style={modalLightbox.imageLayout
+                    ? {
+                        position: 'absolute',
+                        top: `${((modalLightbox.imageLayout.top || 0) / DEFAULT_CANVAS_HEIGHT) * 100}%`,
+                        left: `${((modalLightbox.imageLayout.left || 0) / DEFAULT_CANVAS_WIDTH) * 100}%`,
+                        width: `${((modalLightbox.imageLayout.width || DEFAULT_CANVAS_WIDTH) / DEFAULT_CANVAS_WIDTH) * 100}%`,
+                        height: `${((modalLightbox.imageLayout.height || DEFAULT_CANVAS_HEIGHT) / DEFAULT_CANVAS_HEIGHT) * 100}%`,
+                      }
+                    : { display: 'block', maxWidth: '90vw', maxHeight: '75vh' }}
                 />
-                {/* Freehand drawing overlay in lightbox */}
                 {modalLightbox.drawingSrc && (
                   <img
                     src={modalLightbox.drawingSrc}
                     alt="drawing"
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'fill', pointerEvents: 'none' }}
                   />
                 )}
                 {modalLightbox.marcadores && modalLightbox.marcadores.length > 0 && (
                   <svg
                     style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-                    viewBox="0 0 1200 800"
-                    preserveAspectRatio="xMidYMid meet"
+                    viewBox={`0 0 ${DEFAULT_CANVAS_WIDTH} ${DEFAULT_CANVAS_HEIGHT}`}
+                    preserveAspectRatio="none"
                   >
                     {modalLightbox.marcadores.map((m, i) => {
                       const iconMap = { camara: '/icons/camara.png', wifi: '/icons/wifi.png', arbol: '/icons/arbol.png' };

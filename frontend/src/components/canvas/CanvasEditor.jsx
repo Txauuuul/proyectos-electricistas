@@ -8,6 +8,10 @@ const ICON_TYPES = [
   { id: 'arbol', label: 'Árbol', icon: TreePine, color: '#95E1D3' },
 ];
 
+const CANVAS_WIDTH = 1200;
+const CANVAS_HEIGHT = 800;
+const MARKER_SIZE = 90;
+
 export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -15,50 +19,116 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
   const [herramientaActiva, setHerramientaActiva] = useState(null);
   const [marcadores, setMarcadores] = useState([]);
 
-  // Exponer función para obtener datos del canvas
+  const extractMarkersFromCanvas = (canvasInstance) => {
+    if (!canvasInstance) return [];
+
+    return (canvasInstance.getObjects() || [])
+      .filter(obj => obj.type === 'image')
+      .map((img) => {
+        const meta = img.metadata || img.get('metadata');
+        if (!meta || meta.type !== 'marker' || !meta.markerType) return null;
+
+        return {
+          tipo: meta.markerType,
+          x: img.left,
+          y: img.top,
+        };
+      })
+      .filter(Boolean);
+  };
+
   useImperativeHandle(ref, () => ({
     getCanvasData: () => {
       if (!canvas) return { marcadores: [], dataDibujo: null };
 
-      // Obtener datos JSON del canvas (para dibujos)
-      const canvasJSON = canvas.toJSON();
-
-      // Filtrar solo los objetos de dibujo (excluyendo marcadores)
-      const dibujos = canvasJSON.objects.filter(obj => !obj.metadata || obj.metadata.type !== 'marker');
+      const canvasJSON = canvas.toJSON(['metadata', 'path', 'stroke', 'strokeWidth', 'fill']);
+      const dibujos = (canvasJSON.objects || []).filter(obj => obj.type !== 'image');
 
       return {
-        marcadores: marcadores,
-        dataDibujo: dibujos.length > 0 ? canvasJSON : null,
+        marcadores: extractMarkersFromCanvas(canvas).map(marker => ({
+          ...marker,
+          aspectRatio: CANVAS_WIDTH / CANVAS_HEIGHT,
+        })),
+        dataDibujo: dibujos.length > 0
+          ? {
+              ...canvasJSON,
+              objects: dibujos,
+              canvasWidth: CANVAS_WIDTH,
+              canvasHeight: CANVAS_HEIGHT,
+              background: 'transparent',
+              backgroundImage: null,
+            }
+          : null,
       };
     },
-  }), [canvas, marcadores]);
+  }), [canvas]);
 
   useEffect(() => {
     if (!imagenBase64 || !canvasRef.current || !containerRef.current) return;
 
     try {
-      // Crear canvas de Fabric con fondo transparente
       const newCanvas = new fabric.Canvas(canvasRef.current, {
-        width: 1200,
-        height: 800,
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
         backgroundColor: 'transparent',
+        renderOnAddRemove: false,
+        uniformScaling: true,
       });
 
-      console.log('Canvas created with transparent background - Size: 1200x800');
+      const applyResponsiveSize = () => {
+        if (!containerRef.current || !newCanvas.wrapperEl) return;
 
-      // Poner imagen como fondo del contenedor
-      if (containerRef.current) {
-        containerRef.current.style.backgroundImage = `url(${imagenBase64})`;
-        containerRef.current.style.backgroundSize = 'contain';
-        containerRef.current.style.backgroundRepeat = 'no-repeat';
-        containerRef.current.style.backgroundPosition = 'center';
-      }
+        const availableWidth = Math.min(containerRef.current.clientWidth - 24, CANVAS_WIDTH);
+        const displayWidth = Math.max(320, availableWidth);
+        const displayHeight = displayWidth * (CANVAS_HEIGHT / CANVAS_WIDTH);
+
+        newCanvas.wrapperEl.style.width = `${displayWidth}px`;
+        newCanvas.wrapperEl.style.height = `${displayHeight}px`;
+        newCanvas.wrapperEl.style.position = 'relative';
+
+        [newCanvas.lowerCanvasEl, newCanvas.upperCanvasEl].forEach((el) => {
+          el.style.width = `${displayWidth}px`;
+          el.style.height = `${displayHeight}px`;
+          el.style.background = 'transparent';
+        });
+
+        newCanvas.calcOffset();
+        newCanvas.requestRenderAll();
+      };
+
+      fabric.Image.fromURL(
+        imagenBase64,
+        (img) => {
+          const scale = Math.min(CANVAS_WIDTH / img.width, CANVAS_HEIGHT / img.height);
+          const offsetLeft = (CANVAS_WIDTH - img.width * scale) / 2;
+          const offsetTop = (CANVAS_HEIGHT - img.height * scale) / 2;
+
+          newCanvas.setBackgroundImage(
+            img,
+            () => {
+              applyResponsiveSize();
+              newCanvas.renderAll();
+            },
+            {
+              scaleX: scale,
+              scaleY: scale,
+              left: offsetLeft,
+              top: offsetTop,
+              originX: 'left',
+              originY: 'top',
+            }
+          );
+        },
+        { crossOrigin: 'anonymous' }
+      );
+
+      const resizeObserver = new ResizeObserver(() => applyResponsiveSize());
+      resizeObserver.observe(containerRef.current);
 
       setCanvas(newCanvas);
-      console.log('Canvas initialized successfully');
 
-      // Cleanup
       return () => {
+        resizeObserver.disconnect();
         if (newCanvas) {
           newCanvas.dispose();
         }
@@ -74,25 +144,25 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
       return;
     }
 
+    canvas.isDrawingMode = false;
     setHerramientaActiva(tipo);
 
     const handleMouseDown = (event) => {
       const pointer = canvas.getPointer(event.e);
 
-      // Mapeo de iconos PNG personalizados
-      let iconPath = '';
       const iconMap = {
         'camara': '/icons/camara.png',
         'wifi': '/icons/wifi.png',
         'arbol': '/icons/arbol.png',
       };
-      
-      iconPath = iconMap[tipo];
+      const iconPath = iconMap[tipo];
 
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         try {
+          const scaleX = MARKER_SIZE / img.naturalWidth;
+          const scaleY = MARKER_SIZE / img.naturalHeight;
           const fabricImage = new fabric.Image(img, {
             left: pointer.x,
             top: pointer.y,
@@ -101,14 +171,20 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
             selectable: true,
             hasControls: true,
             metadata: { type: 'marker', markerType: tipo },
-            scaleX: 0.35,
-            scaleY: 0.35,
+            excludeFromExport: true,
+            scaleX,
+            scaleY,
           });
 
           canvas.add(fabricImage);
           canvas.renderAll();
 
-          setMarcadores(prev => [...prev, { tipo, x: pointer.x, y: pointer.y }]);
+          setMarcadores(
+            extractMarkersFromCanvas(canvas).map(marker => ({
+              ...marker,
+              aspectRatio: CANVAS_WIDTH / CANVAS_HEIGHT,
+            }))
+          );
           console.log(`✅ Marcador ${tipo} añadido`);
         } catch (error) {
           console.error('Error adding marker:', error);
@@ -152,13 +228,21 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
       const lastObject = objects[objects.length - 1];
       canvas.remove(lastObject);
       canvas.renderAll();
+      setMarcadores(
+        extractMarkersFromCanvas(canvas).map(marker => ({
+          ...marker,
+          aspectRatio: CANVAS_WIDTH / CANVAS_HEIGHT,
+        }))
+      );
     }
   };
 
   const limpiarTodo = () => {
     if (!canvas) return;
 
-    canvas.clear();
+    const objects = canvas.getObjects().slice();
+    objects.forEach(obj => canvas.remove(obj));
+    canvas.isDrawingMode = false;
     canvas.renderAll();
     setMarcadores([]);
   };
@@ -224,15 +308,12 @@ export default forwardRef(function CanvasEditor({ imagenBase64 }, ref) {
         ref={containerRef}
         className="bg-gray-100 p-6 flex justify-center overflow-auto relative"
         style={{ 
-          minHeight: '650px',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
+          minHeight: '760px',
         }}
       >
         <canvas 
           ref={canvasRef} 
-          className="rounded shadow-lg cursor-crosshair" 
+          className="rounded shadow-lg cursor-crosshair bg-white" 
         />
       </div>
 

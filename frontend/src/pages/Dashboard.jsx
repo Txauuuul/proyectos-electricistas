@@ -161,15 +161,15 @@ export default function Dashboard() {
   // ============================
   if (!esAdmin) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mijn projecten</h1>
-            <p className="text-gray-600">{proyectos.length} project{proyectos.length !== 1 ? 'en' : ''}</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Mijn projecten</h1>
+            <p className="text-gray-600 text-sm">{proyectos.length} project{proyectos.length !== 1 ? 'en' : ''}</p>
           </div>
           <button
             onClick={() => navigate('/nuevo-proyecto')}
-            className="flex items-center gap-2 px-4 py-2 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-lg font-semibold"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-[#29ace3] hover:bg-[#1d96cb] text-white rounded-xl font-semibold text-sm w-full sm:w-auto"
           >
             <Plus size={18} /> Nieuw project
           </button>
@@ -185,16 +185,16 @@ export default function Dashboard() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {proyectos.map(p => {
               const si = getStatusInfo(p.estado);
               return (
-                <div key={p._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-bold text-gray-900">
+                <div key={p._id} className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md active:scale-95 transition p-4 sm:p-5">
+                  <div className="flex justify-between items-start mb-2 gap-2">
+                    <h3 className="text-base font-bold text-gray-900 line-clamp-2 flex-1">
                       {p.tituloAutomatico || p.nombreCasa}
                     </h3>
-                    <span className={`px-2 py-0.5 rounded text-white text-xs font-semibold ${si.bg}`}>{si.label}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-white text-[10px] font-bold flex-shrink-0 ${si.bg}`}>{si.label}</span>
                   </div>
                   {p.tituloPersonalizado && (
                     <p className="text-sm text-gray-500 mb-1 italic">{p.tituloPersonalizado}</p>
@@ -299,19 +299,19 @@ export default function Dashboard() {
       {/* ── Top bar: stats + search + filters ── */}
       <div className="flex-shrink-0 border-b px-6 py-6 space-y-5 shadow-sm" style={{ background: '#1a1a1a' }}>
 
-        <div className="flex flex-col items-center text-center gap-2 pb-2">
-          <h1 className="text-2xl font-extrabold text-white tracking-wide uppercase">
+        <div className="flex flex-col items-center text-center gap-1 pb-2">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide uppercase">
             Project<span style={{ color: '#29ace3' }}>dashboard</span>
           </h1>
-          <p className="text-sm text-gray-400 max-w-2xl">
+          <p className="text-xs sm:text-sm text-gray-400 max-w-2xl hidden sm:block">
             Beheer alle actieve projecten, bekijk de pipeline en stuur het werk vooruit vanuit één plek.
           </p>
         </div>
 
         {/* Stats row */}
         {!cargando && proyectos.length > 0 && (
-          <div className="flex flex-wrap gap-4 mb-10 justify-center">
-            <MiniStat label="Totaal" value={proyectos.length} color="text-gray-800" />
+          <div className="flex flex-wrap gap-2 mb-4 justify-center">
+            <MiniStat label="Totaal" value={proyectos.length} color="text-white" />
             <MiniStat label="In uitvoering" value={proyectos.filter(p => p.estado === 'working').length} color="text-yellow-600" />
             <MiniStat label="Wacht op betaling" value={proyectos.filter(p => p.estado === 'pending_payment').length} color="text-orange-600" />
             <MiniStat label="Betaald" value={proyectos.filter(p => p.estado === 'paid').length} color="text-green-700" />
@@ -346,24 +346,24 @@ export default function Dashboard() {
         )}
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4 justify-center mt-2 mb-4">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-4 justify-center mt-2 mb-2">
+          <div className="relative w-full sm:w-72">
             <Search size={15} className="absolute left-2.5 top-2.5 text-gray-400" />
             <input
               type="text"
               placeholder="Zoek projecten..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none w-72"
+              className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-gray-600">Sorteren:</label>
+            <label className="text-xs font-semibold text-gray-400">Sorteren:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
+              className="flex-1 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
             >
               <option value="fecha-desc">Nieuwste eerst</option>
               <option value="fecha-asc">Oudste eerst</option>
@@ -373,11 +373,11 @@ export default function Dashboard() {
 
           {clientesUnicos.length > 0 && (
           <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-gray-600">Klant:</label>
+              <label className="text-xs font-semibold text-gray-400">Klant:</label>
               <select
                 value={filtroCliente}
                 onChange={(e) => setFiltroCliente(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
+                className="flex-1 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
               >
                 <option value="">Alle</option>
                 {clientesUnicos.map(c => (
@@ -387,7 +387,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <span className="text-xs text-gray-400">{filtered.length} project{filtered.length !== 1 ? 'en' : ''}</span>
+          <span className="text-xs text-gray-400 text-center">{filtered.length} project{filtered.length !== 1 ? 'en' : ''}</span>
         </div>
       </div>
 
@@ -397,7 +397,66 @@ export default function Dashboard() {
           <p className="text-gray-500">Projecten laden...</p>
         </div>
       ) : (
-        <div className="flex-1 overflow-x-auto overflow-y-hidden flex justify-center items-start px-4 py-6">
+        <>
+          {/* MOBILE: vertical list grouped by status */}
+          <div className="md:hidden flex-1 overflow-y-auto px-3 py-4 space-y-3">
+            {filtered.length === 0 && (
+              <p className="text-gray-400 text-sm text-center py-10">Geen projecten gevonden</p>
+            )}
+            {filtered.map(p => {
+              const si = getStatusInfo(p.estado);
+              return (
+                <div
+                  key={p._id}
+                  className={`rounded-xl shadow-sm border p-4 cursor-pointer active:scale-95 transition ${getClientCardTheme(p).card}`}
+                  onClick={() => navigate(`/proyecto/${p._id}`)}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className={`inline-flex px-2.5 py-0.5 rounded-full font-bold text-xs ${getClientCardTheme(p).chip}`}>
+                      {p.usuarioId?.nombre || '—'}
+                    </span>
+                    <span className={`text-[10px] text-white px-2 py-0.5 rounded-full font-semibold flex-shrink-0 ${si.bg}`}>
+                      {si.label}
+                    </span>
+                  </div>
+                  <p className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">
+                    {p.tituloAutomatico || p.nombreCasa}
+                  </p>
+                  <p className="text-xs text-gray-500 mb-2 line-clamp-1">{p.direccion}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">{new Date(p.fechaInicio).toLocaleDateString()}</span>
+                    {getProjectAmount(p) > 0 && (
+                      <span className="text-xs font-bold text-green-700">€{getProjectAmount(p).toFixed(0)}</span>
+                    )}
+                  </div>
+                  {/* Mobile quick actions */}
+                  <div className="flex flex-wrap gap-1.5 mt-3" onClick={e => e.stopPropagation()}>
+                    {['created', 'offer_ready'].includes(p.estado) && (
+                      <button onClick={() => navigate(`/proyecto/${p._id}/preparar-oferta`)}
+                        className="text-xs px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg font-semibold flex items-center gap-1">
+                        <FileText size={12} /> Offerte
+                      </button>
+                    )}
+                    {p.estado === 'offer_ready' && (
+                      <button onClick={() => handleAction(`${API}/proyectos/${p._id}/enviar-oferta`, 'Offerte verzenden?', 'Verzonden!', p._id)}
+                        className="text-xs px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg font-semibold flex items-center gap-1">
+                        <Send size={12} /> Verzenden
+                      </button>
+                    )}
+                    {p.estado === 'pending_payment' && (
+                      <button onClick={() => handleAction(`${API}/proyectos/${p._id}/marcar-pagado`, 'Markeren als betaald?', 'Betaald!', p._id)}
+                        className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-semibold flex items-center gap-1">
+                        <DollarSign size={12} /> Betaald
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* DESKTOP: Kanban board */}
+          <div className="hidden md:flex flex-1 overflow-x-auto overflow-y-hidden justify-center items-start px-4 py-6">
           <div className="flex gap-5 h-full" style={{ minWidth: 'max-content' }}>
             {kanbanStates.map(state => {
               const si = getStatusInfo(state);
@@ -501,7 +560,8 @@ export default function Dashboard() {
               );
             })}
           </div>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
@@ -509,9 +569,9 @@ export default function Dashboard() {
 
 function MiniStat({ label, value, color }) {
   return (
-    <div className="flex items-center gap-1.5 rounded px-4 py-2" style={{ background: '#2b2b2b' }}>
-      <span className="text-xs text-gray-400">{label}:</span>
-      <span className={`text-sm font-bold ${color}`}>{value}</span>
+    <div className="flex items-center gap-1 rounded px-2 py-1.5" style={{ background: '#2b2b2b' }}>
+      <span className="text-[10px] text-gray-400">{label}:</span>
+      <span className={`text-xs font-bold ${color}`}>{value}</span>
     </div>
   );
 }

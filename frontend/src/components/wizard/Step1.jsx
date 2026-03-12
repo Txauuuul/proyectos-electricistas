@@ -77,7 +77,7 @@ export default function Step1() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-8">
+      <div className="bg-white rounded-xl shadow-md p-4 sm:p-8">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Nieuw project aanmaken</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
@@ -124,7 +124,7 @@ export default function Step1() {
           </div>
 
           {/* Straat + Nr. */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide mb-1">Straat *</label>
               <input type="text" {...register("straat", { required: "Verplicht veld" })} className={inp(errors.straat)} placeholder="Bijv. Kerkstraat" />
@@ -171,8 +171,8 @@ export default function Step1() {
           </div>
 
           {/* Volgende stap */}
-          <button type="submit" className="w-full bg-[#29ace3] hover:bg-[#1d96cb] text-white font-bold py-3 rounded-lg flex gap-2 items-center justify-center transition mt-6">
-            Volgende stap <ChevronRight size={20} />
+          <button type="submit" className="w-full bg-[#29ace3] hover:bg-[#1d96cb] text-white font-bold py-3.5 rounded-xl flex gap-2 items-center justify-center transition mt-4 text-sm sm:text-base">
+            Volgende stap <ChevronRight size={18} />
           </button>
         </form>
       </div>

@@ -35,7 +35,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-12" style={{ background: '#111111' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: '#111111' }}>
       <style>{`
         @keyframes loginGlow {
           0%, 100% { opacity: 0.4; transform: scale(1); }
@@ -43,61 +43,43 @@ export default function LoginPage() {
         }
       `}</style>
 
-      <div
-        className="absolute top-20 left-12 h-40 w-40 rounded-full blur-3xl"
-        style={{ background: 'rgba(41, 172, 227, 0.18)', animation: 'loginGlow 6s ease-in-out infinite' }}
-      />
-      <div
-        className="absolute bottom-16 right-10 h-56 w-56 rounded-full blur-3xl"
-        style={{ background: 'rgba(41, 172, 227, 0.1)', animation: 'loginGlow 8s ease-in-out infinite' }}
-      />
+      {/* Glow decorations */}
+      <div className="fixed top-16 left-16 h-48 w-48 rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(41, 172, 227, 0.15)', animation: 'loginGlow 6s ease-in-out infinite' }} />
+      <div className="fixed bottom-16 right-14 h-64 w-64 rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(41, 172, 227, 0.08)', animation: 'loginGlow 9s ease-in-out infinite' }} />
 
+      {/* Unified card */}
       <div
-        className="absolute inset-x-0 top-0 h-[38vh] flex items-center justify-center px-4"
+        className="relative w-full max-w-sm sm:max-w-md rounded-2xl px-8 sm:px-10 py-10"
+        style={{
+          background: 'linear-gradient(160deg, rgba(26,26,26,0.98) 0%, rgba(18,18,18,0.98) 100%)',
+          border: '1px solid rgba(41, 172, 227, 0.15)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+        }}
       >
-        <div
-          className="w-full max-w-md rounded-2xl px-6 py-5 text-center"
-          style={{
-            background: 'rgba(21, 21, 21, 0.82)',
-            border: '1px solid rgba(41, 172, 227, 0.18)',
-            backdropFilter: 'blur(14px)',
-            boxShadow: '0 18px 42px rgba(0,0,0,0.35)'
-          }}
-        >
-          <img
-            src="/logo-2beit.png"
-            alt="2beIT logo"
-            className="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-lg"
-          />
-          <p className="text-gray-300 text-sm text-center leading-relaxed">
-            Welkom op het elektriciënbeheerportaal.<br />
-            Beheer uw projecten, cliënten en offertes.
+        {/* Logo + brand centered at top */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="p-3 rounded-2xl mb-4"
+            style={{ background: 'rgba(41, 172, 227, 0.08)', border: '1px solid rgba(41, 172, 227, 0.18)' }}>
+            <img
+              src="/logo-2beit.png"
+              alt="2beIT logo"
+              className="w-14 h-14 object-contain drop-shadow-lg"
+            />
+          </div>
+          <h1 className="text-white text-2xl font-extrabold tracking-tight">
+            {isLogin ? 'Welkom terug' : 'Account aanmaken'}
+          </h1>
+          <p className="text-gray-500 text-xs mt-1.5 text-center leading-relaxed">
+            Elektriciënbeheerportaal · 2beIT
           </p>
         </div>
-      </div>
 
-      <div className="relative w-full max-w-md">
-        <div
-          className="rounded-2xl px-8 pt-24 pb-8"
-          style={{
-            background: 'linear-gradient(180deg, rgba(29,29,29,0.98) 0%, rgba(22,22,22,0.98) 100%)',
-            border: '1px solid #2b2b2b',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.55)'
-          }}
-        >
-          <div className="mb-6" style={{ height: '1px', background: 'linear-gradient(90deg, transparent 0%, rgba(41, 172, 227, 0.45) 50%, transparent 100%)' }} />
+        {/* Divider */}
+        <div className="mb-6" style={{ height: '1px', background: 'linear-gradient(90deg, transparent, rgba(41,172,227,0.35), transparent)' }} />
 
-          <h2
-            className="text-xs font-bold tracking-widest uppercase mb-1 text-center"
-            style={{ color: '#29ace3' }}
-          >
-            Elektriciënbeheer
-          </h2>
-          <p className="text-white text-2xl font-extrabold mb-7 text-center">
-            {isLogin ? 'Welkom terug' : 'Account aanmaken'}
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div
                 className="rounded-lg p-3 flex gap-2 items-start text-sm"
@@ -210,7 +192,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-5 text-center">
+          <div className="mt-6 text-center">
             <p className="text-gray-500 text-xs">
               {isLogin ? 'Nog geen account? ' : 'Heeft u al een account? '}
               <button
@@ -222,7 +204,6 @@ export default function LoginPage() {
               </button>
             </p>
           </div>
-        </div>
       </div>
     </div>
   );

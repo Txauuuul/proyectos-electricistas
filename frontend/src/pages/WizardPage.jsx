@@ -86,38 +86,43 @@ export default function WizardPage() {
 
       {/* Header met progress */}
       <header className="shadow" style={{ background: '#1a1a1a' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <button
             onClick={handleBack}
-            className="flex gap-2 items-center mb-4 font-semibold text-xs uppercase tracking-widest"
+            className="flex gap-1.5 items-center mb-3 font-semibold text-xs uppercase tracking-widest"
             style={{ color: '#29ace3' }}
           >
-            <ChevronLeft size={18} /> Terug
+            <ChevronLeft size={16} /> Terug
           </button>
 
-          <h1 className="text-xl font-extrabold text-white uppercase tracking-wide mb-5">
+          <h1 className="text-lg sm:text-xl font-extrabold text-white uppercase tracking-wide mb-4">
             Nieuw<span style={{ color: '#29ace3' }}> project</span>
           </h1>
 
-          {/* Indicador visual de progreso */}
-          <div className="flex gap-2 md:gap-4">
+          {/* Progress bars */}
+          <div className="flex gap-1.5 sm:gap-2">
             {pasos.map(paso => (
               <div
                 key={paso.numero}
-                className={`flex-1 h-2 rounded-full transition ${
-                  paso.numero <= pasoActual ? 'bg-[#29ace3]' : 'bg-gray-300'
+                className={`flex-1 h-1.5 sm:h-2 rounded-full transition ${
+                  paso.numero <= pasoActual ? 'bg-[#29ace3]' : 'bg-gray-600'
                 }`}
               />
             ))}
           </div>
 
-          <div className="mt-4 flex justify-between text-sm text-gray-600">
+          {/* Step labels — only show active on mobile */}
+          <div className="mt-2 flex justify-between text-xs text-gray-500">
             {pasos.map(paso => (
               <span
                 key={paso.numero}
-                className={paso.numero === pasoActual ? 'font-bold text-[#29ace3]' : ''}
+                className={`${
+                  paso.numero === pasoActual
+                    ? 'font-bold text-[#29ace3]'
+                    : 'hidden sm:block'
+                }`}
               >
-                Stap {paso.numero}
+                {paso.numero === pasoActual ? `Stap ${paso.numero}: ${paso.titulo}` : `${paso.numero}`}
               </span>
             ))}
           </div>
@@ -125,7 +130,7 @@ export default function WizardPage() {
       </header>
 
       {/* Contenido del paso */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {renderStep()}
       </main>
     </div>
