@@ -5,6 +5,7 @@ import {
   BarChart2, TrendingUp, Users, Euro, Clock, ArrowUpDown,
   ChevronUp, ChevronDown, Loader2, AlertTriangle
 } from 'lucide-react';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 const SORT_OPTIONS = [
   { key: 'nombre', label: 'Naam' },
@@ -97,18 +98,12 @@ export default function AdminElectricianStats() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
-      {/* Header */}
-      <header className="shadow sticky top-0 z-10" style={{ background: '#1a1a1a' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-3">
-          <BarChart2 size={26} style={{ color: '#29ace3' }} />
-          <div>
-            <h1 className="text-xl font-extrabold text-white uppercase tracking-wide">
-              Prestaties<span style={{ color: '#29ace3' }}>statistieken</span>
-            </h1>
-            <p className="text-xs text-gray-400">Admin-dashboard · Teamstatistieken</p>
-          </div>
-        </div>
-      </header>
+      <AdminPageHeader
+        icon={BarChart2}
+        title="Prestaties"
+        accent="statistieken"
+        subtitle="Admin-dashboard · Teamstatistieken"
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {cargando ? (

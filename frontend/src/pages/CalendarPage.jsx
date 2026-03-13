@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 const ESTADO_COLORS = {
   created: 'bg-[#29ace3]',
@@ -120,19 +121,13 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f8]">
-      {/* Header */}
-      <header className="shadow sticky top-0 z-10" style={{ background: '#1a1a1a' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Calendar size={24} style={{ color: '#29ace3' }} />
-            <div>
-              <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
-                Installatie<span style={{ color: '#29ace3' }}>kalender</span>
-              </h1>
-              <p className="text-xs text-gray-400">Geplande projectdata</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
+      <AdminPageHeader
+        icon={Calendar}
+        title="Installatie"
+        accent="kalender"
+        subtitle="Geplande projectdata"
+        actions={(
+          <>
             <button
               onClick={() => setViewMode(viewMode === 'calendar' ? 'list' : 'calendar')}
               className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-gray-300 border border-gray-600 rounded hover:border-[#29ace3] hover:text-[#29ace3] transition"
@@ -146,9 +141,9 @@ export default function CalendarPage() {
             >
               Vandaag
             </button>
-          </div>
-        </div>
-      </header>
+          </>
+        )}
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {cargando ? (

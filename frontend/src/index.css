@@ -96,3 +96,7 @@ canvas {
   background: var(--brand-light);
   padding: 2rem 1rem;
 }
+
+/* ─── Stats scroll row (hide scrollbar) ─── */
+.stats-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+.stats-scroll::-webkit-scrollbar { display: none; }

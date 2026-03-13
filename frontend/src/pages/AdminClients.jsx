@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Search, User, ChevronRight, Mail, Phone, Building } from 'lucide-react';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 export default function AdminClients() {
   const { token, usuario } = useAuth();
@@ -37,18 +38,17 @@ export default function AdminClients() {
 
   return (
     <div className="min-h-screen" style={{ background: '#f4f6f8' }}>
-      <header className="shadow mb-0" style={{ background: '#1a1a1a' }}>
-        <div className="max-w-5xl mx-auto px-4 py-5">
-          <h1 className="text-lg font-extrabold text-white uppercase tracking-wide">
-            Klanten<span style={{ color: '#29ace3' }}>beheer</span>
-          </h1>
-          <p className="text-xs text-gray-400 mt-0.5">Alle geregistreerde elektriciens en clienten.</p>
-        </div>
-      </header>
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <AdminPageHeader
+        icon={User}
+        title="Klanten"
+        accent="beheer"
+        subtitle="Alle geregistreerde elektriciens en klanten."
+      />
+
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
 
       {/* Search */}
-      <div className="relative mb-6">
+      <div className="relative mb-6 mx-auto max-w-5xl">
         <Search size={18} className="absolute left-3 top-3 text-gray-400" />
         <input
           type="text" placeholder="Zoek op naam, e-mail of bedrijf..."
@@ -60,11 +60,11 @@ export default function AdminClients() {
       {cargando ? (
         <p className="text-gray-500 text-center py-12">Laden...</p>
       ) : filtrados.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center text-gray-500">
+        <div className="mx-auto max-w-5xl bg-white rounded-lg shadow-md p-12 text-center text-gray-500">
           Geen klanten gevonden
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="mx-auto max-w-5xl space-y-3">
           {filtrados.map(e => (
             <div
               key={e._id}

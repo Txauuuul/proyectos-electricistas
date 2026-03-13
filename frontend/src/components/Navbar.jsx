@@ -143,7 +143,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-40" style={{ background: '#1a1a1a' }}>
       {/* Main bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[64px]">
+<div className="flex items-center justify-between h-[52px] sm:h-[64px]">
 
           {/* Logo */}
           <button
@@ -153,7 +153,7 @@ export default function Navbar() {
             <img
               src="/logo-2beit.png"
               alt="2beIT"
-              className="h-10 w-10 object-contain rounded"
+              className="h-8 w-8 sm:h-10 sm:w-10 object-contain rounded"
             />
           </button>
 

@@ -2,8 +2,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Plus, Eye, Search, FileText, Send, CheckCircle, DollarSign, Flag, RefreshCw, Download, TrendingUp,
+  Plus, Eye, Search, FileText, Send, CheckCircle, DollarSign, Flag, RefreshCw, Download, TrendingUp, LayoutDashboard,
 } from 'lucide-react';
+import AdminPageHeader from '../components/AdminPageHeader';
 
 const CLIENT_CARD_PALETTE = [
   {
@@ -294,100 +295,95 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="flex flex-col" style={{ background: '#f4f6f8', height: 'calc(100vh - 64px)' }}>
+    <div className="flex flex-col overflow-hidden" style={{ background: '#f4f6f8', height: 'calc(100vh - 52px)' }}>
+      <AdminPageHeader
+        icon={LayoutDashboard}
+        title="Project"
+        accent="dashboard"
+        subtitle="Overzicht van projecten, voortgang en conversie"
+      />
 
-      {/* ── Top bar: stats + search + filters ── */}
-      <div className="flex-shrink-0 border-b px-6 py-6 space-y-5 shadow-sm" style={{ background: '#1a1a1a' }}>
+      {/* ── Top bar: filters + stats (ultra-compact) ── */}
+      <div className="flex-shrink-0 border-b border-gray-200 bg-[#f4f6f8] px-3 py-3 shadow-sm">
 
-        <div className="flex flex-col items-center text-center gap-1 pb-2">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-wide uppercase">
-            Project<span style={{ color: '#29ace3' }}>dashboard</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-400 max-w-2xl hidden sm:block">
-            Beheer alle actieve projecten, bekijk de pipeline en stuur het werk vooruit vanuit één plek.
-          </p>
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2">
+
+        {/* Row 1: search + sort + client + count — single line */}
+        <div className="flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
+          <div className="relative w-full max-w-xl sm:min-w-[18rem] sm:flex-1 sm:max-w-md md:max-w-lg lg:max-w-xl">
+            <Search size={13} className="absolute left-2.5 top-[9px] text-gray-400" />
+            <input
+              type="text"
+              placeholder="Zoeken..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="w-full pl-8 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-[#29ace3] outline-none"
+            />
+          </div>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full max-w-xl shrink-0 px-2 py-2 bg-white border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-[#29ace3] outline-none sm:w-auto"
+          >
+            <option value="fecha-desc">Nieuwste</option>
+            <option value="fecha-asc">Oudste</option>
+            <option value="cliente">Klant A-Z</option>
+          </select>
+
+          {clientesUnicos.length > 0 && (
+            <select
+              value={filtroCliente}
+              onChange={(e) => setFiltroCliente(e.target.value)}
+              className="w-full max-w-xl shrink-0 px-2 py-2 bg-white border border-gray-300 rounded-lg text-xs text-gray-700 focus:ring-1 focus:ring-[#29ace3] outline-none sm:w-auto sm:max-w-[180px]"
+            >
+              <option value="">Alle klanten</option>
+              {clientesUnicos.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          )}
+
+          <span className="shrink-0 rounded-lg bg-white px-3 py-2 text-center text-xs text-gray-600 font-semibold border border-gray-300">
+            {filtered.length}
+          </span>
         </div>
 
-        {/* Stats row */}
+        {/* Row 2: stats strip — always single horizontal scroll line */}
         {!cargando && proyectos.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4 justify-center">
-            <MiniStat label="Totaal" value={proyectos.length} color="text-white" />
-            <MiniStat label="In uitvoering" value={proyectos.filter(p => p.estado === 'working').length} color="text-yellow-600" />
-            <MiniStat label="Wacht op betaling" value={proyectos.filter(p => p.estado === 'pending_payment').length} color="text-orange-600" />
-            <MiniStat label="Betaald" value={proyectos.filter(p => p.estado === 'paid').length} color="text-green-700" />
+          <div className="mx-auto flex w-full justify-center overflow-x-auto stats-scroll">
+            <div className="flex min-w-max justify-center gap-1.5 px-0.5">
+            <MiniStat label="Totaal" value={proyectos.length} color="text-gray-800" />
+            <MiniStat label="Uitvoering" value={proyectos.filter(p => p.estado === 'working').length} color="text-yellow-500" />
+            <MiniStat label="Betaling" value={proyectos.filter(p => p.estado === 'pending_payment').length} color="text-orange-500" />
+            <MiniStat label="Betaald" value={proyectos.filter(p => p.estado === 'paid').length} color="text-green-500" />
             <MiniStat
               label="Omzet"
               value={`€${proyectos.filter(p => p.estado === 'paid').reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0).toFixed(0)}`}
-              color="text-green-700"
+              color="text-green-500"
             />
-            {/* Conversion rate: approved / offer_sent */}
             {(() => {
               const sent = proyectos.filter(p => ['offer_sent', 'approved', 'working', 'finished', 'pending_payment', 'paid', 'rejected'].includes(p.estado)).length;
               const approved = proyectos.filter(p => ['approved', 'working', 'finished', 'pending_payment', 'paid'].includes(p.estado)).length;
               const rate = sent > 0 ? Math.round((approved / sent) * 100) : null;
               return rate !== null ? (
-                <MiniStat label="Conversie" value={`${rate}%`} color={rate >= 60 ? 'text-green-700' : rate >= 40 ? 'text-yellow-600' : 'text-red-600'} />
+                <MiniStat label="Conversie" value={`${rate}%`} color={rate >= 60 ? 'text-green-500' : rate >= 40 ? 'text-yellow-500' : 'text-red-500'} />
               ) : null;
             })()}
-            {/* Avg project value (paid) */}
             {(() => {
               const pagados = proyectos.filter(p => p.estado === 'paid' && p.oferta?.precioTotal);
               if (pagados.length === 0) return null;
               const avg = pagados.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0) / pagados.length;
-              return <MiniStat label="Gem. waarde" value={`€${avg.toFixed(0)}`} color="text-[#1d8ab5]" />;
+              return <MiniStat label="Gem." value={`€${avg.toFixed(0)}`} color="text-[#29ace3]" />;
             })()}
-            {/* Pipeline value (offer_sent + approved + working) */}
             {(() => {
               const pipeline = proyectos.filter(p => ['offer_sent', 'approved', 'working'].includes(p.estado));
               const val = pipeline.reduce((s, p) => s + (p.oferta?.precioTotal || 0), 0);
-              return val > 0 ? <MiniStat label="Pipeline" value={`€${val.toFixed(0)}`} color="text-indigo-700" /> : null;
+              return val > 0 ? <MiniStat label="Pipeline" value={`€${val.toFixed(0)}`} color="text-indigo-400" /> : null;
             })()}
+            </div>
           </div>
         )}
-
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-4 justify-center mt-2 mb-2">
-          <div className="relative w-full sm:w-72">
-            <Search size={15} className="absolute left-2.5 top-2.5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Zoek projecten..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-semibold text-gray-400">Sorteren:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="flex-1 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
-            >
-              <option value="fecha-desc">Nieuwste eerst</option>
-              <option value="fecha-asc">Oudste eerst</option>
-              <option value="cliente">Klant A-Z</option>
-            </select>
-          </div>
-
-          {clientesUnicos.length > 0 && (
-          <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-gray-400">Klant:</label>
-              <select
-                value={filtroCliente}
-                onChange={(e) => setFiltroCliente(e.target.value)}
-                className="flex-1 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#29ace3] outline-none"
-              >
-                <option value="">Alle</option>
-                {clientesUnicos.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <span className="text-xs text-gray-400 text-center">{filtered.length} project{filtered.length !== 1 ? 'en' : ''}</span>
         </div>
       </div>
 
@@ -397,7 +393,7 @@ export default function Dashboard() {
           <p className="text-gray-500">Projecten laden...</p>
         </div>
       ) : (
-        <>
+        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
           {/* MOBILE: vertical list grouped by status */}
           <div className="md:hidden flex-1 overflow-y-auto px-3 py-4 space-y-3">
             {filtered.length === 0 && (
@@ -455,45 +451,44 @@ export default function Dashboard() {
             })}
           </div>
 
-          {/* DESKTOP: Kanban board */}
-          <div className="hidden md:flex flex-1 overflow-x-auto overflow-y-hidden justify-center items-start px-4 py-6">
-          <div className="flex gap-5 h-full" style={{ minWidth: 'max-content' }}>
+          {/* DESKTOP: Kanban board — all columns in one row, share available width */}
+          <div className="hidden md:flex flex-1 min-h-0 gap-2 p-2 lg:gap-3 lg:p-3">
             {kanbanStates.map(state => {
               const si = getStatusInfo(state);
               const cards = grouped[state] || [];
               return (
                 <div
                   key={state}
-                  className={`w-72 flex-shrink-0 flex flex-col rounded-xl border ${si.col} overflow-hidden`}
+                  className={`flex-1 min-w-0 flex flex-col rounded-xl border ${si.col} overflow-hidden`}
                 >
                   {/* Column header — fixed, never scrolls */}
-                  <div className="flex-shrink-0 px-3 py-2.5 border-b bg-white/70 backdrop-blur-sm flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${si.bg}`} />
-                      <span className="font-semibold text-gray-800 text-sm">{si.label}</span>
+                  <div className="flex-shrink-0 px-2.5 py-2 border-b bg-white/70 backdrop-blur-sm flex items-center justify-between lg:px-3 lg:py-2.5">
+                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                      <span className={`w-2 h-2 flex-shrink-0 rounded-full ${si.bg}`} />
+                      <span className="font-semibold text-gray-800 text-xs truncate">{si.label}</span>
                     </div>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full text-white ${si.bg}`}>
+                    <span className={`flex-shrink-0 text-xs font-bold px-1.5 py-0.5 rounded-full text-white ml-1 ${si.bg}`}>
                       {cards.length}
                     </span>
                   </div>
 
                   {/* Card list — this column scrolls independently */}
-                  <div className="flex-1 overflow-y-auto min-h-0 p-3 space-y-3">
+                  <div className="flex-1 overflow-y-auto min-h-0 p-2 space-y-2 lg:p-2.5 lg:space-y-2.5">
                     {cards.length === 0 && (
                       <p className="text-gray-400 text-xs text-center py-6 select-none">Geen projecten</p>
                     )}
                     {cards.map(p => (
                       <div
                         key={p._id}
-                        className={`rounded-xl shadow-sm border p-4 hover:shadow-md transition cursor-pointer ${getClientCardTheme(p).card}`}
+                        className={`rounded-xl shadow-sm border p-3 hover:shadow-md transition cursor-pointer lg:p-4 ${getClientCardTheme(p).card}`}
                         onClick={() => navigate(`/proyecto/${p._id}`)}
                       >
-                        <div className="mb-3">
-                          <span className={`inline-flex px-3 py-1 rounded-full font-bold text-sm ${getClientCardTheme(p).chip}`}>
+                        <div className="mb-2.5 lg:mb-3">
+                          <span className={`inline-flex px-2.5 py-1 rounded-full font-bold text-xs lg:px-3 lg:text-sm ${getClientCardTheme(p).chip}`}>
                             {p.usuarioId?.nombre || '—'}
                           </span>
                         </div>
-                        <p className="font-semibold text-gray-900 text-sm mb-2 truncate">
+                        <p className="font-semibold text-gray-900 text-xs mb-2 truncate lg:text-sm">
                           {p.tituloAutomatico || p.nombreCasa}
                         </p>
                         {p.tituloPersonalizado && (
@@ -560,8 +555,7 @@ export default function Dashboard() {
               );
             })}
           </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -569,8 +563,8 @@ export default function Dashboard() {
 
 function MiniStat({ label, value, color }) {
   return (
-    <div className="flex items-center gap-1 rounded px-2 py-1.5" style={{ background: '#2b2b2b' }}>
-      <span className="text-[10px] text-gray-400">{label}:</span>
+    <div className="flex-shrink-0 flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2 py-1.5">
+      <span className="text-[10px] text-gray-500">{label}:</span>
       <span className={`text-xs font-bold ${color}`}>{value}</span>
     </div>
   );
